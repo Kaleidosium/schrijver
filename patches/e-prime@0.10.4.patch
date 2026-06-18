@@ -1,0 +1,14 @@
+diff --git a/e-prime.js b/e-prime.js
+index 5fd2c28..f79409f 100644
+--- a/e-prime.js
++++ b/e-prime.js
+@@ -38,7 +38,8 @@ module.exports = function (text) {
+     var suggestions = [];
+     if (!text || text.length === 0) return suggestions;
+     text = text.replace(/[\u2018\u2019]/g, "'"); // convert smart quotes
+-    while (match = re.exec(text)) {
++    var match;
++    while ((match = re.exec(text))) {
+         var be = match[0].toLowerCase();
+         suggestions.push({
+             index: match.index,

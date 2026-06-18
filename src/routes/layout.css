@@ -22,7 +22,7 @@
 	--space-xl: clamp(3rem, 2.693rem + 1.364vw, 3.75rem);
 	--editor-block-space: clamp(3rem, 2.182rem + 3.636vw, 5rem);
 	--editor-inline-space: clamp(1rem, 0.591rem + 1.818vw, 2rem);
-	--control-size: clamp(2.25rem, 2.148rem + 0.455vw, 2.5rem);
+	--control-size: clamp(1.65rem, 1.609rem + 0.182vw, 1.75rem);
 }
 
 * {
@@ -61,9 +61,6 @@ button {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: var(--space-xs) var(--space-s);
-	padding: var(--space-xs)
-		max(var(--space-s), calc((100vw - var(--shell-max)) / 2 + var(--space-s)));
 	font-family:
 		ui-sans-serif,
 		system-ui,
@@ -75,49 +72,151 @@ button {
 }
 
 .topbar {
-	flex-wrap: wrap;
+	min-height: calc(var(--control-size) + var(--space-2xs));
+	padding: var(--space-3xs)
+		max(var(--space-s), calc((100vw - var(--shell-max)) / 2 + var(--space-s)));
 	border-bottom: 1px solid var(--rule);
 	background: rgba(244, 246, 242, 0.92);
 	backdrop-filter: blur(14px);
 }
 
-.brand {
-	color: var(--ink);
-	font-weight: 700;
-	letter-spacing: 0;
-	text-decoration: none;
-}
-
 .actions {
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
-	gap: var(--space-2xs);
-	margin-left: auto;
+	width: 100%;
+	gap: 0.125rem;
 	flex-wrap: wrap;
 }
 
-.actions button {
+.toolbar-spacer {
+	flex: 1 1 auto;
+	min-width: var(--space-xs);
+}
+
+.toolbar-button {
 	min-height: var(--control-size);
-	padding: 0 var(--space-xs);
+	padding: 0 var(--space-2xs);
 	border: 1px solid transparent;
-	border-radius: 6px;
+	border-radius: 4px;
 	background: transparent;
 	color: var(--muted);
 	cursor: pointer;
+	font-size: 0.78rem;
+	line-height: 1;
 }
 
-.actions button:hover,
-.actions button:focus-visible,
-.actions button.active {
+.toolbar-button:hover,
+.toolbar-button:focus-visible,
+.toolbar-button[data-mode='on'],
+.toolbar-button[data-state='on'] {
 	border-color: var(--rule);
 	background: var(--paper);
 	color: var(--accent-ink);
 }
 
-.actions button:focus-visible {
+.toolbar-button:focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;
+}
+
+@media (max-width: 42rem) {
+	.topbar {
+		padding-inline: var(--space-2xs);
+	}
+
+	.actions {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.actions::-webkit-scrollbar {
+		display: none;
+	}
+
+	.toolbar-spacer {
+		display: none;
+	}
+
+	.toolbar-button {
+		flex: 0 0 auto;
+		padding: 0 var(--space-3xs);
+		font-size: 0.72rem;
+	}
+}
+
+.feature-menu {
+	z-index: 50;
+	min-width: 13.5rem;
+	max-width: calc(100vw - 1rem);
+	padding: var(--space-3xs);
+	border: 1px solid var(--rule);
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--paper) 96%, var(--page));
+	box-shadow: 0 0.5rem 1.5rem rgba(34, 35, 31, 0.1);
+	font-family:
+		ui-sans-serif,
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		sans-serif;
+	font-size: 0.86rem;
+	color: var(--ink);
+}
+
+.feature-menu-item {
+	display: flex;
+	min-height: 1.9rem;
+	align-items: center;
+	gap: var(--space-2xs);
+	padding: 0 var(--space-2xs);
+	border-radius: 4px;
+	outline: none;
+	user-select: none;
+	cursor: default;
+}
+
+.feature-menu-item[data-highlighted] {
+	background: color-mix(in srgb, var(--accent) 11%, transparent);
+}
+
+.feature-menu-item[data-disabled] {
+	opacity: 0.4;
+}
+
+.feature-menu-check {
+	width: 1.2rem;
+	flex: 0 0 1.2rem;
+	color: var(--ink);
+	font-weight: 700;
+	text-align: center;
+}
+
+.feature-menu-separator {
+	height: 1px;
+	margin: var(--space-3xs) var(--space-2xs);
+	background: var(--rule);
+}
+
+.syntax-adjective {
+	color: #8a6500;
+}
+
+.syntax-noun {
+	color: #b84a4a;
+}
+
+.syntax-adverb {
+	color: #7657a6;
+}
+
+.syntax-verb {
+	color: #2f6db5;
+}
+
+.syntax-conjunction {
+	color: #2f7d4a;
 }
 
 .writing-surface {
@@ -133,7 +232,10 @@ button {
 
 .statusbar {
 	min-height: var(--space-xl);
+	gap: var(--space-xs) var(--space-s);
 	flex-wrap: wrap;
+	padding: var(--space-xs)
+		max(var(--space-s), calc((100vw - var(--shell-max)) / 2 + var(--space-s)));
 	border-top: 1px solid var(--rule);
 	background: rgba(244, 246, 242, 0.92);
 	font-size: 0.82rem;

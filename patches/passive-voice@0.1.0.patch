@@ -1,0 +1,14 @@
+diff --git a/passive.js b/passive.js
+index 9bd2334..074630b 100644
+--- a/passive.js
++++ b/passive.js
+@@ -171,7 +171,8 @@ module.exports = function (text, options) {
+           (byRe || constructByRe()) : re; // not sorry
+ 
+   var suggestions = [];
+-  while (match = r.exec(text)) {
++  var match;
++  while ((match = r.exec(text))) {
+     if (exceptions.indexOf(match[2].toLowerCase()) === -1) {
+       suggestions.push({
+         index: match.index,
