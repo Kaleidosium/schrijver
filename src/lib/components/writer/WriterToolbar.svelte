@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { DropdownMenu, Toolbar } from 'bits-ui';
-	import type { Attachment } from 'svelte/attachments';
 	import type { FocusScope, PartOfSpeech, ReviewCheck } from './writer-types';
 
 	interface SyntaxOption {
@@ -15,20 +14,27 @@
 	}
 
 	interface Props {
+		readonly addNoteDisabled: boolean;
 		readonly focusMode: boolean;
 		readonly focusScope: FocusScope;
 		readonly hemingwayMode: boolean;
-		readonly onExport: () => void;
+		readonly notesOpen: boolean;
+		readonly onAddNote: () => void;
 		readonly onFocusModeChange: (enabled: boolean) => void;
 		readonly onFocusScopeChange: (scope: string) => void;
+		readonly onGuideOpen: () => void;
 		readonly onHemingwayModeChange: (enabled: boolean) => void;
-		readonly onImport: (file: File) => Promise<void>;
+		readonly onNotesOpenChange: (enabled: boolean) => void;
+		readonly onOpen: () => Promise<void>;
+		readonly onOutlineOpenChange: (enabled: boolean) => void;
 		readonly onReviewCheckChange: (check: ReviewCheck, enabled: boolean) => Promise<void>;
 		readonly onReviewModeChange: (enabled: boolean) => Promise<void>;
+		readonly onSave: () => Promise<void>;
 		readonly onSearch: () => void;
 		readonly onSyntaxModeChange: (enabled: boolean) => Promise<void>;
 		readonly onSyntaxPartChange: (part: PartOfSpeech, enabled: boolean) => void;
 		readonly onTypewriterModeChange: (enabled: boolean) => void;
+		readonly outlineOpen: boolean;
 		readonly reviewChecks: Record<ReviewCheck, boolean>;
 		readonly reviewMode: boolean;
 		readonly syntaxMode: boolean;
@@ -55,55 +61,44 @@
 		{ check: 'eprime', label: 'E-Prime' }
 	];
 
-	let importInput: HTMLInputElement | undefined;
 	const {
+		addNoteDisabled,
 		focusMode,
 		focusScope,
 		hemingwayMode,
-		onExport,
+		notesOpen,
+		onAddNote,
 		onFocusModeChange,
 		onFocusScopeChange,
+		onGuideOpen,
 		onHemingwayModeChange,
-		onImport,
+		onNotesOpenChange,
+		onOpen,
+		onOutlineOpenChange,
 		onReviewCheckChange,
 		onReviewModeChange,
+		onSave,
 		onSearch,
 		onSyntaxModeChange,
 		onSyntaxPartChange,
 		onTypewriterModeChange,
+		outlineOpen,
 		reviewChecks,
 		reviewMode,
 		syntaxMode,
 		syntaxParts,
 		typewriterMode
 	}: Props = $props();
-
-	const attachImportInput: Attachment<HTMLInputElement> = (input) => {
-		importInput = input;
-
-		return () => {
-			importInput = undefined;
-		};
-	};
-
-	function chooseImportFile(): void {
-		importInput?.click();
-	}
-
-	async function importFile(event: Event): Promise<void> {
-		const input = event.currentTarget as HTMLInputElement;
-		const file = input.files?.[0];
-
-		if (file) {
-			await onImport(file);
-		}
-
-		input.value = '';
-	}
 </script>
 
 <header class="topbar" aria-label="Writing controls">
 	<Toolbar.Root class="actions" loop={false}>
+		<Toolbar.Button class="toolbar-button" type="button" onclick={() => void onOpen()}>
+			Open
+		</Toolbar.Button>
+		<Toolbar.Button class="toolbar-button" type="button" onclick={() => void onSave()}>
+			Save
+		</Toolbar.Button>
 		<span class="toolbar-spacer"></span>
 		<Toolbar.Button class="toolbar-button" type="button" onclick={onSearch}>Search</Toolbar.Button>
 		<DropdownMenu.Root>
@@ -258,17 +253,34 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={chooseImportFile}>
-			Import
+		<Toolbar.Button
+			aria-pressed={outlineOpen}
+			class="toolbar-button"
+			data-mode={outlineOpen ? 'on' : 'off'}
+			type="button"
+			onclick={() => onOutlineOpenChange(!outlineOpen)}
+		>
+			Outline
 		</Toolbar.Button>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={onExport}>Export</Toolbar.Button>
+		<Toolbar.Button
+			aria-pressed={notesOpen}
+			class="toolbar-button"
+			data-mode={notesOpen ? 'on' : 'off'}
+			type="button"
+			onclick={() => onNotesOpenChange(!notesOpen)}
+		>
+			Notes
+		</Toolbar.Button>
+		<Toolbar.Button
+			class="toolbar-button"
+			disabled={addNoteDisabled}
+			type="button"
+			onclick={onAddNote}
+		>
+			Add Note
+		</Toolbar.Button>
+		<Toolbar.Button class="toolbar-button" type="button" onclick={onGuideOpen}>
+			Shortcuts
+		</Toolbar.Button>
 	</Toolbar.Root>
-	<input
-		{@attach attachImportInput}
-		accept=".md,.markdown,.txt,text/markdown,text/plain"
-		aria-label="Import Markdown or text"
-		class="visually-hidden"
-		type="file"
-		onchange={(event) => void importFile(event)}
-	/>
 </header>

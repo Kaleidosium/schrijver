@@ -25,6 +25,43 @@ export const markdownHighlightStyle = HighlightStyle.define([
 	}
 ]);
 
+export const writerNoteTheme = EditorView.theme({
+	'&': {
+		width: '100%',
+		minHeight: '4.5rem',
+		backgroundColor: 'transparent',
+		color: 'var(--ink)',
+		fontSize: '0.82rem'
+	},
+	'&.cm-focused': {
+		boxShadow: 'inset 0 -1px var(--accent)',
+		outline: 'none'
+	},
+	'.cm-scroller': {
+		overflow: 'auto',
+		fontFamily: 'monospace',
+		lineHeight: '1.45'
+	},
+	'.cm-content': {
+		minHeight: '4.5rem',
+		padding: '0',
+		caretColor: 'transparent'
+	},
+	'.cm-line': {
+		padding: '0'
+	},
+	'.cm-selectionBackground, .cm-content ::selection': {
+		backgroundColor: 'var(--selection)'
+	},
+	'.cm-cursor': {
+		borderLeft: '1px solid var(--accent)',
+		borderLeftColor: 'var(--accent)'
+	},
+	'.cm-placeholder': {
+		color: 'color-mix(in srgb, var(--muted) 65%, transparent)'
+	}
+});
+
 export const writerTheme = EditorView.theme({
 	'&': {
 		height: '100%',
@@ -301,7 +338,7 @@ export const writerTheme = EditorView.theme({
 			gridRow: '3'
 		}
 	},
-	'.cm-searchMatch, .cm-selectionMatch': {
+	'.cm-searchMatch': {
 		backgroundColor: 'color-mix(in srgb, var(--mark) 24%, transparent)'
 	},
 	'.cm-searchMatch.cm-searchMatch-selected': {

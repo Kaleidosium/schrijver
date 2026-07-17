@@ -3,18 +3,15 @@
         defaultKeymap,
         history,
         historyKeymap,
+        insertNewlineAndIndent,
     } from "@codemirror/commands";
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { syntaxHighlighting } from "@codemirror/language";
     import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
-    import {
-        highlightSelectionMatches,
-        openSearchPanel,
-        search,
-        searchKeymap,
-    } from "@codemirror/search";
+    import { openSearchPanel, search, searchKeymap } from "@codemirror/search";
     import {
         EditorState,
+        Prec,
         RangeSetBuilder,
         StateEffect,
         StateField,
@@ -37,23 +34,78 @@
         maskMarkdownForProse,
         type TextRange,
     } from "$lib/writing";
+    import {
+        emptySidecar,
+        fallbackFileNames,
+        hashText,
+        normalizeMarkdownFileName,
+        outlineItems,
+        parseRecovery,
+        parseSidecar,
+        resolveTextSelector,
+        sidecarName,
+        type OutlineItem,
+        type RecoveryJournal,
+        type WriterNote,
+        type WriterSidecar,
+    } from "$lib/writer-document";
+    import { Dialog } from "bits-ui";
+    import { createHotkeys } from "@tanstack/svelte-hotkeys";
+    import { untrack } from "svelte";
     import type { Attachment } from "svelte/attachments";
     import {
         markdownHighlightStyle,
         writerTheme,
     } from "./writer-editor-theme";
     import { installSearchIcons } from "./writer-search-icons";
+    import {
+        APP_SHORTCUTS,
+        insertParagraphBreak,
+        paragraphNavigationKeymap,
+        wrapSelection,
+    } from "./writer-commands";
+    import WriterPanels from "./WriterPanels.svelte";
     import WriterStatus from "./WriterStatus.svelte";
     import WriterToolbar from "./WriterToolbar.svelte";
     import type {
         FocusScope,
+        NoteView,
         PartOfSpeech,
         ReviewCheck,
     } from "./writer-types";
 
-    const STORAGE_KEY = "schrijver:draft:v1";
+    const LEGACY_STORAGE_KEY = "schrijver:draft:v1";
+    const RECOVERY_KEY = "schrijver:recovery:v1";
+    const RECOVERY_DELAY = 600;
+    const DEFAULT_FILE_NAME = "schrijver-draft.md";
     type NlpParser = typeof import("compromise").default;
     type WriteGood = typeof import("write-good").default;
+    interface PickerWindow extends Window {
+        showDirectoryPicker?: (options?: {
+            mode?: "read" | "readwrite";
+        }) => Promise<FileSystemDirectoryHandle>;
+    }
+    interface FileSystemPermissionDescriptor {
+        readonly mode?: "read" | "readwrite";
+    }
+    interface PermissionedFileSystemHandle {
+        queryPermission?: (
+            descriptor?: FileSystemPermissionDescriptor,
+        ) => Promise<PermissionState>;
+        requestPermission?: (
+            descriptor?: FileSystemPermissionDescriptor,
+        ) => Promise<PermissionState>;
+    }
+    interface OpenedFile {
+        readonly file: File;
+    }
+    interface ManuscriptCandidate {
+        readonly name: string;
+        readonly label: string;
+        readonly modifiedAt: number;
+        readonly markdownHandle: FileSystemFileHandle;
+        readonly sidecarHandle?: FileSystemFileHandle;
+    }
     interface CompromiseTerm {
         offset?: { start: number; length: number };
         tags?: string[];
@@ -107,14 +159,16 @@
     });
     const typewriterScroll = EditorState.transactionExtender.of(
         (transaction) => {
+            const cursorMove =
+                transaction.selection !== undefined &&
+                transaction.newSelection.ranges.every((range) => range.empty);
+            const enablingTypewriter = transaction.effects.some(
+                (effect) => effect.is(setTypewriterMode) && effect.value,
+            );
+
             if (
                 !transaction.state.field(typewriterModeField) ||
-                (!transaction.docChanged &&
-                    transaction.selection === undefined &&
-                    !transaction.effects.some(
-                        (effect) =>
-                            effect.is(setTypewriterMode) && effect.value,
-                    ))
+                (!transaction.docChanged && !cursorMove && !enablingTypewriter)
             ) {
                 return null;
             }
@@ -232,7 +286,7 @@
         "Verb",
         "Conjunction",
     ];
-
+    const refreshNotes = StateEffect.define<void>();
     class HeadingMarkWidget extends WidgetType {
         readonly marker: string;
 
@@ -264,6 +318,26 @@
 
     let editor: EditorView | undefined;
     let draft = $state("");
+    let fileName = $state(DEFAULT_FILE_NAME);
+    let projectId = $state("");
+    let baselineHash = $state<string | undefined>();
+    let dirty = $state(false);
+    let journalSaved = $state(false);
+    let saveState = $state<
+        "idle" | "recovered" | "saving" | "saved" | "downloaded" | "error"
+    >("idle");
+    let recoveryAvailable = $state(true);
+    let recoveryRestored = $state(false);
+    let storageConflict = $state(false);
+    let outlineOpen = $state(false);
+    let notesOpen = $state(false);
+    let guideOpen = $state(false);
+    let activeNoteId = $state<string | undefined>();
+    let autofocusNoteId = $state<string | undefined>();
+    let hasTextSelection = $state(false);
+    let outline = $state.raw<OutlineItem[]>([]);
+    let notes = $state<WriterNote[]>([]);
+    let noteTops = $state<Record<string, number>>({});
     let focusMode = $state(false);
     let focusScope = $state<FocusScope>("all");
     let typewriterMode = $state(false);
@@ -288,9 +362,49 @@
         cliches: true,
         eprime: false,
     });
-    const saveLabel = "Saved locally";
+    const saveLabel = $derived.by(() => {
+        if (!recoveryAvailable && dirty) {
+            return "Recovery unavailable";
+        }
+
+        if (storageConflict) {
+            return "Newer recovery in another tab";
+        }
+
+        if (saveState === "saving") {
+            return "Saving…";
+        }
+
+        if (saveState === "downloaded") {
+            return "Downloaded; recovery retained";
+        }
+
+        if (saveState === "error") {
+            return "Save failed; recovery retained";
+        }
+
+        if (dirty) {
+            return journalSaved
+                ? "Recovery saved locally"
+                : "Saving recovery…";
+        }
+
+        return saveState === "saved" ? `Saved to ${fileNameInputValue()}` : "No file selected";
+    });
     let nlpParser: NlpParser | undefined;
     let writeGoodRunner: WriteGood | undefined;
+    let directoryHandle: FileSystemDirectoryHandle | undefined;
+    let markdownHandle: FileSystemFileHandle | undefined;
+    let sidecarHandle: FileSystemFileHandle | undefined;
+    let pendingOpenDirectory: FileSystemDirectoryHandle | undefined;
+    let manuscriptCandidates = $state.raw<ManuscriptCandidate[]>([]);
+    let manuscriptDialogOpen = $state(false);
+    let manuscriptOpening = $state(false);
+    let fallbackInput: HTMLInputElement | undefined;
+    let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
+    let recoveryRevision = 0;
+    let lastFallbackSaveTime = 0;
+    let loadingProject = false;
     const wordCount = $derived(countWords(draft));
     const characterCount = $derived(draft.length);
     const stats = $derived(
@@ -298,14 +412,41 @@
             characterCount === 1 ? "character" : "characters"
         }`,
     );
-    const attachEditor: Attachment<HTMLDivElement> = (editorElement) => {
-        const initialDraft = localStorage.getItem(STORAGE_KEY) ?? "";
+    const noteViews = $derived.by(buildNoteViews);
+    const attachEditor: Attachment<HTMLDivElement> = (editorElement) =>
+        untrack(() => {
+        const recovery = loadInitialRecovery();
+        const initialDraft = recovery?.markdown ?? "";
+        const initialContext = recovery?.context;
 
         draft = initialDraft;
+        fileName = recovery?.fileName ?? DEFAULT_FILE_NAME;
+        projectId =
+            recovery?.sidecar.projectId ?? emptySidecar(fileName).projectId;
+        notes = recovery?.sidecar.notes.map((note) => ({ ...note })) ?? [];
+        baselineHash = recovery?.baselineHash;
+        recoveryRevision = recovery?.revision ?? 0;
+        recoveryRestored = Boolean(recovery);
+        dirty = Boolean(recovery);
+        journalSaved = Boolean(recovery);
+        saveState = recovery ? "recovered" : "idle";
+        outlineOpen = initialContext?.outlineOpen ?? false;
+        notesOpen = initialContext?.notesOpen ?? false;
+        activeNoteId = initialContext?.activeNoteId;
         editor = new EditorView({
             parent: editorElement,
             state: EditorState.create({
                 doc: initialDraft,
+                selection: {
+                    anchor: clampPosition(
+                        initialContext?.anchor ?? initialDraft.length,
+                        initialDraft.length,
+                    ),
+                    head: clampPosition(
+                        initialContext?.head ?? initialDraft.length,
+                        initialDraft.length,
+                    ),
+                },
                 extensions: [
                     history(),
                     markdown({
@@ -315,9 +456,6 @@
                     }),
                     syntaxHighlighting(markdownHighlightStyle),
                     search({ top: true }),
-                    highlightSelectionMatches({
-                        highlightWordAroundCursor: true,
-                    }),
                     linter(writeGoodDiagnostics, { delay: 900 }),
                     writerTheme,
                     focusScopeField,
@@ -330,6 +468,8 @@
                     focusPlugin,
                     syntaxPlugin,
                     headingMarkPlugin,
+                    notePlugin,
+                    notePositionPlugin,
                     EditorView.lineWrapping,
                     EditorView.contentAttributes.of({
                         "aria-label": "Markdown draft",
@@ -337,13 +477,33 @@
                         spellcheck: "true",
                     }),
                     EditorView.updateListener.of((update) => {
-                        if (!update.docChanged) {
-                            return;
+                        if (update.docChanged) {
+                            draft = update.state.doc.toString();
+                            remapNotes(update.startState, update.state, (position, association) =>
+                                update.changes.mapPos(position, association),
+                            );
+                            outline = outlineItems(update.state);
+
+                            if (!loadingProject) {
+                                markDirty();
+                            }
                         }
 
-                        draft = update.state.doc.toString();
-                        localStorage.setItem(STORAGE_KEY, draft);
+                        if (update.selectionSet) {
+                            hasTextSelection = !update.state.selection.main.empty;
+                            scheduleRecovery();
+                        }
                     }),
+                    Prec.highest(
+                        keymap.of([
+                            ...paragraphNavigationKeymap,
+                            { key: "Enter", run: insertParagraphBreak },
+                            {
+                                key: "Shift-Enter",
+                                run: insertNewlineAndIndent,
+                            },
+                        ]),
+                    ),
                     keymap.of([
                         {
                             key: "Mod-z",
@@ -357,6 +517,18 @@
                             key: "Mod-y",
                             run: (view) => view.state.field(hemingwayModeField),
                         },
+                        {
+                            key: "Mod-b",
+                            run: (view) => wrapSelection(view, "**", "**"),
+                        },
+                        {
+                            key: "Mod-i",
+                            run: (view) => wrapSelection(view, "*", "*"),
+                        },
+                        {
+                            key: "Mod-k",
+                            run: (view) => wrapSelection(view, "[", "]()"),
+                        },
                         ...searchKeymap,
                         ...defaultKeymap,
                         ...historyKeymap,
@@ -365,14 +537,70 @@
             }),
         });
         const removeSearchIcons = installSearchIcons(editor.dom);
+
+        outline = outlineItems(editor.state);
+        hasTextSelection = !editor.state.selection.main.empty;
+        requestAnimationFrame(() => {
+            const scroller = editor?.scrollDOM;
+
+            if (scroller && initialContext) {
+                scroller.scrollTop = initialContext.scrollTop;
+            }
+
+            updateNotePositions();
+        });
         editor.focus();
 
+            return () => {
+                flushRecovery();
+                removeSearchIcons();
+                editor?.destroy();
+                editor = undefined;
+            };
+        });
+    const attachFallbackInput: Attachment<HTMLInputElement> = (input) => {
+        fallbackInput = input;
+
         return () => {
-            removeSearchIcons();
-            editor?.destroy();
-            editor = undefined;
+            fallbackInput = undefined;
         };
     };
+
+    createHotkeys(
+        [
+            {
+                hotkey: APP_SHORTCUTS.open,
+                callback: () => void openProject(),
+            },
+            {
+                hotkey: APP_SHORTCUTS.save,
+                callback: () => void saveProject(),
+            },
+            {
+                hotkey: APP_SHORTCUTS.focus,
+                callback: () => setFocusModeValue(!focusMode),
+            },
+            {
+                hotkey: APP_SHORTCUTS.addNote,
+                callback: addNote,
+            },
+            {
+                hotkey: APP_SHORTCUTS.outline,
+                callback: () => setOutlineOpen(!outlineOpen),
+            },
+            {
+                hotkey: APP_SHORTCUTS.review,
+                callback: () => void setReviewModeValue(!reviewMode),
+            },
+            {
+                hotkey: APP_SHORTCUTS.guide,
+                callback: () => {
+                    guideOpen = !guideOpen;
+                },
+            },
+        ],
+        { ignoreInputs: false, preventDefault: true, stopPropagation: true },
+    );
 
     function setFocusScopeValue(nextFocusScope: string): void {
         if (!focusMode) {
@@ -389,6 +617,7 @@
 
         focusScope = nextFocusScope;
         editor?.dispatch({ effects: setFocusScope.of(focusScope) });
+        scheduleRecovery();
         editor?.focus();
     }
 
@@ -399,6 +628,7 @@
 
         typewriterMode = nextTypewriterMode;
         editor?.dispatch({ effects: setTypewriterMode.of(typewriterMode) });
+        scheduleRecovery();
         editor?.focus();
     }
 
@@ -410,6 +640,7 @@
                 setTypewriterMode.of(focusMode && typewriterMode),
             ],
         });
+        scheduleRecovery();
         editor?.focus();
     }
 
@@ -430,6 +661,7 @@
             editor.dispatch({ effects: setHemingwayMode.of(false) });
         }
 
+        scheduleRecovery();
         editor.focus();
     }
 
@@ -442,6 +674,7 @@
             editor?.dispatch({ effects: setSyntaxMode.of(syntaxMode) });
         }
 
+        scheduleRecovery();
         editor?.focus();
     }
 
@@ -458,6 +691,7 @@
         }
 
         reviewMode = nextReviewMode;
+        scheduleRecovery();
 
         if (!reviewMode) {
             editor.dispatch(setDiagnostics(editor.state, []));
@@ -480,6 +714,7 @@
         }
 
         syntaxParts[part] = checked;
+        scheduleRecovery();
         editor?.dispatch({ effects: setSyntaxMode.of(syntaxMode) });
         editor?.focus();
     }
@@ -493,6 +728,7 @@
         }
 
         reviewChecks[check] = checked;
+        scheduleRecovery();
 
         if (reviewMode && editor) {
             editor.dispatch(
@@ -505,32 +741,374 @@
         }
     }
 
-    async function importDraft(file: File): Promise<void> {
-        if (draft.trim().length > 0 && !confirm("Replace the current draft?")) {
+    function setOutlineOpen(enabled: boolean): void {
+        outlineOpen = enabled;
+        scheduleRecovery();
+    }
+
+    function setNotesOpen(enabled: boolean): void {
+        notesOpen = enabled;
+        scheduleRecovery();
+        requestAnimationFrame(updateNotePositions);
+    }
+
+    async function openProject(): Promise<void> {
+        const picker = window as PickerWindow;
+
+        if (!picker.showDirectoryPicker) {
+            fallbackInput?.click();
             return;
         }
 
-        replaceDraft(await file.text());
+        try {
+            const nextDirectory = await picker.showDirectoryPicker({
+                mode: "read",
+            });
+            const candidates = await manuscriptCandidatesIn(nextDirectory);
+
+            if (candidates.length === 0) {
+                alert("This folder does not contain a Markdown file.");
+                return;
+            }
+
+            if (candidates.length === 1) {
+                const candidate = candidates[0];
+                if (candidate) {
+                    await openManuscriptCandidate(nextDirectory, candidate);
+                }
+                return;
+            }
+
+            pendingOpenDirectory = nextDirectory;
+            manuscriptCandidates = candidates;
+            manuscriptDialogOpen = true;
+        } catch (error) {
+            if (!isAbortError(error)) {
+                saveState = "error";
+                alert(error instanceof Error ? error.message : "Could not open the folder.");
+            }
+        }
     }
 
-    function exportDraft(): void {
-        const url = URL.createObjectURL(
-            new Blob([draft], { type: "text/markdown;charset=utf-8" }),
+    async function openFallbackFiles(event: Event): Promise<void> {
+        const input = event.currentTarget as HTMLInputElement;
+        const openedFiles = [...(input.files ?? [])].map((file) => ({ file }));
+
+        input.value = "";
+        await openFiles(openedFiles);
+    }
+
+    async function openFiles(openedFiles: readonly OpenedFile[]): Promise<void> {
+        const markdownFile = openedFiles.find((openedFile) =>
+            /\.(?:md|markdown|txt)$/i.test(openedFile.file.name),
         );
+
+        if (!markdownFile) {
+            alert("Choose a Markdown file. Select its matching Writer’s Notes file too if you have one.");
+            return;
+        }
+
+        try {
+            const notesFile = openedFiles.find(
+                (openedFile) =>
+                    openedFile.file.name === sidecarName(markdownFile.file.name),
+            );
+            const nextSidecar = notesFile
+                ? parseSidecar(
+                      JSON.parse(await notesFile.file.text()) as unknown,
+                      markdownFile.file.name,
+                  )
+                : emptySidecar(markdownFile.file.name);
+
+            if (
+                !loadDiskProject(
+                    await markdownFile.file.text(),
+                    markdownFile.file.name,
+                    nextSidecar,
+                )
+            ) {
+                return;
+            }
+
+            directoryHandle = undefined;
+            markdownHandle = undefined;
+            sidecarHandle = undefined;
+        } catch (error) {
+            saveState = "error";
+            alert(error instanceof Error ? error.message : "Could not open the file.");
+        }
+    }
+
+    async function manuscriptCandidatesIn(
+        directory: FileSystemDirectoryHandle,
+    ): Promise<ManuscriptCandidate[]> {
+        const candidates: ManuscriptCandidate[] = [];
+
+        for await (const [name, handle] of directory.entries()) {
+            if (
+                handle.kind !== "file" ||
+                !/\.(?:md|markdown|txt)$/i.test(name)
+            ) {
+                continue;
+            }
+
+            const file = await handle.getFile();
+            const sidecarHandle = await existingFileHandle(
+                directory,
+                sidecarName(name),
+            );
+
+            candidates.push({
+                name,
+                label: manuscriptLabel(name),
+                modifiedAt: file.lastModified,
+                markdownHandle: handle,
+                ...(sidecarHandle ? { sidecarHandle } : {}),
+            });
+        }
+
+        return candidates.sort(
+            (left, right) =>
+                right.modifiedAt - left.modifiedAt ||
+                left.name.localeCompare(right.name),
+        );
+    }
+
+    async function chooseManuscriptCandidate(
+        candidate: ManuscriptCandidate,
+    ): Promise<void> {
+        if (!pendingOpenDirectory || manuscriptOpening) {
+            return;
+        }
+
+        manuscriptOpening = true;
+
+        try {
+            if (await openManuscriptCandidate(pendingOpenDirectory, candidate)) {
+                closeManuscriptDialog();
+            }
+        } catch (error) {
+            saveState = "error";
+            alert(error instanceof Error ? error.message : "Could not open the file.");
+        } finally {
+            manuscriptOpening = false;
+        }
+    }
+
+    async function openManuscriptCandidate(
+        nextDirectory: FileSystemDirectoryHandle,
+        candidate: ManuscriptCandidate,
+    ): Promise<boolean> {
+        const markdownText = await (await candidate.markdownHandle.getFile()).text();
+        const nextSidecar = candidate.sidecarHandle
+            ? parseSidecar(
+                  JSON.parse(
+                      await (await candidate.sidecarHandle.getFile()).text(),
+                  ) as unknown,
+                  candidate.name,
+              )
+            : emptySidecar(candidate.name);
+
+        if (!loadDiskProject(markdownText, candidate.name, nextSidecar)) {
+            return false;
+        }
+
+        directoryHandle = nextDirectory;
+        markdownHandle = candidate.markdownHandle;
+        sidecarHandle = candidate.sidecarHandle;
+        return true;
+    }
+
+    function handleManuscriptDialogOpenChange(open: boolean): void {
+        manuscriptDialogOpen = open;
+
+        if (!open && !manuscriptOpening) {
+            closeManuscriptDialog();
+        }
+    }
+
+    function closeManuscriptDialog(): void {
+        manuscriptDialogOpen = false;
+        manuscriptCandidates = [];
+        pendingOpenDirectory = undefined;
+    }
+
+    function loadDiskProject(
+        markdownText: string,
+        nextFileName: string,
+        nextSidecar: WriterSidecar,
+    ): boolean {
+        const diskHash = hashText(markdownText);
+        const reconnectingRecovery =
+            dirty &&
+            baselineHash === diskHash &&
+            (projectId === nextSidecar.projectId || fileName === nextFileName);
+
+        if (reconnectingRecovery) {
+            fileName = nextFileName;
+            saveState = "recovered";
+            recoveryRestored = false;
+            return true;
+        }
+
+        if (dirty && draft.trim() && !confirm("Replace the recovered unsaved work?")) {
+            return false;
+        }
+
+        loadingProject = true;
+        replaceDraft(markdownText);
+        loadingProject = false;
+        fileName = nextFileName;
+        projectId = nextSidecar.projectId;
+        notes = nextSidecar.notes.map((note) => ({ ...note }));
+        baselineHash = diskHash;
+        dirty = false;
+        journalSaved = false;
+        recoveryRestored = false;
+        storageConflict = false;
+        saveState = "saved";
+        clearRecovery();
+        refreshNoteDisplay();
+        return true;
+    }
+
+    async function saveProject(): Promise<void> {
+        const picker = window as PickerWindow;
+
+        if (!markdownHandle && picker.showDirectoryPicker) {
+            try {
+                const nextDirectory = await picker.showDirectoryPicker({
+                    mode: "readwrite",
+                });
+                const requestedName = prompt("File name", fileNameInputValue());
+
+                if (!requestedName) {
+                    return;
+                }
+
+                const nextFileName = normalizeMarkdownFileName(requestedName);
+
+                directoryHandle = nextDirectory;
+                fileName = nextFileName;
+                markdownHandle = await nextDirectory.getFileHandle(nextFileName, {
+                    create: true,
+                });
+                sidecarHandle = await nextDirectory.getFileHandle(
+                    sidecarName(nextFileName),
+                    { create: true },
+                );
+            } catch (error) {
+                if (!isAbortError(error)) {
+                    saveState = "error";
+                }
+                return;
+            }
+        }
+
+        if (!markdownHandle) {
+            downloadProject();
+            return;
+        }
+
+        if (!(await ensureReadWritePermission(directoryHandle ?? markdownHandle))) {
+            markDirty();
+            saveState = "error";
+            alert("Allow folder editing to save the manuscript and Writer’s Notes.");
+            return;
+        }
+
+        saveState = "saving";
+
+        try {
+            sidecarHandle ??= await directoryHandle?.getFileHandle(
+                sidecarName(fileName),
+                { create: true },
+            );
+
+            if (!sidecarHandle) {
+                throw new Error("Could not create the Writer’s Notes file.");
+            }
+
+            await writeFile(markdownHandle, draft);
+            await writeFile(
+                sidecarHandle,
+                `${JSON.stringify(currentSidecar(), null, 2)}\n`,
+            );
+
+            baselineHash = hashText(draft);
+            dirty = false;
+            journalSaved = false;
+            recoveryRestored = false;
+            saveState = "saved";
+            clearRecovery();
+        } catch {
+            markDirty();
+            saveState = "error";
+        }
+    }
+
+    function downloadProject(): void {
+        const requestedName = prompt("File name", fileNameInputValue());
+
+        if (!requestedName) {
+            return;
+        }
+
+        try {
+            lastFallbackSaveTime = Math.max(Date.now(), lastFallbackSaveTime + 1);
+            const names = fallbackFileNames(
+                requestedName,
+                new Date(lastFallbackSaveTime),
+            );
+
+            downloadFile(names.markdown, draft, "text/markdown;charset=utf-8");
+            downloadFile(
+                names.sidecar,
+                `${JSON.stringify(currentSidecar(names.markdown), null, 2)}\n`,
+                "application/json;charset=utf-8",
+            );
+            saveState = "downloaded";
+            dirty = true;
+            journalSaved = false;
+            flushRecovery();
+        } catch (error) {
+            saveState = "error";
+            alert(error instanceof Error ? error.message : "Could not name the download.");
+        }
+    }
+
+    function downloadFile(name: string, content: string, type: string): void {
+        const url = URL.createObjectURL(new Blob([content], { type }));
         const link = document.createElement("a");
 
         link.href = url;
-        link.download = "schrijver-draft.md";
+        link.download = name;
         document.body.append(link);
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
     }
 
+    function fileNameInputValue(): string {
+        return fileName.replace(/\.(?:md|markdown|txt)$/i, "");
+    }
+
+    function manuscriptLabel(name: string): string {
+        return name.replace(/\.(?:md|markdown|txt)$/i, "");
+    }
+
+    function formatModified(timestamp: number): string {
+        return new Intl.DateTimeFormat(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+        }).format(timestamp);
+    }
+
     function replaceDraft(text: string): void {
         if (!editor) {
             draft = text;
-            localStorage.setItem(STORAGE_KEY, text);
             return;
         }
 
@@ -539,6 +1117,472 @@
             filter: false,
             selection: { anchor: text.length },
         });
+    }
+
+    function addNote(): void {
+        const selection = editor?.state.selection.main;
+
+        if (!editor || !selection || selection.empty) {
+            alert("Select the text you want to attach the Writer’s Note to.");
+            return;
+        }
+
+        const now = new Date().toISOString();
+        const note: WriterNote = {
+            id: crypto.randomUUID(),
+            body: "",
+            createdAt: now,
+            updatedAt: now,
+            resolved: false,
+            selection: {
+                from: selection.from,
+                to: selection.to,
+                quote: editor.state.doc.sliceString(selection.from, selection.to),
+            },
+        };
+
+        notes.push(note);
+        activeNoteId = note.id;
+        autofocusNoteId = note.id;
+        notesOpen = true;
+        notesChanged();
+    }
+
+    function updateNote(id: string, body: string): void {
+        const note = notes.find((candidate) => candidate.id === id);
+
+        if (!note) {
+            return;
+        }
+
+        note.body = body;
+        note.updatedAt = new Date().toISOString();
+        notesChanged();
+    }
+
+    function resolveNote(id: string, resolved: boolean): void {
+        const note = notes.find((candidate) => candidate.id === id);
+
+        if (!note) {
+            return;
+        }
+
+        note.resolved = resolved;
+        note.updatedAt = new Date().toISOString();
+        notesChanged();
+    }
+
+    function deleteNote(id: string): void {
+        if (!confirm("Delete this Writer’s Note?")) {
+            return;
+        }
+
+        notes = notes.filter((note) => note.id !== id);
+
+        if (activeNoteId === id) {
+            activeNoteId = undefined;
+        }
+
+        notesChanged();
+    }
+
+    function reattachNote(id: string): void {
+        const note = notes.find((candidate) => candidate.id === id);
+        const selection = editor?.state.selection.main;
+
+        if (!editor || !note || !selection || selection.empty) {
+            alert("Select the replacement text first.");
+            return;
+        }
+
+        note.selection = {
+            from: selection.from,
+            to: selection.to,
+            quote: editor.state.doc.sliceString(selection.from, selection.to),
+        };
+        note.updatedAt = new Date().toISOString();
+        notesChanged();
+    }
+
+    function focusNote(id: string): void {
+        activeNoteId = id;
+        notesOpen = true;
+        refreshNoteDisplay();
+        scheduleRecovery();
+    }
+
+    function noteAutofocused(id: string): void {
+        if (autofocusNoteId === id) {
+            autofocusNoteId = undefined;
+        }
+    }
+
+    function activateNote(id: string): void {
+        focusNote(id);
+
+        const note = notes.find((candidate) => candidate.id === id);
+        const range = note ? noteRange(note) : undefined;
+
+        if (range && editor) {
+            editor.dispatch({
+                selection: { anchor: range.from, head: range.to },
+                effects: EditorView.scrollIntoView(range.from, { y: "center" }),
+            });
+        }
+    }
+
+    function jumpToHeading(item: OutlineItem): void {
+        editor?.dispatch({
+            selection: { anchor: item.from },
+            effects: EditorView.scrollIntoView(item.from, { y: "center" }),
+        });
+        editor?.focus();
+    }
+
+    function notesChanged(): void {
+        refreshNoteDisplay();
+        markDirty();
+    }
+
+    function refreshNoteDisplay(): void {
+        editor?.dispatch({ effects: refreshNotes.of(undefined) });
+        requestAnimationFrame(updateNotePositions);
+    }
+
+    function remapNotes(
+        oldState: EditorState,
+        newState: EditorState,
+        mapPosition: (position: number, association: -1 | 1) => number,
+    ): void {
+        let changed = false;
+
+        for (const note of notes) {
+            const oldRange = noteRangeForState(note, oldState);
+
+            if (!oldRange) {
+                continue;
+            }
+
+            const from = mapPosition(oldRange.from, 1);
+            const to = mapPosition(oldRange.to, -1);
+            const quote =
+                from < to
+                    ? newState.doc.sliceString(from, to)
+                    : oldState.doc.sliceString(oldRange.from, oldRange.to);
+            note.selection = {
+                from,
+                to: from < to ? to : from + quote.length,
+                quote,
+            };
+            changed = true;
+        }
+
+        if (changed) {
+            refreshNoteDisplay();
+        }
+    }
+
+    function noteRange(note: WriterNote): TextRange | undefined {
+        if (!editor) {
+            return undefined;
+        }
+
+        return noteRangeForState(note, editor.state);
+    }
+
+    function noteRangeForState(
+        note: WriterNote,
+        state: EditorState,
+    ): TextRange | undefined {
+        return resolveTextSelector(note.selection, state.doc.toString());
+    }
+
+    function buildNoteViews(): NoteView[] {
+        return notes.map((note) => {
+            const range = noteRange(note);
+            const label = range
+                ? draft
+                      .slice(range.from, range.to)
+                      .replace(/\s+/g, " ")
+                      .trim()
+                      .slice(0, 54)
+                : "Unattached note";
+
+            return {
+                note,
+                anchorLabel: label || "Empty paragraph",
+                orphaned: !range,
+                top: noteTops[note.id] ?? 0,
+            };
+        });
+    }
+
+    function updateNotePositions(): void {
+        if (!editor || !notesOpen) {
+            return;
+        }
+
+        const surface = editor.dom.closest(".writing-surface");
+
+        if (!(surface instanceof HTMLElement)) {
+            return;
+        }
+
+        const surfaceTop = surface.getBoundingClientRect().top;
+        const ordered = notes
+            .map((note) => ({ note, range: noteRange(note) }))
+            .filter(
+                (
+                    item,
+                ): item is { note: WriterNote; range: TextRange } =>
+                    Boolean(item.range),
+            )
+            .sort((left, right) => left.range.from - right.range.from);
+        const next: Record<string, number> = {};
+        let previousBottom = 0;
+
+        for (const { note, range } of ordered) {
+            const coordinates = editor.coordsAtPos(range.from);
+            const anchorTop = Math.max(
+                0,
+                (coordinates?.top ?? surfaceTop) - surfaceTop,
+            );
+            const top = Math.max(anchorTop, previousBottom);
+
+            next[note.id] = top;
+            previousBottom = top + 156;
+        }
+
+        noteTops = next;
+    }
+
+    function markDirty(): void {
+        dirty = true;
+        journalSaved = false;
+
+        if (saveState !== "downloaded") {
+            saveState = "recovered";
+        }
+
+        scheduleRecovery();
+    }
+
+    function scheduleRecovery(): void {
+        if (!dirty || storageConflict) {
+            return;
+        }
+
+        if (recoveryTimer) {
+            clearTimeout(recoveryTimer);
+        }
+
+        recoveryTimer = setTimeout(writeRecovery, RECOVERY_DELAY);
+    }
+
+    function flushRecovery(): void {
+        if (recoveryTimer) {
+            clearTimeout(recoveryTimer);
+            recoveryTimer = undefined;
+        }
+
+        if (dirty && !storageConflict) {
+            writeRecovery();
+        }
+    }
+
+    function writeRecovery(): void {
+        if (!editor || !dirty || storageConflict) {
+            return;
+        }
+
+        recoveryRevision += 1;
+        const selection = editor.state.selection.main;
+        const journal: RecoveryJournal = {
+            version: 1,
+            markdown: draft,
+            fileName,
+            ...(baselineHash ? { baselineHash } : {}),
+            sidecar: currentSidecar(),
+            context: {
+                anchor: selection.anchor,
+                head: selection.head,
+                scrollTop: editor.scrollDOM.scrollTop,
+                ...(activeNoteId ? { activeNoteId } : {}),
+                outlineOpen,
+                notesOpen,
+            },
+            updatedAt: new Date().toISOString(),
+            revision: recoveryRevision,
+        };
+
+        try {
+            localStorage.setItem(RECOVERY_KEY, JSON.stringify(journal));
+            recoveryAvailable = true;
+            journalSaved = true;
+        } catch {
+            recoveryAvailable = false;
+            journalSaved = false;
+        }
+    }
+
+    function clearRecovery(): void {
+        if (recoveryTimer) {
+            clearTimeout(recoveryTimer);
+            recoveryTimer = undefined;
+        }
+
+        try {
+            localStorage.removeItem(RECOVERY_KEY);
+        } catch {
+            // The file save still succeeded; local recovery is secondary.
+        }
+    }
+
+    function currentSidecar(markdownFile = fileName): WriterSidecar {
+        return {
+            version: 1,
+            projectId,
+            markdownFile,
+            notes: $state.snapshot(notes),
+        };
+    }
+
+    function loadInitialRecovery(): RecoveryJournal | undefined {
+        const existing = parseRecovery(localStorage.getItem(RECOVERY_KEY));
+
+        if (existing) {
+            return existing;
+        }
+
+        const legacyDraft = localStorage.getItem(LEGACY_STORAGE_KEY);
+
+        if (!legacyDraft) {
+            return undefined;
+        }
+
+        const sidecar = emptySidecar(DEFAULT_FILE_NAME);
+        const migrated: RecoveryJournal = {
+            version: 1,
+            markdown: legacyDraft,
+            fileName: DEFAULT_FILE_NAME,
+            sidecar,
+            context: {
+                anchor: legacyDraft.length,
+                head: legacyDraft.length,
+                scrollTop: 0,
+                outlineOpen: false,
+                notesOpen: false,
+            },
+            updatedAt: new Date().toISOString(),
+            revision: 1,
+        };
+
+        try {
+            localStorage.setItem(RECOVERY_KEY, JSON.stringify(migrated));
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
+        } catch {
+            recoveryAvailable = false;
+        }
+
+        return migrated;
+    }
+
+    function handleVisibilityChange(): void {
+        if (document.visibilityState === "hidden") {
+            flushRecovery();
+        }
+    }
+
+    function handlePageHide(): void {
+        flushRecovery();
+    }
+
+    function handleBeforeUnload(event: BeforeUnloadEvent): void {
+        flushRecovery();
+
+        if (dirty && !recoveryAvailable) {
+            event.preventDefault();
+        }
+    }
+
+    function handleStorage(event: StorageEvent): void {
+        if (event.key !== RECOVERY_KEY) {
+            return;
+        }
+
+        const other = parseRecovery(event.newValue);
+
+        if (other && other.revision > recoveryRevision) {
+            storageConflict = true;
+        }
+    }
+
+    function keepThisTab(): void {
+        storageConflict = false;
+        markDirty();
+        flushRecovery();
+    }
+
+    function reloadOtherRecovery(): void {
+        location.reload();
+    }
+
+    function handleWindowKeydown(event: KeyboardEvent): void {
+        if (guideOpen && event.key === "Escape") {
+            guideOpen = false;
+        }
+    }
+
+    async function existingFileHandle(
+        directory: FileSystemDirectoryHandle,
+        name: string,
+    ): Promise<FileSystemFileHandle | undefined> {
+        try {
+            return await directory.getFileHandle(name);
+        } catch (error) {
+            if (error instanceof DOMException && error.name === "NotFoundError") {
+                return undefined;
+            }
+
+            throw error;
+        }
+    }
+
+    async function writeFile(
+        handle: FileSystemFileHandle,
+        content: string,
+    ): Promise<void> {
+        const writable = await handle.createWritable();
+
+        await writable.write(content);
+        await writable.close();
+    }
+
+    async function ensureReadWritePermission(
+        handle: FileSystemHandle,
+    ): Promise<boolean> {
+        const permissioned = handle as FileSystemHandle &
+            PermissionedFileSystemHandle;
+
+        if (!permissioned.queryPermission || !permissioned.requestPermission) {
+            return true;
+        }
+
+        const descriptor = { mode: "readwrite" } as const;
+
+        if ((await permissioned.queryPermission(descriptor)) === "granted") {
+            return true;
+        }
+
+        return (await permissioned.requestPermission(descriptor)) === "granted";
+    }
+
+    function clampPosition(position: number, length: number): number {
+        return Math.min(Math.max(position, 0), length);
+    }
+
+    function isAbortError(error: unknown): boolean {
+        return error instanceof DOMException && error.name === "AbortError";
     }
 
     async function writeGoodDiagnostics(
@@ -797,25 +1841,137 @@
             decorations: (plugin) => plugin.decorations,
         },
     );
+
+    function buildNoteDecorations(view: EditorView): DecorationSet {
+        const builder = new RangeSetBuilder<Decoration>();
+        const ranges = notes
+            .filter((note) => !note.resolved)
+            .map((note) => ({
+                note,
+                range: noteRangeForState(note, view.state),
+            }))
+            .filter(
+                (
+                    item,
+                ): item is { note: WriterNote; range: TextRange } =>
+                    Boolean(item.range),
+            )
+            .sort((left, right) => left.range.from - right.range.from);
+
+        for (const { note, range } of ranges) {
+            builder.add(
+                range.from,
+                range.to,
+                Decoration.mark({
+                    attributes: { "data-writer-note-id": note.id },
+                    class:
+                        note.id === activeNoteId
+                            ? "cm-writer-note-anchor cm-writer-note-anchor-active"
+                            : "cm-writer-note-anchor",
+                }),
+            );
+        }
+
+        return builder.finish();
+    }
+
+    const notePlugin = ViewPlugin.fromClass(
+        class {
+            decorations: DecorationSet;
+
+            constructor(view: EditorView) {
+                this.decorations = buildNoteDecorations(view);
+            }
+
+            update(update: ViewUpdate): void {
+                if (
+                    update.docChanged ||
+                    update.transactions.some((transaction) =>
+                        transaction.effects.some((effect) =>
+                            effect.is(refreshNotes),
+                        ),
+                    )
+                ) {
+                    this.decorations = buildNoteDecorations(update.view);
+                }
+            }
+        },
+        {
+            decorations: (plugin) => plugin.decorations,
+            eventHandlers: {
+                click: (event) => {
+                    const target =
+                        event.target instanceof Element
+                            ? event.target.closest<HTMLElement>("[data-writer-note-id]")
+                            : null;
+                    const id = target?.dataset.writerNoteId;
+
+                    if (!id) {
+                        return false;
+                    }
+
+                    activateNote(id);
+                    return true;
+                },
+            },
+        },
+    );
+
+    const notePositionPlugin = ViewPlugin.fromClass(
+        class {
+            update(update: ViewUpdate): void {
+                if (
+                    update.docChanged ||
+                    update.viewportChanged ||
+                    update.geometryChanged
+                ) {
+                    requestAnimationFrame(updateNotePositions);
+                }
+            }
+        },
+        {
+            eventHandlers: {
+                scroll: () => {
+                    requestAnimationFrame(updateNotePositions);
+                    return false;
+                },
+            },
+        },
+    );
 </script>
+
+<svelte:window
+	onbeforeunload={handleBeforeUnload}
+	onkeydown={handleWindowKeydown}
+	onpagehide={handlePageHide}
+	onstorage={handleStorage}
+/>
+<svelte:document onvisibilitychange={handleVisibilityChange} />
 
 <main class={["app-shell", { focused: focusMode && focusScope !== "all" }]}>
     <WriterToolbar
+        addNoteDisabled={!hasTextSelection}
         {focusMode}
         {focusScope}
         {hemingwayMode}
+        {notesOpen}
+        {outlineOpen}
         {reviewChecks}
         {reviewMode}
         {syntaxMode}
         {syntaxParts}
         {typewriterMode}
-        onExport={exportDraft}
+        onAddNote={addNote}
         onFocusModeChange={setFocusModeValue}
         onFocusScopeChange={setFocusScopeValue}
+        onGuideOpen={() => (guideOpen = true)}
         onHemingwayModeChange={setHemingwayModeValue}
-        onImport={importDraft}
+        onNotesOpenChange={setNotesOpen}
+        onOpen={openProject}
+        onOutlineOpenChange={setOutlineOpen}
         onReviewCheckChange={setReviewCheckValue}
         onReviewModeChange={setReviewModeValue}
+        onSave={saveProject}
         onSearch={showSearch}
         onSyntaxModeChange={setSyntaxModeValue}
         onSyntaxPartChange={setSyntaxPartValue}
@@ -823,8 +1979,105 @@
     />
 
     <section class="writing-surface" aria-label="Writing surface">
+        {#if recoveryRestored}
+            <div class="recovery-banner" role="status">
+                <span>Unsaved changes restored from this browser.</span>
+                <button type="button" onclick={() => (recoveryRestored = false)}>Dismiss</button>
+            </div>
+        {/if}
+        {#if storageConflict}
+            <div class="recovery-banner conflict-banner" role="alert">
+                <span>Another tab has newer recovered work.</span>
+                <button type="button" onclick={reloadOtherRecovery}>Load it</button>
+                <button type="button" onclick={keepThisTab}>Keep this tab</button>
+            </div>
+        {/if}
+        <WriterPanels
+            {activeNoteId}
+            {autofocusNoteId}
+            {guideOpen}
+            {noteViews}
+            {notesOpen}
+            onActivateNote={focusNote}
+            onAutofocusNote={noteAutofocused}
+            onCloseGuide={() => (guideOpen = false)}
+            onDeleteNote={deleteNote}
+            onJumpToNote={activateNote}
+            onJumpToHeading={jumpToHeading}
+            onReattachNote={reattachNote}
+            onResolveNote={resolveNote}
+            onUpdateNote={updateNote}
+            {outline}
+            {outlineOpen}
+        />
         <div class="editor-host" {@attach attachEditor}></div>
     </section>
 
+    <Dialog.Root
+        open={manuscriptDialogOpen}
+        onOpenChange={handleManuscriptDialogOpenChange}
+    >
+        {#if manuscriptCandidates.length > 0}
+            <Dialog.Portal>
+                <Dialog.Overlay class="dialog-overlay" />
+                <Dialog.Content class="manuscript-dialog">
+                    <header>
+                        <div>
+                            <Dialog.Title class="manuscript-dialog-title">
+                                Choose manuscript
+                            </Dialog.Title>
+                            <Dialog.Description class="manuscript-dialog-description">
+                                Most recently modified first. Writer’s Notes load from the matching sidecar.
+                            </Dialog.Description>
+                        </div>
+                        <Dialog.Close
+                            class="manuscript-cancel"
+                            disabled={manuscriptOpening}
+                            type="button"
+                        >
+                            Cancel
+                        </Dialog.Close>
+                    </header>
+                    <div class="manuscript-list">
+                        {#each manuscriptCandidates as candidate (candidate.name)}
+                            <button
+                                aria-label={`Open ${candidate.name}`}
+                                class="manuscript-option"
+                                disabled={manuscriptOpening}
+                                type="button"
+                                onclick={() => void chooseManuscriptCandidate(candidate)}
+                            >
+                                <span class="manuscript-option-main">
+                                    <span class="manuscript-title">{candidate.label}</span>
+                                    <span
+                                        class={[
+                                            "manuscript-notes",
+                                            { "notes-missing": !candidate.sidecarHandle },
+                                        ]}
+                                    >
+                                        {candidate.sidecarHandle ? "Notes found" : "No notes yet"}
+                                    </span>
+                                </span>
+                                <span class="manuscript-option-detail">
+                                    <span>{candidate.name}</span>
+                                    <span>Modified {formatModified(candidate.modifiedAt)}</span>
+                                </span>
+                            </button>
+                        {/each}
+                    </div>
+                </Dialog.Content>
+            </Dialog.Portal>
+        {/if}
+    </Dialog.Root>
+
     <WriterStatus {saveLabel} {stats} />
+    <input
+        {@attach attachFallbackInput}
+        accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"
+        aria-label="Open file"
+        class="visually-hidden"
+        multiple
+        type="file"
+        onchange={(event) => void openFallbackFiles(event)}
+    />
 </main>
