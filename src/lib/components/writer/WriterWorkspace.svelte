@@ -8,7 +8,13 @@
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { syntaxHighlighting } from "@codemirror/language";
     import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
-    import { openSearchPanel, search, searchKeymap } from "@codemirror/search";
+    import {
+        closeSearchPanel,
+        openSearchPanel,
+        search,
+        searchKeymap,
+        searchPanelOpen,
+    } from "@codemirror/search";
     import {
         EditorState,
         Prec,
@@ -77,6 +83,7 @@
         toggleTaskList,
     } from "./writer-commands";
     import WriterPanels from "./WriterPanels.svelte";
+    import { createZedSearchPanel } from "./writer-search-panel";
     import WriterStatus from "./WriterStatus.svelte";
     import WriterToolbar from "./WriterToolbar.svelte";
     import type {
@@ -361,6 +368,7 @@
     let outlineOpen = $state(false);
     let notesOpen = $state(false);
     let guideOpen = $state(false);
+    let searchOpen = $state(false);
     let activeNoteId = $state<string | undefined>();
     let autofocusNoteId = $state<string | undefined>();
     let hasTextSelection = $state(false);
@@ -453,7 +461,7 @@
                         pasteURLAsLink: false,
                     }),
                     syntaxHighlighting(markdownHighlightStyle),
-                    search({ top: true }),
+                    search({ top: true, createPanel: createZedSearchPanel }),
                     linter(writeGoodDiagnostics, { delay: 900 }),
                     writerTheme,
                     focusScopeField,
@@ -475,6 +483,8 @@
                         spellcheck: "true",
                     }),
                     EditorView.updateListener.of((update) => {
+                        searchOpen = searchPanelOpen(update.state);
+
                         if (update.docChanged) {
                             draft = update.state.doc.toString();
                             remapNotes(update.startState, update.state, (position, association) =>
@@ -544,6 +554,7 @@
             }),
         });
         outline = outlineItems(editor.state);
+        searchOpen = searchPanelOpen(editor.state);
         hasTextSelection = !editor.state.selection.main.empty;
         selectedText = hasTextSelection
             ? editor.state.doc.sliceString(
@@ -696,9 +707,18 @@
         editor?.focus();
     }
 
-    function showSearch(): void {
-        if (editor) {
+    function toggleSearch(): void {
+        if (!editor) {
+            return;
+        }
+
+        if (searchPanelOpen(editor.state)) {
+            closeSearchPanel(editor);
+            searchOpen = false;
+            editor.focus();
+        } else {
             openSearchPanel(editor);
+            searchOpen = true;
         }
     }
 
@@ -1931,6 +1951,7 @@
         {outlineOpen}
         {reviewChecks}
         {reviewMode}
+        {searchOpen}
         {syntaxMode}
         {syntaxParts}
         {typewriterMode}
@@ -1944,7 +1965,7 @@
         onReviewCheckChange={setReviewCheckValue}
         onReviewModeChange={setReviewModeValue}
         onSave={saveProject}
-        onSearch={showSearch}
+        onSearch={toggleSearch}
         onSyntaxModeChange={setSyntaxModeValue}
         onSyntaxPartChange={setSyntaxPartValue}
         onTypewriterModeChange={setTypewriterModeValue}

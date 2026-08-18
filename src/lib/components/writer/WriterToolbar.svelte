@@ -36,6 +36,7 @@
 		readonly outlineOpen: boolean;
 		readonly reviewChecks: Record<ReviewCheck, boolean>;
 		readonly reviewMode: boolean;
+		readonly searchOpen?: boolean;
 		readonly syntaxMode: boolean;
 		readonly syntaxParts: Record<PartOfSpeech, boolean>;
 		readonly typewriterMode: boolean;
@@ -82,6 +83,7 @@
 		outlineOpen,
 		reviewChecks,
 		reviewMode,
+		searchOpen = false,
 		syntaxMode,
 		syntaxParts,
 		typewriterMode
@@ -453,13 +455,15 @@
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
-			<!-- 9. Search (Action Button) -->
+			<!-- 9. Search (Toggle Action Button) -->
 			<Tooltip.Root>
 				<Tooltip.Trigger>
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
+							aria-pressed={searchOpen}
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							data-mode={searchOpen ? 'on' : 'off'}
 							type="button"
 							onclick={onSearch}
 						>

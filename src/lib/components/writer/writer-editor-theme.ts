@@ -131,254 +131,172 @@ export const writerTheme = EditorView.theme({
 	},
 	'.cm-panel.cm-search': {
 		display: 'grid',
-		gridTemplateColumns:
-			'minmax(12rem, 1fr) repeat(4, 1.8rem) 0.65rem repeat(2, 1.8rem) 0.75rem 1.8rem',
-		gridTemplateRows: '2rem 2rem',
+		gridTemplateColumns: 'minmax(0, 1fr) auto',
+		rowGap: '0.35rem',
+		columnGap: '0.4rem',
 		alignItems: 'center',
-		columnGap: '0.2rem',
-		rowGap: '0.25rem',
 		padding:
-			'0.375rem max(var(--spacing-2xs), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-2xs)))',
-		backgroundColor: 'color-mix(in srgb, var(--color-page) 94%, var(--color-paper))',
+			'0.45rem max(var(--spacing-s), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-s)))',
+		backgroundColor: 'color-mix(in srgb, var(--color-page) 92%, var(--color-paper))',
+		borderBottom: '1px solid var(--color-rule)',
 		fontFamily:
 			"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
-		lineHeight: '1'
+		lineHeight: '1',
+		fontSize: '0.82rem'
 	},
 	'.cm-panel.cm-search br': {
 		display: 'none'
 	},
-	'.cm-panel.cm-search .cm-textfield, .cm-panel.cm-search .cm-button, .cm-panel.cm-search label': {
-		margin: '0'
+	'.cm-search-row, .cm-replace-row': {
+		display: 'contents'
 	},
-	'.cm-panel.cm-search .cm-textfield': {
+	'.cm-search-input-box': {
+		display: 'flex',
+		alignItems: 'center',
 		width: '100%',
-		height: '2rem',
 		minWidth: '0',
+		height: '2rem',
 		border: '1px solid var(--color-rule)',
-		borderRadius: '3px',
-		backgroundColor: 'color-mix(in srgb, var(--color-paper) 82%, var(--color-page))',
-		color: 'var(--color-ink)',
-		font: 'inherit',
-		padding: '0 var(--spacing-2xs)'
+		borderRadius: '4px',
+		backgroundColor: 'color-mix(in srgb, var(--color-paper) 88%, var(--color-page))',
+		padding: '0 0.25rem 0 0.55rem',
+		transition: 'border-color 0.12s, box-shadow 0.12s'
 	},
-	'.cm-panel.cm-search .cm-textfield::placeholder': {
-		color: 'color-mix(in srgb, var(--color-muted) 70%, transparent)'
-	},
-	'.cm-panel.cm-search .cm-textfield:focus': {
+	'.cm-search-input-box:focus-within': {
 		borderColor: 'var(--color-accent)',
-		outline: '1px solid var(--color-accent)',
-		outlineOffset: '0'
+		boxShadow: '0 0 0 1px var(--color-accent)'
 	},
-	'.cm-panel.cm-search .cm-textfield[name="search"]': {
-		gridColumn: '1',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search .cm-textfield[name="replace"]': {
-		gridColumn: '1',
-		gridRow: '2'
-	},
-	'.cm-panel.cm-search label': {
-		position: 'relative',
-		display: 'grid',
-		width: '1.65rem',
-		height: '1.65rem',
-		placeItems: 'center',
-		border: '1px solid transparent',
-		borderRadius: '3px',
-		color: 'var(--color-muted)',
-		cursor: 'pointer',
-		fontSize: '0',
-		justifySelf: 'center',
-		userSelect: 'none'
-	},
-	'.cm-panel.cm-search label:nth-of-type(1)': {
-		gridColumn: '2',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search label:nth-of-type(2)': {
-		gridColumn: '4',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search label:nth-of-type(3)': {
-		gridColumn: '3',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search label:hover': {
-		borderColor: 'var(--color-rule)',
-		backgroundColor: 'var(--color-paper)',
+	'.cm-search-input-field': {
+		flex: '1 1 0%',
+		minWidth: '0',
+		height: '100%',
+		background: 'transparent',
+		border: 'none',
+		outline: 'none',
+		padding: '0',
+		margin: '0',
+		fontFamily: 'inherit',
+		fontSize: '0.8rem',
 		color: 'var(--color-ink)'
 	},
-	'.cm-panel.cm-search label:has(input:checked)': {
+	'.cm-search-input-field::placeholder': {
+		color: 'color-mix(in srgb, var(--color-muted) 65%, transparent)'
+	},
+	'.cm-search-input-toggles': {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.15rem',
+		marginLeft: '0.35rem'
+	},
+	'.cm-search-toggle-btn': {
+		display: 'inline-flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: '1.45rem',
+		minWidth: '1.5rem',
+		padding: '0 0.35rem',
+		border: '1px solid transparent',
+		borderRadius: '3px',
+		background: 'transparent',
+		color: 'var(--color-muted)',
+		fontFamily: 'inherit',
+		fontSize: '0.72rem',
+		fontWeight: '600',
+		cursor: 'pointer',
+		userSelect: 'none',
+		transition: 'all 0.12s ease'
+	},
+	'.cm-search-toggle-btn:hover': {
+		backgroundColor: 'color-mix(in srgb, var(--color-page) 80%, var(--color-paper))',
+		color: 'var(--color-ink)'
+	},
+	'.cm-search-toggle-btn[aria-pressed="true"]': {
+		backgroundColor: 'color-mix(in srgb, var(--color-accent) 15%, var(--color-paper))',
 		borderColor: 'color-mix(in srgb, var(--color-accent) 45%, var(--color-rule))',
-		backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, var(--color-paper))',
 		color: 'var(--color-accent-ink)'
 	},
-	'.cm-panel.cm-search label:has(input:focus-visible)': {
+	'.cm-search-toggle-btn:focus-visible': {
 		outline: '2px solid var(--color-accent)',
 		outlineOffset: '1px'
 	},
-	'.cm-panel.cm-search input[type="checkbox"]': {
-		position: 'absolute',
-		width: '1px',
-		height: '1px',
-		opacity: '0',
-		pointerEvents: 'none'
+	'.cm-search-toggle-word .cm-search-word-label': {
+		borderBottom: '1.5px solid currentColor',
+		lineHeight: '1.1'
 	},
-	'.cm-panel.cm-search .cm-button, .cm-panel.cm-search button[name="close"]': {
-		appearance: 'none',
-		display: 'grid',
-		width: '1.65rem',
-		height: '1.65rem',
-		minHeight: '0',
+	'.cm-search-actions': {
+		display: 'flex',
 		alignItems: 'center',
-		justifyItems: 'center',
+		gap: '0.2rem',
+		flexShrink: '0'
+	},
+	'.cm-replace-actions': {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.2rem',
+		flexShrink: '0',
+		justifySelf: 'start'
+	},
+	'.cm-search-action-btn': {
+		display: 'inline-flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		width: '1.75rem',
+		height: '1.75rem',
 		padding: '0',
 		border: '1px solid transparent',
-		borderRadius: '3px',
+		borderRadius: '4px',
+		background: 'transparent',
 		color: 'var(--color-muted)',
 		cursor: 'pointer',
-		fontSize: '0',
-		justifySelf: 'center'
+		transition: 'all 0.12s ease'
 	},
-	'.cm-panel.cm-search label:has(input[name="case"])::after': {
-		content: '"Aa"',
-		fontSize: '0.72rem',
-		fontWeight: '600',
-		lineHeight: '1'
+	'.cm-search-action-btn:hover': {
+		backgroundColor: 'var(--color-paper)',
+		borderColor: 'var(--color-rule)',
+		color: 'var(--color-accent-ink)'
 	},
-	'.cm-panel.cm-search label:has(input[name="word"])::after': {
-		content: '"\\b"',
-		fontSize: '0.72rem',
-		fontWeight: '600',
-		lineHeight: '1'
+	'.cm-search-action-btn:focus-visible': {
+		outline: '2px solid var(--color-accent)',
+		outlineOffset: '1px',
+		backgroundColor: 'var(--color-paper)',
+		borderColor: 'var(--color-rule)'
 	},
-	'.cm-panel.cm-search label:has(input[name="re"])::after': {
-		content: '".*"',
-		fontSize: '0.72rem',
-		fontWeight: '600',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="select"]::after': {
-		content: '"⬚"',
-		fontSize: '0.85rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="prev"]::after': {
-		content: '"‹"',
-		fontSize: '1.1rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="next"]::after': {
-		content: '"›"',
-		fontSize: '1.1rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="close"]::after': {
-		content: '"✕"',
-		fontSize: '0.72rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="replace"]::after': {
-		content: '"↷"',
-		fontSize: '0.95rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="replaceAll"]::after': {
-		content: '"⇶"',
-		fontSize: '0.95rem',
-		lineHeight: '1'
-	},
-	'.cm-panel.cm-search button[name="select"]': {
-		gridColumn: '5',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search button[name="prev"]': {
-		gridColumn: '7',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search button[name="next"]': {
-		gridColumn: '8',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search button[name="close"]': {
-		position: 'static',
-		gridColumn: '10',
-		gridRow: '1'
-	},
-	'.cm-panel.cm-search button[name="replace"]': {
-		gridColumn: '2',
-		gridRow: '2'
-	},
-	'.cm-panel.cm-search button[name="replaceAll"]': {
-		gridColumn: '3',
-		gridRow: '2',
-		width: '100%'
-	},
-	'.cm-panel.cm-search .cm-button:hover, .cm-panel.cm-search .cm-button:focus-visible, .cm-panel.cm-search button[name="close"]:hover, .cm-panel.cm-search button[name="close"]:focus-visible':
-		{
-			borderColor: 'var(--color-rule)',
-			backgroundColor: 'var(--color-paper)',
-			color: 'var(--color-accent-ink)'
-		},
-	'.cm-panel.cm-search .cm-button:focus-visible, .cm-panel.cm-search button[name="close"]:focus-visible':
-		{
-			outline: '2px solid var(--color-accent)',
-			outlineOffset: '1px'
-		},
-	'.cm-panel.cm-search .cm-button[disabled]': {
+	'.cm-search-action-btn[disabled]': {
 		cursor: 'default',
-		opacity: '0.35'
+		opacity: '0.35',
+		pointerEvents: 'none'
+	},
+	'.cm-search-count-badge': {
+		display: 'inline-flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		minWidth: '2.75rem',
+		padding: '0 0.25rem',
+		fontFamily: 'inherit',
+		fontSize: '0.74rem',
+		color: 'var(--color-muted)',
+		userSelect: 'none'
+	},
+	'.cm-search-spacer': {
+		display: 'inline-block',
+		width: '1.75rem',
+		height: '1.75rem',
+		flexShrink: '0'
+	},
+	'.cm-search-v-sep': {
+		width: '1px',
+		height: '1rem',
+		backgroundColor: 'var(--color-rule)',
+		margin: '0 0.15rem',
+		flexShrink: '0'
 	},
 	'@media (max-width: 48rem)': {
 		'.cm-panel.cm-search': {
-			gridTemplateColumns:
-				'repeat(4, minmax(0, 1fr)) 0.5rem repeat(2, minmax(0, 1fr)) 0.5rem minmax(0, 1fr)',
-			gridTemplateRows: '1.75rem 1.65rem 1.75rem',
-			padding: 'var(--spacing-3xs) var(--spacing-2xs)'
+			padding: '0.35rem 0.5rem'
 		},
-		'.cm-panel.cm-search .cm-textfield[name="search"]': {
-			gridColumn: '1 / 10',
-			gridRow: '1'
-		},
-		'.cm-panel.cm-search label:nth-of-type(1)': {
-			gridColumn: '1',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search label:nth-of-type(3)': {
-			gridColumn: '2',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search label:nth-of-type(2)': {
-			gridColumn: '3',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search button[name="select"]': {
-			gridColumn: '4',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search button[name="prev"]': {
-			gridColumn: '6',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search button[name="next"]': {
-			gridColumn: '7',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search button[name="close"]': {
-			gridColumn: '9',
-			gridRow: '2'
-		},
-		'.cm-panel.cm-search .cm-textfield[name="replace"]': {
-			gridColumn: '1 / 7',
-			gridRow: '3'
-		},
-		'.cm-panel.cm-search button[name="replace"]': {
-			gridColumn: '7',
-			gridRow: '3'
-		},
-		'.cm-panel.cm-search button[name="replaceAll"]': {
-			gridColumn: '9',
-			gridRow: '3'
+		'.cm-search-count-badge': {
+			minWidth: '2.2rem',
+			fontSize: '0.7rem'
 		}
 	},
 	'.cm-searchMatch': {
