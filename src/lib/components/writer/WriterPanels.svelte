@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { OutlineItem } from '$lib/writer-document';
+	import { Dialog } from 'bits-ui';
 	import { COMMAND_HELP } from './writer-commands';
 	import type { NoteView } from './writer-types';
 	import WriterNoteEditor from './WriterNoteEditor.svelte';
@@ -138,28 +139,25 @@
 	</aside>
 {/if}
 
-{#if guideOpen}
-	<div
-		class="fixed inset-0 z-50 grid place-items-center bg-ink/30 p-s backdrop-blur-xs"
-		role="presentation"
-	>
-		<div
-			aria-labelledby="shortcut-guide-title"
-			aria-modal="true"
-			class="max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,100%)] overflow-auto rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)]"
-			role="dialog"
+<Dialog.Root open={guideOpen} onOpenChange={(open) => { if (!open) onCloseGuide(); }}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+		<Dialog.Content
+			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
 		>
 			<header class="flex items-center justify-between gap-s">
-				<h2 class="m-0 text-[1.1rem] font-bold" id="shortcut-guide-title">Keyboard shortcuts</h2>
-				<button
+				<Dialog.Title class="m-0 text-[1.1rem] font-bold">Keyboard shortcuts</Dialog.Title>
+				<Dialog.Close
 					aria-label="Close keyboard shortcuts"
 					class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 					type="button"
-					onclick={onCloseGuide}
 				>
 					Close
-				</button>
+				</Dialog.Close>
 			</header>
+			<Dialog.Description class="sr-only">
+				Keyboard shortcuts reference for application and editor actions.
+			</Dialog.Description>
 			{#each ['App', 'Editor'] as scope (scope)}
 				<h3 class="mt-s mb-0 text-[0.72rem] font-bold tracking-wider text-muted uppercase">
 					{scope}
@@ -179,6 +177,6 @@
 					{/each}
 				</dl>
 			{/each}
-		</div>
-	</div>
-{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
