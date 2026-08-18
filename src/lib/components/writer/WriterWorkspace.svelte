@@ -1948,7 +1948,10 @@
 />
 <svelte:document onvisibilitychange={handleVisibilityChange} />
 
-<main class={["app-shell", { focused: focusMode && focusScope !== "all" }]}>
+<main
+	class="group grid h-screen min-h-screen grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-page font-mono text-ink"
+	data-focused={focusMode && focusScope !== "all"}
+>
     <WriterToolbar
         addNoteDisabled={!hasTextSelection}
         {focusMode}
@@ -1978,18 +1981,42 @@
         onTypewriterModeChange={setTypewriterModeValue}
     />
 
-    <section class="writing-surface" aria-label="Writing surface">
+    <section class="relative min-h-0 flex-1 overflow-hidden p-0" aria-label="Writing surface">
         {#if recoveryRestored}
-            <div class="recovery-banner" role="status">
-                <span>Unsaved changes restored from this browser.</span>
-                <button type="button" onclick={() => (recoveryRestored = false)}>Dismiss</button>
+            <div
+                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-accent)_35%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
+                role="status"
+            >
+                <span class="flex-1">Unsaved changes restored from this browser.</span>
+                <button
+                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    type="button"
+                    onclick={() => (recoveryRestored = false)}
+                >
+                    Dismiss
+                </button>
             </div>
         {/if}
         {#if storageConflict}
-            <div class="recovery-banner conflict-banner" role="alert">
-                <span>Another tab has newer recovered work.</span>
-                <button type="button" onclick={reloadOtherRecovery}>Load it</button>
-                <button type="button" onclick={keepThisTab}>Keep this tab</button>
+            <div
+                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-mark)_45%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
+                role="alert"
+            >
+                <span class="flex-1">Another tab has newer recovered work.</span>
+                <button
+                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    type="button"
+                    onclick={reloadOtherRecovery}
+                >
+                    Load it
+                </button>
+                <button
+                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    type="button"
+                    onclick={keepThisTab}
+                >
+                    Keep this tab
+                </button>
             </div>
         {/if}
         <WriterPanels
@@ -2010,7 +2037,12 @@
             {outline}
             {outlineOpen}
         />
-        <div class="editor-host" {@attach attachEditor}></div>
+        <div
+            class="h-full min-h-0 transition-[padding] duration-150"
+            class:lg:pl-[var(--rail-width)]={outlineOpen}
+            class:lg:pr-[var(--rail-width)]={notesOpen}
+            {@attach attachEditor}
+        ></div>
     </section>
 
     <Dialog.Root
@@ -2019,46 +2051,47 @@
     >
         {#if manuscriptCandidates.length > 0}
             <Dialog.Portal>
-                <Dialog.Overlay class="dialog-overlay" />
-                <Dialog.Content class="manuscript-dialog">
-                    <header>
+                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+                <Dialog.Content
+                    class="fixed top-1/2 left-1/2 z-51 grid max-h-[min(36rem,calc(100svh-2rem))] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_minmax(0,1fr)] rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+                >
+                    <header class="flex items-start justify-between gap-s">
                         <div>
-                            <Dialog.Title class="manuscript-dialog-title">
+                            <Dialog.Title class="text-[1.1rem] font-bold">
                                 Choose manuscript
                             </Dialog.Title>
-                            <Dialog.Description class="manuscript-dialog-description">
+                            <Dialog.Description class="mt-3xs text-[0.82rem] leading-relaxed text-muted">
                                 Most recently modified first. Writer’s Notes load from the matching sidecar.
                             </Dialog.Description>
                         </div>
                         <Dialog.Close
-                            class="manuscript-cancel"
+                            class="shrink-0 cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50"
                             disabled={manuscriptOpening}
                             type="button"
                         >
                             Cancel
                         </Dialog.Close>
                     </header>
-                    <div class="manuscript-list">
+                    <div class="mt-s grid min-h-0 gap-3xs overflow-y-auto">
                         {#each manuscriptCandidates as candidate (candidate.name)}
                             <button
                                 aria-label={`Open ${candidate.name}`}
-                                class="manuscript-option"
+                                class="grid w-full cursor-pointer gap-3xs rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_82%,var(--color-page))] p-2xs text-left text-ink transition-colors hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50"
                                 disabled={manuscriptOpening}
                                 type="button"
                                 onclick={() => void chooseManuscriptCandidate(candidate)}
                             >
-                                <span class="manuscript-option-main">
-                                    <span class="manuscript-title">{candidate.label}</span>
+                                <span class="flex items-baseline justify-between gap-s">
+                                    <span class="truncate font-bold">{candidate.label}</span>
                                     <span
-                                        class={[
-                                            "manuscript-notes",
-                                            { "notes-missing": !candidate.sidecarHandle },
-                                        ]}
+                                        class="shrink-0 text-[0.72rem]"
+                                        class:text-accent-ink={candidate.sidecarHandle}
+                                        class:text-muted={!candidate.sidecarHandle}
                                     >
                                         {candidate.sidecarHandle ? "Notes found" : "No notes yet"}
                                     </span>
                                 </span>
-                                <span class="manuscript-option-detail">
+                                <span class="flex items-baseline justify-between gap-s text-[0.72rem] text-muted">
                                     <span>{candidate.name}</span>
                                     <span>Modified {formatModified(candidate.modifiedAt)}</span>
                                 </span>
@@ -2075,7 +2108,7 @@
         {@attach attachFallbackInput}
         accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"
         aria-label="Open file"
-        class="visually-hidden"
+        class="sr-only"
         multiple
         type="file"
         onchange={(event) => void openFallbackFiles(event)}

@@ -148,4 +148,4 @@
 	};
 </script>
 
-<div class="note-editor" {@attach attachEditor}></div>
+<div class="min-h-[4.5rem] w-full min-w-0" {@attach attachEditor}></div>

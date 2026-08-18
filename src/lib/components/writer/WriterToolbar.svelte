@@ -43,11 +43,11 @@
 	}
 
 	const syntaxOptions: readonly SyntaxOption[] = [
-		{ part: 'Adjective', label: 'Adjectives', className: 'syntax-adjective' },
-		{ part: 'Noun', label: 'Nouns', className: 'syntax-noun' },
-		{ part: 'Adverb', label: 'Adverbs', className: 'syntax-adverb' },
-		{ part: 'Verb', label: 'Verbs', className: 'syntax-verb' },
-		{ part: 'Conjunction', label: 'Conjunctions', className: 'syntax-conjunction' }
+		{ part: 'Adjective', label: 'Adjectives', className: 'text-syntax-adjective' },
+		{ part: 'Noun', label: 'Nouns', className: 'text-syntax-noun' },
+		{ part: 'Adverb', label: 'Adverbs', className: 'text-syntax-adverb' },
+		{ part: 'Verb', label: 'Verbs', className: 'text-syntax-verb' },
+		{ part: 'Conjunction', label: 'Conjunctions', className: 'text-syntax-conjunction' }
 	];
 	const reviewOptions: readonly ReviewOption[] = [
 		{ check: 'weasel', label: 'Weasel Words' },
@@ -91,44 +91,70 @@
 	}: Props = $props();
 </script>
 
-<header class="topbar" aria-label="Writing controls">
-	<Toolbar.Root class="actions" loop={false}>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={() => void onOpen()}>
+<header
+	class="flex min-h-[calc(var(--control-size)+var(--spacing-2xs))] items-center justify-between border-b border-rule bg-page/92 px-2xs py-3xs font-sans text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--shell-max))/2+var(--spacing-s)))]"
+	aria-label="Writing controls"
+>
+	<Toolbar.Root
+		class="flex w-full flex-nowrap items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
+		loop={false}
+	>
+		<Toolbar.Button
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+			type="button"
+			onclick={() => void onOpen()}
+		>
 			Open
 		</Toolbar.Button>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={() => void onSave()}>
+		<Toolbar.Button
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+			type="button"
+			onclick={() => void onSave()}
+		>
 			Save
 		</Toolbar.Button>
-		<span class="toolbar-spacer"></span>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={onSearch}>Search</Toolbar.Button>
+		<span class="hidden min-[42.01rem]:block min-[42.01rem]:flex-1 min-[42.01rem]:min-w-xs"></span>
+		<Toolbar.Button
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+			type="button"
+			onclick={onSearch}
+		>
+			Search
+		</Toolbar.Button>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
 				aria-pressed={syntaxMode}
-				class="toolbar-button"
+				class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 				data-mode={syntaxMode ? 'on' : 'off'}
 			>
 				Syntax
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content align="end" class="feature-menu" sideOffset={6}>
+				<DropdownMenu.Content
+					align="end"
+					class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+					sideOffset={6}
+				>
 					<DropdownMenu.Item
-						class="feature-menu-item"
+						class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 						closeOnSelect={false}
 						onSelect={() => void onSyntaxModeChange(!syntaxMode)}
 					>
-						<span class="feature-menu-check" aria-hidden="true">{syntaxMode ? '✓' : ''}</span>
+						<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+							{syntaxMode ? '✓' : ''}
+						</span>
 						<span>{syntaxMode ? 'Hide Syntax' : 'Show Syntax'}</span>
 					</DropdownMenu.Item>
-					<DropdownMenu.Separator class="feature-menu-separator" />
+					<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 					{#each syntaxOptions as option (option.part)}
 						<DropdownMenu.CheckboxItem
 							checked={syntaxParts[option.part]}
-							class="feature-menu-item"
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
 							disabled={!syntaxMode}
 							onCheckedChange={(checked) => onSyntaxPartChange(option.part, checked)}
 						>
-							<span class="feature-menu-check" aria-hidden="true">
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{syntaxParts[option.part] ? '✓' : ''}
 							</span>
 							<span class={option.className}>{option.label}</span>
@@ -140,66 +166,72 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
 				aria-pressed={focusMode}
-				class="toolbar-button"
+				class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 				data-mode={focusMode ? 'on' : 'off'}
 			>
 				Focus
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content align="end" class="feature-menu" sideOffset={6}>
+				<DropdownMenu.Content
+					align="end"
+					class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+					sideOffset={6}
+				>
 					<DropdownMenu.Item
-						class="feature-menu-item"
+						class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 						closeOnSelect={false}
 						onSelect={() => onFocusModeChange(!focusMode)}
 					>
-						<span class="feature-menu-check" aria-hidden="true">{focusMode ? '✓' : ''}</span>
+						<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+							{focusMode ? '✓' : ''}
+						</span>
 						<span>{focusMode ? 'Disable Focus' : 'Enable Focus'}</span>
 					</DropdownMenu.Item>
-					<DropdownMenu.Separator class="feature-menu-separator" />
+					<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 					<DropdownMenu.RadioGroup value={focusScope} onValueChange={onFocusScopeChange}>
 						<DropdownMenu.RadioItem
-							class="feature-menu-item"
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
 							disabled={!focusMode}
 							value="all"
 						>
-							<span class="feature-menu-check" aria-hidden="true">
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{focusScope === 'all' ? '✓' : ''}
 							</span>
 							<span>All</span>
 						</DropdownMenu.RadioItem>
 						<DropdownMenu.RadioItem
-							class="feature-menu-item"
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
 							disabled={!focusMode}
 							value="paragraph"
 						>
-							<span class="feature-menu-check" aria-hidden="true">
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{focusScope === 'paragraph' ? '✓' : ''}
 							</span>
 							<span>Paragraph</span>
 						</DropdownMenu.RadioItem>
 						<DropdownMenu.RadioItem
-							class="feature-menu-item"
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
 							disabled={!focusMode}
 							value="sentence"
 						>
-							<span class="feature-menu-check" aria-hidden="true">
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{focusScope === 'sentence' ? '✓' : ''}
 							</span>
 							<span>Sentence</span>
 						</DropdownMenu.RadioItem>
 					</DropdownMenu.RadioGroup>
-					<DropdownMenu.Separator class="feature-menu-separator" />
+					<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 					<DropdownMenu.CheckboxItem
 						checked={typewriterMode}
-						class="feature-menu-item"
+						class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 						closeOnSelect={false}
 						disabled={!focusMode}
 						onCheckedChange={onTypewriterModeChange}
 					>
-						<span class="feature-menu-check" aria-hidden="true">
+						<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 							{typewriterMode ? '✓' : ''}
 						</span>
 						<span>Typewriter</span>
@@ -209,7 +241,7 @@
 		</DropdownMenu.Root>
 		<Toolbar.Button
 			aria-pressed={hemingwayMode}
-			class="toolbar-button"
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 			data-mode={hemingwayMode ? 'on' : 'off'}
 			type="button"
 			onclick={() => onHemingwayModeChange(!hemingwayMode)}
@@ -219,32 +251,38 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
 				aria-pressed={reviewMode}
-				class="toolbar-button"
+				class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 				data-mode={reviewMode ? 'on' : 'off'}
 			>
 				Review
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content align="end" class="feature-menu" sideOffset={6}>
+				<DropdownMenu.Content
+					align="end"
+					class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+					sideOffset={6}
+				>
 					<DropdownMenu.Item
-						class="feature-menu-item"
+						class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 						closeOnSelect={false}
 						onSelect={() => void onReviewModeChange(!reviewMode)}
 					>
-						<span class="feature-menu-check" aria-hidden="true">{reviewMode ? '✓' : ''}</span>
+						<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+							{reviewMode ? '✓' : ''}
+						</span>
 						<span>{reviewMode ? 'Disable Review' : 'Enable Review'}</span>
 					</DropdownMenu.Item>
-					<DropdownMenu.Separator class="feature-menu-separator" />
+					<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 					{#each reviewOptions as option (option.check)}
 						<DropdownMenu.CheckboxItem
 							checked={reviewChecks[option.check]}
-							class="feature-menu-item"
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
 							disabled={!reviewMode}
 							onCheckedChange={(checked) =>
 								void onReviewCheckChange(option.check, checked)}
 						>
-							<span class="feature-menu-check" aria-hidden="true">
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewChecks[option.check] ? '✓' : ''}
 							</span>
 							<span>{option.label}</span>
@@ -255,7 +293,7 @@
 		</DropdownMenu.Root>
 		<Toolbar.Button
 			aria-pressed={outlineOpen}
-			class="toolbar-button"
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 			data-mode={outlineOpen ? 'on' : 'off'}
 			type="button"
 			onclick={() => onOutlineOpenChange(!outlineOpen)}
@@ -264,7 +302,7 @@
 		</Toolbar.Button>
 		<Toolbar.Button
 			aria-pressed={notesOpen}
-			class="toolbar-button"
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 			data-mode={notesOpen ? 'on' : 'off'}
 			type="button"
 			onclick={() => onNotesOpenChange(!notesOpen)}
@@ -272,14 +310,18 @@
 			Notes
 		</Toolbar.Button>
 		<Toolbar.Button
-			class="toolbar-button"
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
 			disabled={addNoteDisabled}
 			type="button"
 			onclick={onAddNote}
 		>
 			Add Note
 		</Toolbar.Button>
-		<Toolbar.Button class="toolbar-button" type="button" onclick={onGuideOpen}>
+		<Toolbar.Button
+			class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+			type="button"
+			onclick={onGuideOpen}
+		>
 			Shortcuts
 		</Toolbar.Button>
 	</Toolbar.Root>
