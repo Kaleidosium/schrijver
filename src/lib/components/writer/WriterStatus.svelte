@@ -470,7 +470,7 @@
 							onclick={onAddNote}
 						>
 							<SquarePen size={13} strokeWidth={2} />
-							<span>Note</span>
+							<span>Add Note</span>
 						</button>
 					{/snippet}
 				</Tooltip.Trigger>
