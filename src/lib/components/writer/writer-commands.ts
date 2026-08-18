@@ -25,13 +25,7 @@ export const APP_SHORTCUTS = {
 	guide: 'Mod+/'
 } as const;
 
-export interface CommandHelp {
-	readonly label: string;
-	readonly scope: 'App' | 'Editor';
-	readonly shortcut: string;
-}
-
-export const COMMAND_HELP: readonly CommandHelp[] = [
+export const COMMAND_HELP = [
 	{ label: 'Open folder', shortcut: APP_SHORTCUTS.open, scope: 'App' },
 	{ label: 'Save folder project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
 	{ label: 'Find', shortcut: 'Mod+F', scope: 'Editor' },
@@ -45,7 +39,7 @@ export const COMMAND_HELP: readonly CommandHelp[] = [
 	{ label: 'Bold', shortcut: 'Mod+B', scope: 'Editor' },
 	{ label: 'Italic', shortcut: 'Mod+I', scope: 'Editor' },
 	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' }
-];
+] as const;
 
 export function toggleInlineFormat(
 	view: MarkdownEditorContext,

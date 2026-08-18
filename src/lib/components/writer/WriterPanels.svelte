@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { OutlineItem } from '$lib/writer-document';
+	import { formatForDisplay } from '@tanstack/svelte-hotkeys';
 	import { Dialog } from 'bits-ui';
 	import { COMMAND_HELP } from './writer-commands';
 	import type { NoteView } from './writer-types';
@@ -42,15 +43,9 @@
 		outline,
 		outlineOpen
 	}: Props = $props();
-	const KEY_SYMBOLS: Record<string, string> = {
-		mod: '⌘', cmd: '⌘', command: '⌘',
-		alt: '⌥', option: '⌥', opt: '⌥',
-		shift: '⇧',
-		ctrl: '⌃', control: '⌃'
-	};
 
-	function parseShortcutKeys(shortcut: string): readonly string[] {
-		return shortcut.split('+').map((part) => KEY_SYMBOLS[part.trim().toLowerCase()] ?? part.trim());
+	function parseShortcutKeys(shortcut: string): string[] {
+		return formatForDisplay(shortcut, { separatorToken: '|' }).split('|');
 	}
 </script>
 

@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { formatForDisplay } from '@tanstack/svelte-hotkeys';
 	import { DropdownMenu, Toolbar, Tooltip } from 'bits-ui';
 	import { ChevronDown } from '@lucide/svelte';
+	import { APP_SHORTCUTS } from './writer-commands';
 	import type { FocusScope, PartOfSpeech, ReviewCheck } from './writer-types';
 
 	interface SyntaxOption {
@@ -126,14 +128,14 @@
 							onSelect={() => void onOpen()}
 						>
 							<span>Open manuscript</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ O</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.open)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={() => void onSave()}
 						>
 							<span>Save draft</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ S</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.save)}</kbd>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
@@ -162,7 +164,7 @@
 						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Document outline</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ O</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.outline)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -190,7 +192,7 @@
 						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Writer’s notes</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ N</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.addNote)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -216,7 +218,7 @@
 						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Keyboard shortcuts</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ /</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.guide)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -478,7 +480,7 @@
 						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Search in document</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ F</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+F')}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>

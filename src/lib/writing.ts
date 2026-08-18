@@ -218,13 +218,11 @@ export function activeSentenceRange(markdown: string, cursor: number): TextRange
 	return lastSentence;
 }
 
-function maskPattern(chars: string[], text: string, pattern: RegExp) {
+function maskPattern(chars: string[], text: string, pattern: RegExp): void {
 	for (const match of text.matchAll(pattern)) {
-		const from = match.index;
-
-		for (let index = from; index < from + match[0].length; index += 1) {
-			if (chars[index] !== '\n') {
-				chars[index] = ' ';
+		for (let i = match.index; i < match.index + match[0].length; i += 1) {
+			if (chars[i] !== '\n') {
+				chars[i] = ' ';
 			}
 		}
 	}
@@ -232,7 +230,6 @@ function maskPattern(chars: string[], text: string, pattern: RegExp) {
 
 function lineRanges(text: string): Array<TextRange & { text: string }> {
 	let from = 0;
-
 	return text.split('\n').map((line) => {
 		const range = { from, to: from + line.length, text: line };
 		from = range.to + 1;
@@ -240,13 +237,9 @@ function lineRanges(text: string): Array<TextRange & { text: string }> {
 	});
 }
 
-export function countCharacters(markdown: string): number {
-	return markdown.length;
-}
-
-export function countCharactersWithoutSpaces(markdown: string): number {
-	return markdown.replace(/\s/g, '').length;
-}
+export const countCharacters = (markdown: string): number => markdown.length;
+export const countCharactersWithoutSpaces = (markdown: string): number =>
+	markdown.replace(/\s/g, '').length;
 
 export function countSentences(markdown: string): number {
 	const prose = maskMarkdownForProse(markdown);

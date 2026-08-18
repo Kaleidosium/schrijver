@@ -11,6 +11,7 @@ import {
 } from '@codemirror/search';
 import type { EditorState } from '@codemirror/state';
 import type { EditorView, Panel, ViewUpdate } from '@codemirror/view';
+import { formatForDisplay } from '@tanstack/svelte-hotkeys';
 
 export interface MatchStats {
 	readonly current: number;
@@ -57,55 +58,46 @@ export function calculateMatchStats(state: EditorState, query: SearchQuery): Mat
 	}
 }
 
-function elt<K extends keyof HTMLElementTagNameMap>(
-	tag: K,
-	props: Record<string, string | boolean | undefined> | null,
-	children?: readonly (Node | string)[]
-): HTMLElementTagNameMap[K] {
-	const element = document.createElement(tag);
-	if (props) {
-		for (const [key, value] of Object.entries(props)) {
-			if (value === undefined) {
-				continue;
-			}
-			if (typeof value === 'boolean') {
-				if (value) {
-					element.setAttribute(key, '');
-				}
-			} else {
-				element.setAttribute(key, value);
-			}
-		}
-	}
-	if (children) {
-		for (const child of children) {
-			if (typeof child === 'string') {
-				element.appendChild(document.createTextNode(child));
-			} else {
-				element.appendChild(child);
-			}
-		}
-	}
-	return element;
-}
-
-function createSvgElement(viewBox: string, pathData: string, size = 14): SVGSVGElement {
-	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	svg.setAttribute('width', String(size));
-	svg.setAttribute('height', String(size));
-	svg.setAttribute('viewBox', viewBox);
-	svg.setAttribute('fill', 'none');
-	svg.setAttribute('stroke', 'currentColor');
-	svg.setAttribute('stroke-width', '2');
-	svg.setAttribute('stroke-linecap', 'round');
-	svg.setAttribute('stroke-linejoin', 'round');
-	svg.setAttribute('aria-hidden', 'true');
-
-	const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-	path.setAttribute('d', pathData);
-	svg.appendChild(path);
-
-	return svg;
+function getSearchPanelHtml(): string {
+	return `
+<div class="cm-search-row">
+	<div class="cm-search-input-box">
+		<input class="cm-textfield cm-search-input-field" name="search" placeholder="Search..." aria-label="Search" main-field="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		<div class="cm-search-input-toggles" role="group" aria-label="Search options">
+			<button type="button" class="cm-search-toggle-btn" name="case" title="Match Case (${formatForDisplay('Mod+Alt+C')})" aria-label="Match Case" aria-pressed="false">Aa</button>
+			<button type="button" class="cm-search-toggle-btn cm-search-toggle-word" name="word" title="Match Whole Word (${formatForDisplay('Mod+Alt+W')})" aria-label="Match Whole Word" aria-pressed="false"><span class="cm-search-word-label">wd</span></button>
+			<button type="button" class="cm-search-toggle-btn" name="re" title="Use Regular Expression (${formatForDisplay('Mod+Alt+R')})" aria-label="Use Regular Expression" aria-pressed="false">.*</button>
+		</div>
+	</div>
+	<div class="cm-search-actions">
+		<button type="button" class="cm-button cm-search-action-btn" name="select" title="Select All Matches (${formatForDisplay('Alt+Enter')})" aria-label="Select All Matches">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+		</button>
+		<div class="cm-search-spacer" aria-hidden="true"></div>
+		<div class="cm-search-v-sep" aria-hidden="true"></div>
+		<button type="button" class="cm-button cm-search-action-btn" name="prev" title="Previous Match (${formatForDisplay('Shift+Enter')})" aria-label="Previous Match">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+		</button>
+		<button type="button" class="cm-button cm-search-action-btn" name="next" title="Next Match (Enter)" aria-label="Next Match">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+		</button>
+		<span class="cm-search-count-badge" aria-live="polite" aria-label="Match count">0/0</span>
+	</div>
+</div>
+<div class="cm-replace-row">
+	<div class="cm-search-input-box cm-replace-input-box">
+		<input class="cm-textfield cm-search-input-field" name="replace" placeholder="Replace with..." aria-label="Replace with" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+	</div>
+	<div class="cm-replace-actions">
+		<button type="button" class="cm-button cm-search-action-btn" name="replace" title="Replace Next (Enter in replace field)" aria-label="Replace Next">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 10 5 5-5 5M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+		</button>
+		<button type="button" class="cm-button cm-search-action-btn" name="replaceAll" title="Replace All (${formatForDisplay('Alt+Enter')} in replace field)" aria-label="Replace All">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4c0-1.1.9-2 2-2M20 2a2 2 0 0 1 2 2M22 8a2 2 0 0 1-2 2M16 10a2 2 0 0 1-2-2M3 7l3 3 3-3M6 10V5a3 3 0 0 1 3-3h2M3 17l3 3 3-3M6 20v-5a3 3 0 0 1 3-3h2"/></svg>
+		</button>
+	</div>
+</div>
+`;
 }
 
 export class ZedSearchPanel implements Panel {
@@ -130,245 +122,73 @@ export class ZedSearchPanel implements Panel {
 		this.wordActive = query.wholeWord;
 		this.reActive = query.regexp;
 
-		this.commit = this.commit.bind(this);
-		this.keydown = this.keydown.bind(this);
+		this.dom = document.createElement('div');
+		this.dom.className = 'cm-panel cm-search cm-zed-search';
+		this.dom.setAttribute('role', 'search');
+		this.dom.innerHTML = getSearchPanelHtml();
 
-		// Search Input
-		this.searchField = elt('input', {
-			class: 'cm-textfield cm-search-input-field',
-			name: 'search',
-			placeholder: 'Search...',
-			'aria-label': 'Search',
-			value: query.search,
-			'main-field': 'true',
-			autocomplete: 'off',
-			autocorrect: 'off',
-			autocapitalize: 'off',
-			spellcheck: 'false'
-		});
-		this.searchField.addEventListener('input', () => {
-			this.commit();
-		});
+		if (view.state.readOnly) {
+			this.dom.querySelector('.cm-replace-row')?.remove();
+		}
 
-		// Toggles inside Search input box
-		this.caseBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-search-toggle-btn',
-				name: 'case',
-				title: 'Match Case (⌥⌘C)',
-				'aria-label': 'Match Case',
-				'aria-pressed': this.caseActive ? 'true' : 'false'
-			},
-			['Aa']
-		);
+		this.searchField = this.dom.querySelector('input[name="search"]')!;
+		this.replaceField = this.dom.querySelector('input[name="replace"]')!;
+		this.caseBtn = this.dom.querySelector('button[name="case"]')!;
+		this.wordBtn = this.dom.querySelector('button[name="word"]')!;
+		this.reBtn = this.dom.querySelector('button[name="re"]')!;
+		this.countBadge = this.dom.querySelector('.cm-search-count-badge')!;
+
+		this.searchField.value = query.search;
+		if (this.replaceField) {
+			this.replaceField.value = query.replace;
+		}
+
+		this.searchField.addEventListener('input', () => this.commit());
+		this.replaceField?.addEventListener('input', () => this.commit());
+
 		this.caseBtn.addEventListener('click', () => {
 			this.caseActive = !this.caseActive;
 			this.updateToggleStates();
 			this.commit();
 		});
 
-		const wordSpan = elt('span', { class: 'cm-search-word-label' }, ['wd']);
-		this.wordBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-search-toggle-btn cm-search-toggle-word',
-				name: 'word',
-				title: 'Match Whole Word (⌥⌘W)',
-				'aria-label': 'Match Whole Word',
-				'aria-pressed': this.wordActive ? 'true' : 'false'
-			},
-			[wordSpan]
-		);
 		this.wordBtn.addEventListener('click', () => {
 			this.wordActive = !this.wordActive;
 			this.updateToggleStates();
 			this.commit();
 		});
 
-		this.reBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-search-toggle-btn',
-				name: 're',
-				title: 'Use Regular Expression (⌥⌘R)',
-				'aria-label': 'Use Regular Expression',
-				'aria-pressed': this.reActive ? 'true' : 'false'
-			},
-			['.*']
-		);
 		this.reBtn.addEventListener('click', () => {
 			this.reActive = !this.reActive;
 			this.updateToggleStates();
 			this.commit();
 		});
 
-		const searchToggles = elt(
-			'div',
-			{ class: 'cm-search-input-toggles', role: 'group', 'aria-label': 'Search options' },
-			[this.caseBtn, this.wordBtn, this.reBtn]
-		);
+		this.dom
+			.querySelector('button[name="select"]')
+			?.addEventListener('click', () => selectMatches(this.view));
+		this.dom
+			.querySelector('button[name="prev"]')
+			?.addEventListener('click', () => findPrevious(this.view));
+		this.dom
+			.querySelector('button[name="next"]')
+			?.addEventListener('click', () => findNext(this.view));
+		this.dom
+			.querySelector('button[name="replace"]')
+			?.addEventListener('click', () => replaceNext(this.view));
+		this.dom
+			.querySelector('button[name="replaceAll"]')
+			?.addEventListener('click', () => replaceAll(this.view));
 
-		const searchInputBox = elt('div', { class: 'cm-search-input-box' }, [
-			this.searchField,
-			searchToggles
-		]);
-
-		// Search Actions
-		const selectAllSvg = createSvgElement('0 0 24 24', 'M3 6h18M3 12h18M3 18h18');
-		const selectAllBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-button cm-search-action-btn',
-				name: 'select',
-				title: 'Select All Matches (⌥Enter)',
-				'aria-label': 'Select All Matches'
-			},
-			[selectAllSvg]
-		);
-		selectAllBtn.addEventListener('click', () => selectMatches(this.view));
-
-		const spacer = elt('div', { class: 'cm-search-spacer', 'aria-hidden': 'true' });
-		const separator = elt('div', { class: 'cm-search-v-sep', 'aria-hidden': 'true' });
-
-		const prevSvg = createSvgElement('0 0 24 24', 'm15 18-6-6 6-6');
-		const prevBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-button cm-search-action-btn',
-				name: 'prev',
-				title: 'Previous Match (⇧Enter)',
-				'aria-label': 'Previous Match'
-			},
-			[prevSvg]
-		);
-		prevBtn.addEventListener('click', () => findPrevious(this.view));
-
-		const nextSvg = createSvgElement('0 0 24 24', 'm9 18 6-6-6-6');
-		const nextBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-button cm-search-action-btn',
-				name: 'next',
-				title: 'Next Match (Enter)',
-				'aria-label': 'Next Match'
-			},
-			[nextSvg]
-		);
-		nextBtn.addEventListener('click', () => findNext(this.view));
-
-		this.countBadge = elt(
-			'span',
-			{
-				class: 'cm-search-count-badge',
-				'aria-live': 'polite',
-				'aria-label': 'Match count'
-			},
-			['0/0']
-		);
-
-		const searchActions = elt('div', { class: 'cm-search-actions' }, [
-			selectAllBtn,
-			spacer,
-			separator,
-			prevBtn,
-			nextBtn,
-			this.countBadge
-		]);
-
-		const searchRow = elt('div', { class: 'cm-search-row' }, [searchInputBox, searchActions]);
-
-		// Replace row
-		this.replaceField = elt('input', {
-			class: 'cm-textfield cm-search-input-field',
-			name: 'replace',
-			placeholder: 'Replace with...',
-			'aria-label': 'Replace with',
-			value: query.replace,
-			autocomplete: 'off',
-			autocorrect: 'off',
-			autocapitalize: 'off',
-			spellcheck: 'false'
-		});
-		this.replaceField.addEventListener('input', () => {
-			this.commit();
-		});
-
-		const replaceInputBox = elt('div', { class: 'cm-search-input-box cm-replace-input-box' }, [
-			this.replaceField
-		]);
-
-		// Replace Next SVG: Curved arrow down-right (CornerDownRight)
-		const replaceNextSvg = createSvgElement('0 0 24 24', 'm15 10 5 5-5 5M4 4v7a4 4 0 0 0 4 4h12');
-		const replaceNextBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-button cm-search-action-btn',
-				name: 'replace',
-				title: 'Replace Next (Enter in replace field)',
-				'aria-label': 'Replace Next'
-			},
-			[replaceNextSvg]
-		);
-		replaceNextBtn.addEventListener('click', () => replaceNext(this.view));
-
-		// Replace All SVG
-		const replaceAllSvg = createSvgElement(
-			'0 0 24 24',
-			'M14 4c0-1.1.9-2 2-2M20 2a2 2 0 0 1 2 2M22 8a2 2 0 0 1-2 2M16 10a2 2 0 0 1-2-2M3 7l3 3 3-3M6 10V5a3 3 0 0 1 3-3h2M3 17l3 3 3-3M6 20v-5a3 3 0 0 1 3-3h2'
-		);
-		const replaceAllBtn = elt(
-			'button',
-			{
-				type: 'button',
-				class: 'cm-button cm-search-action-btn',
-				name: 'replaceAll',
-				title: 'Replace All (⌥Enter in replace field)',
-				'aria-label': 'Replace All'
-			},
-			[replaceAllSvg]
-		);
-		replaceAllBtn.addEventListener('click', () => replaceAll(this.view));
-
-		const replaceActions = elt('div', { class: 'cm-replace-actions' }, [
-			replaceNextBtn,
-			replaceAllBtn
-		]);
-
-		const replaceRow = elt('div', { class: 'cm-replace-row' }, [replaceInputBox, replaceActions]);
-
-		const rows: HTMLElement[] = [searchRow];
-		if (!view.state.readOnly) {
-			rows.push(replaceRow);
-		}
-
-		this.dom = elt(
-			'div',
-			{
-				class: 'cm-panel cm-search cm-zed-search',
-				role: 'search'
-			},
-			rows
-		);
-
-		this.dom.addEventListener('keydown', (e) => {
-			this.keydown(e);
-		});
+		this.dom.addEventListener('keydown', (e) => this.keydown(e));
 		this.updateToggleStates();
 		this.updateMatchCount();
 	}
 
 	private updateToggleStates(): void {
-		this.caseBtn.setAttribute('aria-pressed', this.caseActive ? 'true' : 'false');
-		this.wordBtn.setAttribute('aria-pressed', this.wordActive ? 'true' : 'false');
-		this.reBtn.setAttribute('aria-pressed', this.reActive ? 'true' : 'false');
+		this.caseBtn.setAttribute('aria-pressed', String(this.caseActive));
+		this.wordBtn.setAttribute('aria-pressed', String(this.wordActive));
+		this.reBtn.setAttribute('aria-pressed', String(this.reActive));
 	}
 
 	private updateMatchCount(): void {
@@ -383,7 +203,7 @@ export class ZedSearchPanel implements Panel {
 			caseSensitive: this.caseActive,
 			wholeWord: this.wordActive,
 			regexp: this.reActive,
-			replace: this.replaceField.value
+			replace: this.replaceField?.value ?? ''
 		});
 
 		if (!query.eq(this.query)) {
@@ -402,26 +222,17 @@ export class ZedSearchPanel implements Panel {
 
 		const isMod = e.metaKey || e.ctrlKey;
 
-		// Shortcuts to toggle search options
 		if (isMod && e.altKey) {
 			const key = e.key.toLowerCase();
-			if (key === 'c') {
+			if (key === 'c' || key === 'w' || key === 'r') {
 				e.preventDefault();
-				this.caseActive = !this.caseActive;
-				this.updateToggleStates();
-				this.commit();
-				return;
-			}
-			if (key === 'w') {
-				e.preventDefault();
-				this.wordActive = !this.wordActive;
-				this.updateToggleStates();
-				this.commit();
-				return;
-			}
-			if (key === 'r') {
-				e.preventDefault();
-				this.reActive = !this.reActive;
+				if (key === 'c') {
+					this.caseActive = !this.caseActive;
+				} else if (key === 'w') {
+					this.wordActive = !this.wordActive;
+				} else {
+					this.reActive = !this.reActive;
+				}
 				this.updateToggleStates();
 				this.commit();
 				return;
@@ -468,7 +279,7 @@ export class ZedSearchPanel implements Panel {
 		if (this.searchField.value !== query.search) {
 			this.searchField.value = query.search;
 		}
-		if (this.replaceField.value !== query.replace) {
+		if (this.replaceField && this.replaceField.value !== query.replace) {
 			this.replaceField.value = query.replace;
 		}
 		this.caseActive = query.caseSensitive;
