@@ -60,7 +60,7 @@
 	aria-label="Formatting and document statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
-		<div class="flex items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+		<div class="flex items-center gap-0.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 			<!-- Group 1: Headings Menu (H1 - H6 + Body) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>

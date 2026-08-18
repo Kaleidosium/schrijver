@@ -59,6 +59,13 @@
 	--rail-width: var(--width-rail);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+	html,
+	.cm-scroller {
+		scroll-behavior: smooth;
+	}
+}
+
 html,
 body {
 	height: 100%;
@@ -67,6 +74,7 @@ body {
 	background: var(--color-page);
 	color: var(--color-ink);
 	font-family: var(--font-mono);
+	overscroll-behavior: none;
 }
 
 .cm-writer-note-anchor {

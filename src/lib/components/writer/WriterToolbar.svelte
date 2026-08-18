@@ -97,7 +97,7 @@
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
 		<Toolbar.Root
-			class="flex w-full flex-nowrap items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
+			class="flex w-full flex-nowrap items-center gap-0.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
 			loop={false}
 		>
 			<Tooltip.Root>

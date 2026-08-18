@@ -171,26 +171,44 @@
             return value;
         },
     });
-    const typewriterScroll = EditorState.transactionExtender.of(
+    const workspaceScroll = EditorState.transactionExtender.of(
         (transaction) => {
             const cursorMove =
                 transaction.selection !== undefined &&
                 transaction.newSelection.ranges.every((range) => range.empty);
+            const isTypewriter = transaction.state.field(typewriterModeField);
             const enablingTypewriter = transaction.effects.some(
                 (effect) => effect.is(setTypewriterMode) && effect.value,
             );
 
-            if (
-                !transaction.state.field(typewriterModeField) ||
-                (!transaction.docChanged && !cursorMove && !enablingTypewriter)
-            ) {
+            if (isTypewriter) {
+                if (
+                    !transaction.docChanged &&
+                    !cursorMove &&
+                    !enablingTypewriter
+                ) {
+                    return null;
+                }
+
+                return {
+                    effects: EditorView.scrollIntoView(
+                        transaction.newSelection.main.head,
+                        { y: "center" },
+                    ),
+                };
+            }
+
+            if (!transaction.docChanged && !cursorMove) {
                 return null;
             }
 
             return {
                 effects: EditorView.scrollIntoView(
                     transaction.newSelection.main.head,
-                    { y: "center" },
+                    {
+                        y: "nearest",
+                        yMargin: 48,
+                    },
                 ),
             };
         },
@@ -495,7 +513,7 @@
                     typewriterModeField,
                     typewriterAttributes,
                     hemingwayModeField,
-                    typewriterScroll,
+                    workspaceScroll,
                     hemingwayFilter,
                     syntaxModeField,
                     focusPlugin,
@@ -2101,7 +2119,7 @@
             <Dialog.Portal>
                 <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
                 <Dialog.Content
-                    class="fixed top-1/2 left-1/2 z-51 grid max-h-[min(36rem,calc(100svh-2rem))] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_minmax(0,1fr)] rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+                    class="fixed top-1/2 left-1/2 z-51 grid max-h-[min(36rem,calc(100svh-2rem))] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_minmax(0,1fr)] overscroll-contain rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
                 >
                     <header class="flex items-start justify-between gap-s">
                         <div>
@@ -2120,7 +2138,7 @@
                             Cancel
                         </Dialog.Close>
                     </header>
-                    <div class="mt-s grid min-h-0 gap-3xs overflow-y-auto">
+                    <div class="mt-s grid min-h-0 gap-3xs overflow-y-auto overscroll-y-contain">
                         {#each manuscriptCandidates as candidate (candidate.name)}
                             <button
                                 aria-label={`Open ${candidate.name}`}

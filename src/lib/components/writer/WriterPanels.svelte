@@ -46,7 +46,7 @@
 
 {#if outlineOpen}
 	<aside
-		class="absolute top-0 bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto border-r border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
+		class="absolute top-0 bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
 		aria-label="Document outline"
 		data-rail="outline"
 	>
@@ -72,7 +72,7 @@
 
 {#if notesOpen}
 	<aside
-		class="absolute top-0 right-0 bottom-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
+		class="absolute top-0 right-0 bottom-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
 		aria-label="Writer’s Notes"
 		data-rail="notes"
 	>
@@ -143,7 +143,7 @@
 	<Dialog.Portal>
 		<Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
 		<Dialog.Content
-			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
 		>
 			<header class="flex items-center justify-between gap-s">
 				<Dialog.Title class="m-0 text-[1.1rem] font-bold">Keyboard shortcuts</Dialog.Title>

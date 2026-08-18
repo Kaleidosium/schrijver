@@ -39,6 +39,7 @@ export const writerNoteTheme = EditorView.theme({
 	},
 	'.cm-scroller': {
 		overflow: 'auto',
+		overscrollBehavior: 'contain',
 		fontFamily: 'monospace',
 		lineHeight: '1.45'
 	},
@@ -80,7 +81,9 @@ export const writerTheme = EditorView.theme({
 		minHeight: '100%',
 		fontFamily: 'monospace',
 		fontSize: '1.5em',
-		lineHeight: '1.75'
+		lineHeight: '1.75',
+		overscrollBehavior: 'contain',
+		scrollPaddingBlock: 'clamp(2.5rem, 2rem + 1.5vw, 3.5rem)'
 	},
 	'.cm-content': {
 		flex: '0 1 70ch',
