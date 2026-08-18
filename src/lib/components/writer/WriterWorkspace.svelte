@@ -61,7 +61,6 @@
         markdownHighlightStyle,
         writerTheme,
     } from "./writer-editor-theme";
-    import { installSearchIcons } from "./writer-search-icons";
     import {
         APP_SHORTCUTS,
         insertCodeBlock,
@@ -76,7 +75,6 @@
         toggleInlineFormat,
         toggleNumberedList,
         toggleTaskList,
-        wrapSelection,
     } from "./writer-commands";
     import WriterPanels from "./WriterPanels.svelte";
     import WriterStatus from "./WriterStatus.svelte";
@@ -88,7 +86,6 @@
         ReviewCheck,
     } from "./writer-types";
 
-    const LEGACY_STORAGE_KEY = "schrijver:draft:v1";
     const RECOVERY_KEY = "schrijver:recovery:v1";
     const RECOVERY_DELAY = 600;
     const DEFAULT_FILE_NAME = "schrijver-draft.md";
@@ -413,56 +410,6 @@
     const selectionStats = $derived(
         hasTextSelection && selectedText ? calculateSelectionStats(selectedText) : undefined,
     );
-    const toggleFormatAction = (open: string, close = open) => {
-        if (editor) {
-            toggleInlineFormat(editor, open, close);
-        }
-    };
-    const toggleHeadingAction = (level: number) => {
-        if (editor) {
-            toggleHeading(editor, level);
-        }
-    };
-    const toggleBlockquoteAction = () => {
-        if (editor) {
-            toggleBlockquote(editor);
-        }
-    };
-    const toggleBulletListAction = () => {
-        if (editor) {
-            toggleBulletList(editor);
-        }
-    };
-    const toggleNumberedListAction = () => {
-        if (editor) {
-            toggleNumberedList(editor);
-        }
-    };
-    const toggleTaskListAction = () => {
-        if (editor) {
-            toggleTaskList(editor);
-        }
-    };
-    const insertLinkAction = () => {
-        if (editor) {
-            insertLink(editor);
-        }
-    };
-    const insertCodeBlockAction = () => {
-        if (editor) {
-            insertCodeBlock(editor);
-        }
-    };
-    const insertHorizontalRuleAction = () => {
-        if (editor) {
-            insertHorizontalRule(editor);
-        }
-    };
-    const insertFootnoteAction = () => {
-        if (editor) {
-            insertFootnote(editor);
-        }
-    };
     const noteViews = $derived.by(buildNoteViews);
     const attachEditor: Attachment<HTMLDivElement> = (editorElement) =>
         untrack(() => {
@@ -596,8 +543,6 @@
                 ],
             }),
         });
-        const removeSearchIcons = installSearchIcons(editor.dom);
-
         outline = outlineItems(editor.state);
         hasTextSelection = !editor.state.selection.main.empty;
         selectedText = hasTextSelection
@@ -619,7 +564,6 @@
 
             return () => {
                 flushRecovery();
-                removeSearchIcons();
                 editor?.destroy();
                 editor = undefined;
             };
@@ -662,6 +606,14 @@
                 hotkey: APP_SHORTCUTS.guide,
                 callback: () => {
                     guideOpen = !guideOpen;
+                },
+            },
+            {
+                hotkey: "Escape",
+                callback: () => {
+                    if (guideOpen) {
+                        guideOpen = false;
+                    }
                 },
             },
         ],
@@ -1046,7 +998,7 @@
                 const nextDirectory = await picker.showDirectoryPicker({
                     mode: "readwrite",
                 });
-                const requestedName = prompt("File name", fileNameInputValue());
+                const requestedName = prompt("File name", manuscriptLabel(fileName));
 
                 if (!requestedName) {
                     return;
@@ -1114,7 +1066,7 @@
     }
 
     function downloadProject(): void {
-        const requestedName = prompt("File name", fileNameInputValue());
+        const requestedName = prompt("File name", manuscriptLabel(fileName));
 
         if (!requestedName) {
             return;
@@ -1153,10 +1105,6 @@
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
-    }
-
-    function fileNameInputValue(): string {
-        return fileName.replace(/\.(?:md|markdown|txt)$/i, "");
     }
 
     function manuscriptLabel(name: string): string {
@@ -1514,43 +1462,7 @@
     }
 
     function loadInitialRecovery(): RecoveryJournal | undefined {
-        const existing = parseRecovery(localStorage.getItem(RECOVERY_KEY));
-
-        if (existing) {
-            return existing;
-        }
-
-        const legacyDraft = localStorage.getItem(LEGACY_STORAGE_KEY);
-
-        if (!legacyDraft) {
-            return undefined;
-        }
-
-        const sidecar = emptySidecar(DEFAULT_FILE_NAME);
-        const migrated: RecoveryJournal = {
-            version: 1,
-            markdown: legacyDraft,
-            fileName: DEFAULT_FILE_NAME,
-            sidecar,
-            context: {
-                anchor: legacyDraft.length,
-                head: legacyDraft.length,
-                scrollTop: 0,
-                outlineOpen: false,
-                notesOpen: false,
-            },
-            updatedAt: new Date().toISOString(),
-            revision: 1,
-        };
-
-        try {
-            localStorage.setItem(RECOVERY_KEY, JSON.stringify(migrated));
-            localStorage.removeItem(LEGACY_STORAGE_KEY);
-        } catch {
-            recoveryAvailable = false;
-        }
-
-        return migrated;
+        return parseRecovery(localStorage.getItem(RECOVERY_KEY));
     }
 
     function handleVisibilityChange(): void {
@@ -1591,12 +1503,6 @@
 
     function reloadOtherRecovery(): void {
         location.reload();
-    }
-
-    function handleWindowKeydown(event: KeyboardEvent): void {
-        if (guideOpen && event.key === "Escape") {
-            guideOpen = false;
-        }
     }
 
     async function existingFileHandle(
@@ -2008,7 +1914,6 @@
 
 <svelte:window
 	onbeforeunload={handleBeforeUnload}
-	onkeydown={handleWindowKeydown}
 	onpagehide={handlePageHide}
 	onstorage={handleStorage}
 />
@@ -2102,9 +2007,11 @@
             {outlineOpen}
         />
         <div
-            class="h-full min-h-0 transition-[padding] duration-150"
-            class:lg:pl-[var(--rail-width)]={outlineOpen}
-            class:lg:pr-[var(--rail-width)]={notesOpen}
+            class={[
+                "h-full min-h-0 transition-[padding] duration-150",
+                outlineOpen && "lg:pl-rail",
+                notesOpen && "lg:pr-rail",
+            ]}
             {@attach attachEditor}
         ></div>
     </section>
@@ -2148,9 +2055,10 @@
                                 <span class="flex items-baseline justify-between gap-s">
                                     <span class="truncate font-bold">{candidate.label}</span>
                                     <span
-                                        class="shrink-0 text-[0.72rem]"
-                                        class:text-accent-ink={candidate.sidecarHandle}
-                                        class:text-muted={!candidate.sidecarHandle}
+                                        class={[
+                                            "shrink-0 text-[0.72rem]",
+                                            candidate.sidecarHandle ? "text-accent-ink" : "text-muted",
+                                        ]}
                                     >
                                         {candidate.sidecarHandle ? "Notes found" : "No notes yet"}
                                     </span>
@@ -2172,16 +2080,16 @@
         {documentStats}
         {selectionStats}
         onAddNote={addNote}
-        onToggleFormat={toggleFormatAction}
-        onToggleHeading={toggleHeadingAction}
-        onToggleBlockquote={toggleBlockquoteAction}
-        onToggleBulletList={toggleBulletListAction}
-        onToggleNumberedList={toggleNumberedListAction}
-        onToggleTaskList={toggleTaskListAction}
-        onInsertLink={insertLinkAction}
-        onInsertCodeBlock={insertCodeBlockAction}
-        onInsertHorizontalRule={insertHorizontalRuleAction}
-        onInsertFootnote={insertFootnoteAction}
+        onToggleFormat={(open, close) => editor && toggleInlineFormat(editor, open, close)}
+        onToggleHeading={(level) => editor && toggleHeading(editor, level)}
+        onToggleBlockquote={() => editor && toggleBlockquote(editor)}
+        onToggleBulletList={() => editor && toggleBulletList(editor)}
+        onToggleNumberedList={() => editor && toggleNumberedList(editor)}
+        onToggleTaskList={() => editor && toggleTaskList(editor)}
+        onInsertLink={() => editor && insertLink(editor)}
+        onInsertCodeBlock={() => editor && insertCodeBlock(editor)}
+        onInsertHorizontalRule={() => editor && insertHorizontalRule(editor)}
+        onInsertFootnote={() => editor && insertFootnote(editor)}
     />
     <input
         {@attach attachFallbackInput}

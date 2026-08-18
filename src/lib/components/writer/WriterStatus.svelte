@@ -24,7 +24,7 @@
 		readonly documentStats: DocumentStats;
 		readonly selectionStats?: SelectionStats | undefined;
 		readonly onAddNote?: (() => void) | undefined;
-		readonly onToggleFormat: (open: string, close?: string) => void;
+		readonly onToggleFormat: (open: string, close?: string | undefined) => void;
 		readonly onToggleHeading: (level: number) => void;
 		readonly onToggleBlockquote: () => void;
 		readonly onToggleBulletList: () => void;
@@ -54,25 +54,21 @@
 	}: Props = $props();
 
 	let statsOpen = $state(false);
-
-	function setStatsOpen(open: boolean): void {
-		statsOpen = open;
-	}
 </script>
 
 <footer
-	class="flex min-h-[calc(var(--control-size)+var(--spacing-3xs))] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-0.5 font-sans text-[0.76rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--shell-max))/2+var(--spacing-s)))]"
+	class="flex min-h-[calc(var(--size-control)+var(--spacing-3xs))] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-0.5 font-sans text-[0.76rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
 	aria-label="Formatting and document statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
-		<div class="flex items-center gap-0.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+		<div class="flex items-center gap-0.5 overflow-x-auto overscroll-x-contain scrollbar-none [&::-webkit-scrollbar]:hidden">
 			<!-- Group 1: Headings Menu (H1 - H6 + Body) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
 						<button
 							{...triggerProps}
-							class="flex h-6 min-h-[1.5rem] shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Heading options"
 						>
@@ -89,42 +85,42 @@
 						class="z-50 min-w-44 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(1)}
 						>
 							<span class="font-bold text-[0.88rem]">Heading 1</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(2)}
 						>
 							<span class="font-semibold text-[0.82rem]">Heading 2</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">##</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(3)}
 						>
 							<span class="font-medium text-[0.78rem]">Heading 3</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">###</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(4)}
 						>
 							<span class="text-[0.76rem]">Heading 4</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(5)}
 						>
 							<span class="text-[0.74rem]">Heading 5</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(6)}
 						>
 							<span class="text-[0.72rem]">Heading 6</span>
@@ -132,7 +128,7 @@
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-1 h-px bg-rule" />
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(0)}
 						>
 							<span class="text-[0.76rem] text-muted">Body text</span>
@@ -150,7 +146,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] font-bold leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] font-bold leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Bold"
 							onclick={() => onToggleFormat('**')}
@@ -177,7 +173,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] italic leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] italic leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Italic"
 							onclick={() => onToggleFormat('*')}
@@ -204,7 +200,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Strikethrough"
 							onclick={() => onToggleFormat('~~')}
@@ -233,7 +229,7 @@
 					{#snippet child({ props: triggerProps })}
 						<button
 							{...triggerProps}
-							class="flex h-6 min-h-[1.5rem] shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Code options"
 						>
@@ -250,14 +246,14 @@
 						class="z-50 min-w-36 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleFormat('`')}
 						>
 							<span>Inline code</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">`</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={onInsertCodeBlock}
 						>
 							<span>Code block</span>
@@ -273,7 +269,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Link"
 							onclick={onInsertLink}
@@ -303,7 +299,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Bullet list"
 							onclick={onToggleBulletList}
@@ -330,7 +326,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Numbered list"
 							onclick={onToggleNumberedList}
@@ -357,7 +353,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Task checklist"
 							onclick={onToggleTaskList}
@@ -387,7 +383,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Blockquote"
 							onclick={onToggleBlockquote}
@@ -413,7 +409,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Footnote"
 							onclick={onInsertFootnote}
@@ -440,7 +436,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 							type="button"
 							aria-label="Horizontal rule"
 							onclick={onInsertHorizontalRule}
@@ -467,7 +463,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<button
 							{...tooltipProps}
-							class="flex h-6 min-h-[1.5rem] shrink-0 cursor-pointer items-center gap-1 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40"
+							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40"
 							disabled={addNoteDisabled}
 							type="button"
 							aria-label="Add note at selection"
@@ -493,17 +489,17 @@
 	</Tooltip.Provider>
 
 	<!-- Statistics Popover Trigger (Right Side) -->
-	<Popover.Root open={statsOpen} onOpenChange={setStatsOpen}>
+	<Popover.Root bind:open={statsOpen}>
 		<Popover.Trigger>
 			{#snippet child({ props: triggerProps })}
 				<button
 					{...triggerProps}
-					class="flex h-6 min-h-[1.5rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.75rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+					class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.75rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
 					type="button"
 					aria-label="Show document statistics"
 				>
 					<span>{documentStats.words} {documentStats.words === 1 ? 'word' : 'words'}</span>
-					<ChevronDown size={11} class="transition-transform duration-150 {statsOpen ? 'rotate-180' : ''}" />
+					<ChevronDown size={11} class={['transition-transform duration-150', statsOpen && 'rotate-180']} />
 				</button>
 			{/snippet}
 		</Popover.Trigger>

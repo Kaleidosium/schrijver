@@ -1,6 +1,13 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+/// <reference types="svelte" />
+/// <reference types="svelte/elements" />
+
 declare global {
+	namespace svelteHTML {
+		// Fallback for IDE language servers
+		interface HTMLAttributes<T extends EventTarget = any> {}
+		interface SVGAttributes<T extends EventTarget = any> {}
+	}
+
 	namespace App {
 		// interface Error {}
 		// interface Locals {}

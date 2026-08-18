@@ -5,7 +5,7 @@ import { tags } from '@lezer/highlight';
 export const markdownHighlightStyle = HighlightStyle.define([
 	{
 		tag: tags.heading,
-		color: 'var(--ink)',
+		color: 'var(--color-ink)',
 		fontWeight: '700',
 		textDecoration: 'none'
 	},
@@ -14,11 +14,11 @@ export const markdownHighlightStyle = HighlightStyle.define([
 	{ tag: tags.strikethrough, textDecoration: 'line-through' },
 	{
 		tag: [tags.link, tags.url, tags.monospace],
-		color: 'var(--accent-ink)'
+		color: 'var(--color-accent-ink)'
 	},
 	{
 		tag: [tags.processingInstruction, tags.atom, tags.contentSeparator],
-		color: 'color-mix(in srgb, var(--muted) 55%, var(--page))',
+		color: 'color-mix(in srgb, var(--color-muted) 55%, var(--color-page))',
 		fontStyle: 'normal',
 		fontWeight: '400',
 		textDecoration: 'none'
@@ -30,11 +30,11 @@ export const writerNoteTheme = EditorView.theme({
 		width: '100%',
 		minHeight: '4.5rem',
 		backgroundColor: 'transparent',
-		color: 'var(--ink)',
+		color: 'var(--color-ink)',
 		fontSize: '0.82rem'
 	},
 	'&.cm-focused': {
-		boxShadow: 'inset 0 -1px var(--accent)',
+		boxShadow: 'inset 0 -1px var(--color-accent)',
 		outline: 'none'
 	},
 	'.cm-scroller': {
@@ -52,14 +52,14 @@ export const writerNoteTheme = EditorView.theme({
 		padding: '0'
 	},
 	'.cm-selectionBackground, .cm-content ::selection': {
-		backgroundColor: 'var(--selection)'
+		backgroundColor: 'var(--color-selection)'
 	},
 	'.cm-cursor': {
-		borderLeft: '1px solid var(--accent)',
-		borderLeftColor: 'var(--accent)'
+		borderLeft: '1px solid var(--color-accent)',
+		borderLeftColor: 'var(--color-accent)'
 	},
 	'.cm-placeholder': {
-		color: 'color-mix(in srgb, var(--muted) 65%, transparent)'
+		color: 'color-mix(in srgb, var(--color-muted) 65%, transparent)'
 	}
 });
 
@@ -68,7 +68,7 @@ export const writerTheme = EditorView.theme({
 		height: '100%',
 		minHeight: '100%',
 		backgroundColor: 'transparent',
-		color: 'var(--ink)'
+		color: 'var(--color-ink)'
 	},
 	'&.cm-focused': {
 		outline: 'none'
@@ -92,7 +92,7 @@ export const writerTheme = EditorView.theme({
 		minHeight: '100%',
 		margin: '0 auto',
 		padding: 'var(--editor-block-space) var(--editor-inline-space)',
-		caretColor: 'var(--accent)',
+		caretColor: 'var(--color-accent)',
 		fontFamily: 'inherit',
 		lineHeight: 'inherit'
 	},
@@ -105,29 +105,29 @@ export const writerTheme = EditorView.theme({
 		lineHeight: 'inherit'
 	},
 	'.cm-selectionBackground, .cm-content ::selection': {
-		backgroundColor: 'var(--selection)'
+		backgroundColor: 'var(--color-selection)'
 	},
 	'.cm-cursor': {
-		borderLeftColor: 'var(--accent)'
+		borderLeftColor: 'var(--color-accent)'
 	},
 	'.cm-panels': {
-		borderColor: 'var(--rule)',
-		backgroundColor: 'var(--page)',
-		color: 'var(--muted)',
+		borderColor: 'var(--color-rule)',
+		backgroundColor: 'var(--color-page)',
+		color: 'var(--color-muted)',
 		fontFamily:
 			"ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 		fontSize: '0.9rem'
 	},
 	'.cm-panels-top': {
 		zIndex: '10',
-		borderBottom: '1px solid var(--rule)',
+		borderBottom: '1px solid var(--color-rule)',
 		boxShadow: '0 0.35rem 0.9rem rgba(34, 35, 31, 0.05)'
 	},
 	'.cm-panels-bottom': {
-		borderTop: '1px solid var(--rule)'
+		borderTop: '1px solid var(--color-rule)'
 	},
 	'.cm-panel': {
-		padding: 'var(--space-3xs) var(--space-xs)'
+		padding: 'var(--spacing-3xs) var(--spacing-xs)'
 	},
 	'.cm-panel.cm-search': {
 		display: 'grid',
@@ -138,8 +138,8 @@ export const writerTheme = EditorView.theme({
 		columnGap: '0.2rem',
 		rowGap: '0.25rem',
 		padding:
-			'0.375rem max(var(--space-2xs), calc((100vw - var(--shell-max)) / 2 + var(--space-2xs)))',
-		backgroundColor: 'color-mix(in srgb, var(--page) 94%, var(--paper))',
+			'0.375rem max(var(--spacing-2xs), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-2xs)))',
+		backgroundColor: 'color-mix(in srgb, var(--color-page) 94%, var(--color-paper))',
 		fontFamily:
 			"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
 		lineHeight: '1'
@@ -154,19 +154,19 @@ export const writerTheme = EditorView.theme({
 		width: '100%',
 		height: '2rem',
 		minWidth: '0',
-		border: '1px solid var(--rule)',
+		border: '1px solid var(--color-rule)',
 		borderRadius: '3px',
-		backgroundColor: 'color-mix(in srgb, var(--paper) 82%, var(--page))',
-		color: 'var(--ink)',
+		backgroundColor: 'color-mix(in srgb, var(--color-paper) 82%, var(--color-page))',
+		color: 'var(--color-ink)',
 		font: 'inherit',
-		padding: '0 var(--space-2xs)'
+		padding: '0 var(--spacing-2xs)'
 	},
 	'.cm-panel.cm-search .cm-textfield::placeholder': {
-		color: 'color-mix(in srgb, var(--muted) 70%, transparent)'
+		color: 'color-mix(in srgb, var(--color-muted) 70%, transparent)'
 	},
 	'.cm-panel.cm-search .cm-textfield:focus': {
-		borderColor: 'var(--accent)',
-		outline: '1px solid var(--accent)',
+		borderColor: 'var(--color-accent)',
+		outline: '1px solid var(--color-accent)',
 		outlineOffset: '0'
 	},
 	'.cm-panel.cm-search .cm-textfield[name="search"]': {
@@ -185,7 +185,7 @@ export const writerTheme = EditorView.theme({
 		placeItems: 'center',
 		border: '1px solid transparent',
 		borderRadius: '3px',
-		color: 'var(--muted)',
+		color: 'var(--color-muted)',
 		cursor: 'pointer',
 		fontSize: '0',
 		justifySelf: 'center',
@@ -204,17 +204,17 @@ export const writerTheme = EditorView.theme({
 		gridRow: '1'
 	},
 	'.cm-panel.cm-search label:hover': {
-		borderColor: 'var(--rule)',
-		backgroundColor: 'var(--paper)',
-		color: 'var(--ink)'
+		borderColor: 'var(--color-rule)',
+		backgroundColor: 'var(--color-paper)',
+		color: 'var(--color-ink)'
 	},
 	'.cm-panel.cm-search label:has(input:checked)': {
-		borderColor: 'color-mix(in srgb, var(--accent) 45%, var(--rule))',
-		backgroundColor: 'color-mix(in srgb, var(--accent) 12%, var(--paper))',
-		color: 'var(--accent-ink)'
+		borderColor: 'color-mix(in srgb, var(--color-accent) 45%, var(--color-rule))',
+		backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, var(--color-paper))',
+		color: 'var(--color-accent-ink)'
 	},
 	'.cm-panel.cm-search label:has(input:focus-visible)': {
-		outline: '2px solid var(--accent)',
+		outline: '2px solid var(--color-accent)',
 		outlineOffset: '1px'
 	},
 	'.cm-panel.cm-search input[type="checkbox"]': {
@@ -235,18 +235,58 @@ export const writerTheme = EditorView.theme({
 		padding: '0',
 		border: '1px solid transparent',
 		borderRadius: '3px',
-		backgroundImage: 'none',
-		backgroundColor: 'transparent',
-		color: 'var(--muted)',
+		color: 'var(--color-muted)',
 		cursor: 'pointer',
 		fontSize: '0',
 		justifySelf: 'center'
 	},
-	'.cm-panel.cm-search .cm-search-icon > .lucide-icon': {
-		display: 'block',
-		width: '0.94rem',
-		height: '0.94rem',
-		pointerEvents: 'none'
+	'.cm-panel.cm-search label:has(input[name="case"])::after': {
+		content: '"Aa"',
+		fontSize: '0.72rem',
+		fontWeight: '600',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search label:has(input[name="word"])::after': {
+		content: '"\\b"',
+		fontSize: '0.72rem',
+		fontWeight: '600',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search label:has(input[name="re"])::after': {
+		content: '".*"',
+		fontSize: '0.72rem',
+		fontWeight: '600',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="select"]::after': {
+		content: '"⬚"',
+		fontSize: '0.85rem',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="prev"]::after': {
+		content: '"‹"',
+		fontSize: '1.1rem',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="next"]::after': {
+		content: '"›"',
+		fontSize: '1.1rem',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="close"]::after': {
+		content: '"✕"',
+		fontSize: '0.72rem',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="replace"]::after': {
+		content: '"↷"',
+		fontSize: '0.95rem',
+		lineHeight: '1'
+	},
+	'.cm-panel.cm-search button[name="replaceAll"]::after': {
+		content: '"⇶"',
+		fontSize: '0.95rem',
+		lineHeight: '1'
 	},
 	'.cm-panel.cm-search button[name="select"]': {
 		gridColumn: '5',
@@ -276,13 +316,13 @@ export const writerTheme = EditorView.theme({
 	},
 	'.cm-panel.cm-search .cm-button:hover, .cm-panel.cm-search .cm-button:focus-visible, .cm-panel.cm-search button[name="close"]:hover, .cm-panel.cm-search button[name="close"]:focus-visible':
 		{
-			borderColor: 'var(--rule)',
-			backgroundColor: 'var(--paper)',
-			color: 'var(--accent-ink)'
+			borderColor: 'var(--color-rule)',
+			backgroundColor: 'var(--color-paper)',
+			color: 'var(--color-accent-ink)'
 		},
 	'.cm-panel.cm-search .cm-button:focus-visible, .cm-panel.cm-search button[name="close"]:focus-visible':
 		{
-			outline: '2px solid var(--accent)',
+			outline: '2px solid var(--color-accent)',
 			outlineOffset: '1px'
 		},
 	'.cm-panel.cm-search .cm-button[disabled]': {
@@ -294,7 +334,7 @@ export const writerTheme = EditorView.theme({
 			gridTemplateColumns:
 				'repeat(4, minmax(0, 1fr)) 0.5rem repeat(2, minmax(0, 1fr)) 0.5rem minmax(0, 1fr)',
 			gridTemplateRows: '1.75rem 1.65rem 1.75rem',
-			padding: 'var(--space-3xs) var(--space-2xs)'
+			padding: 'var(--spacing-3xs) var(--spacing-2xs)'
 		},
 		'.cm-panel.cm-search .cm-textfield[name="search"]': {
 			gridColumn: '1 / 10',
@@ -342,18 +382,18 @@ export const writerTheme = EditorView.theme({
 		}
 	},
 	'.cm-searchMatch': {
-		backgroundColor: 'color-mix(in srgb, var(--mark) 24%, transparent)'
+		backgroundColor: 'color-mix(in srgb, var(--color-mark) 24%, transparent)'
 	},
 	'.cm-searchMatch.cm-searchMatch-selected': {
-		backgroundColor: 'color-mix(in srgb, var(--mark) 36%, transparent)'
+		backgroundColor: 'color-mix(in srgb, var(--color-mark) 36%, transparent)'
 	},
 	'.cm-tooltip-lint': {
 		margin: '0',
 		padding: '0.55rem 0.7rem',
-		border: '1px solid color-mix(in srgb, var(--rule) 72%, var(--paper))',
-		backgroundColor: 'color-mix(in srgb, var(--paper) 92%, var(--page))',
+		border: '1px solid color-mix(in srgb, var(--color-rule) 72%, var(--color-paper))',
+		backgroundColor: 'color-mix(in srgb, var(--color-paper) 92%, var(--color-page))',
 		boxShadow: '0 0.35rem 1rem rgba(34, 35, 31, 0.08)',
-		color: 'var(--ink)',
+		color: 'var(--color-ink)',
 		fontFamily:
 			"ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 		fontSize: '0.82rem',
@@ -369,9 +409,9 @@ export const writerTheme = EditorView.theme({
 		padding: '0'
 	},
 	'.cm-tooltip-lint .cm-diagnostic + .cm-diagnostic': {
-		marginTop: 'var(--space-3xs)',
-		paddingTop: 'var(--space-3xs)',
-		borderTop: '1px solid color-mix(in srgb, var(--paper) 18%, transparent)'
+		marginTop: 'var(--spacing-3xs)',
+		paddingTop: 'var(--spacing-3xs)',
+		borderTop: '1px solid color-mix(in srgb, var(--color-paper) 18%, transparent)'
 	},
 	'.cm-tooltip-lint .cm-diagnosticText': {
 		display: 'block',
@@ -433,7 +473,7 @@ export const writerTheme = EditorView.theme({
 		left: 'calc(-1 * var(--heading-marker-width))',
 		display: 'inline-block',
 		width: '0',
-		color: 'var(--muted)',
+		color: 'var(--color-muted)',
 		opacity: '0.55',
 		whiteSpace: 'pre'
 	},

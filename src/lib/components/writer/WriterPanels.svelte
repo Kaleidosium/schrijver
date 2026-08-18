@@ -6,8 +6,8 @@
 	import WriterNoteEditor from './WriterNoteEditor.svelte';
 
 	interface Props {
-		readonly activeNoteId?: string;
-		readonly autofocusNoteId?: string;
+		readonly activeNoteId?: string | undefined;
+		readonly autofocusNoteId?: string | undefined;
 		readonly guideOpen: boolean;
 		readonly noteViews: readonly NoteView[];
 		readonly notesOpen: boolean;
@@ -42,27 +42,15 @@
 		outline,
 		outlineOpen
 	}: Props = $props();
+	const KEY_SYMBOLS: Record<string, string> = {
+		mod: '⌘', cmd: '⌘', command: '⌘',
+		alt: '⌥', option: '⌥', opt: '⌥',
+		shift: '⇧',
+		ctrl: '⌃', control: '⌃'
+	};
+
 	function parseShortcutKeys(shortcut: string): readonly string[] {
-		return shortcut.split('+').map((part) => {
-			const trimmed = part.trim();
-			switch (trimmed.toLowerCase()) {
-				case 'mod':
-				case 'cmd':
-				case 'command':
-					return '⌘';
-				case 'alt':
-				case 'option':
-				case 'opt':
-					return '⌥';
-				case 'shift':
-					return '⇧';
-				case 'ctrl':
-				case 'control':
-					return '⌃';
-				default:
-					return trimmed;
-			}
-		});
+		return shortcut.split('+').map((part) => KEY_SYMBOLS[part.trim().toLowerCase()] ?? part.trim());
 	}
 </script>
 
@@ -79,7 +67,7 @@
 			<nav class="grid gap-0.5" aria-label="Document headings">
 				{#each outline as item (item.id)}
 					<button
-						class="w-full truncate rounded-xs border-0 bg-transparent py-1.5 pr-1.5 text-left text-[0.8rem] text-muted cursor-pointer hover:bg-paper hover:text-accent-ink hover:outline hover:outline-1 hover:outline-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+						class="w-full truncate rounded-xs border-0 bg-transparent py-1.5 pr-1.5 text-left text-[0.8rem] text-muted cursor-pointer hover:bg-paper hover:text-accent-ink hover:outline hover:outline-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 						style:padding-left={`calc(0.4rem + ${(item.level - 1) * 0.65}rem)`}
 						type="button"
 						onclick={() => onJumpToHeading(item)}
@@ -107,10 +95,12 @@
 			<div class="relative min-h-auto lg:min-h-full">
 				{#each noteViews as view (view.note.id)}
 					<article
-						class="mb-2xs grid min-h-36 gap-3xs rounded border border-rule border-l-[3px] border-l-accent bg-paper p-2xs shadow-xs transition-all lg:absolute lg:right-0 lg:left-0 lg:top-[var(--note-top)] lg:mb-0"
-						class:border-accent={activeNoteId === view.note.id}
-						class:border-l-mark={view.orphaned}
-						class:opacity-55={view.note.resolved}
+						class={[
+							'mb-2xs grid min-h-36 gap-3xs rounded border border-rule border-l-[3px] border-l-accent bg-paper p-2xs shadow-xs transition-all lg:absolute lg:right-0 lg:left-0 lg:top-(--note-top) lg:mb-0',
+							activeNoteId === view.note.id && 'border-accent',
+							view.orphaned && 'border-l-mark',
+							view.note.resolved && 'opacity-55'
+						]}
 						data-active-note={activeNoteId === view.note.id}
 						style:--note-top={`${view.top}px`}
 						onfocusin={() => onActivateNote(view.note.id)}
@@ -189,9 +179,9 @@
 						<div class="flex items-center justify-between gap-s border-b border-rule py-2">
 							<dt class="m-0 text-[0.84rem] text-ink">{command.label}</dt>
 							<dd class="m-0 flex items-center gap-1">
-								{#each parseShortcutKeys(command.shortcut) as key, i (i)}
+								{#each parseShortcutKeys(command.shortcut) as key, i (`${command.label}-${key}-${i}`)}
 									<kbd
-										class="inline-flex min-w-[1.5rem] items-center justify-center rounded border border-rule border-b-2 bg-paper px-1.5 py-0.5 font-mono text-[0.74rem] font-medium text-ink shadow-[0_1px_2px_rgba(34,35,31,0.06)]"
+										class="inline-flex min-w-6 items-center justify-center rounded border border-rule border-b-2 bg-paper px-1.5 py-0.5 font-mono text-[0.74rem] font-medium text-ink shadow-[0_1px_2px_rgba(34,35,31,0.06)]"
 									>
 										{key}
 									</kbd>

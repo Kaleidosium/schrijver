@@ -89,12 +89,12 @@
 </script>
 
 <header
-	class="flex min-h-[calc(var(--control-size)+0.5rem)] items-center justify-between border-b border-rule bg-page/92 px-2xs py-1.5 font-sans text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--shell-max))/2+var(--spacing-s)))]"
+	class="flex min-h-[calc(var(--size-control)+0.5rem)] items-center justify-between border-b border-rule bg-page/92 px-2xs py-1.5 font-sans text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
 	aria-label="Writing controls"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
 		<Toolbar.Root
-			class="flex w-full flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
+			class="flex w-full flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain scrollbar-none [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
 			loop={false}
 		>
 			<!-- LEFT CLUSTER: File, Outline, Notes, Shortcuts -->
@@ -105,7 +105,7 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							type="button"
 						>
 							<span>File</span>
@@ -144,7 +144,7 @@
 						<Toolbar.Button
 							{...tooltipProps}
 							aria-pressed={outlineOpen}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={outlineOpen ? 'on' : 'off'}
 							type="button"
 							onclick={() => onOutlineOpenChange(!outlineOpen)}
@@ -172,7 +172,7 @@
 						<Toolbar.Button
 							{...tooltipProps}
 							aria-pressed={notesOpen}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={notesOpen ? 'on' : 'off'}
 							type="button"
 							onclick={() => onNotesOpenChange(!notesOpen)}
@@ -199,7 +199,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
 							type="button"
 							onclick={onGuideOpen}
 						>
@@ -231,7 +231,7 @@
 						<Toolbar.Button
 							{...triggerProps}
 							aria-pressed={focusMode}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={focusMode ? 'on' : 'off'}
 						>
 							<span>Focus</span>
@@ -323,7 +323,7 @@
 						<Toolbar.Button
 							{...tooltipProps}
 							aria-pressed={hemingwayMode}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={hemingwayMode ? 'on' : 'off'}
 							type="button"
 							onclick={() => onHemingwayModeChange(!hemingwayMode)}
@@ -351,7 +351,7 @@
 						<Toolbar.Button
 							{...triggerProps}
 							aria-pressed={syntaxMode}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={syntaxMode ? 'on' : 'off'}
 						>
 							<span>Syntax</span>
@@ -405,7 +405,7 @@
 						<Toolbar.Button
 							{...triggerProps}
 							aria-pressed={reviewMode}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={reviewMode ? 'on' : 'off'}
 						>
 							<span>Style</span>
@@ -459,7 +459,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
-							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
 							type="button"
 							onclick={onSearch}
 						>

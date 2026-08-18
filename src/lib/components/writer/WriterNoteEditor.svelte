@@ -22,9 +22,9 @@
 	import { markdownHighlightStyle, writerNoteTheme } from './writer-editor-theme';
 
 	interface Props {
-		readonly autofocus?: boolean;
+		readonly autofocus?: boolean | undefined;
 		readonly note: WriterNote;
-		readonly onAutofocus?: (id: string) => void;
+		readonly onAutofocus?: ((id: string) => void) | undefined;
 		readonly onUpdate: (id: string, body: string) => void;
 	}
 
@@ -148,4 +148,4 @@
 	};
 </script>
 
-<div class="min-h-[4.5rem] w-full min-w-0" {@attach attachEditor}></div>
+<div class="min-h-18 w-full min-w-0" {@attach attachEditor}></div>

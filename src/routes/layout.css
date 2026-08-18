@@ -36,27 +36,8 @@
 
 :root {
 	color-scheme: light;
-	--page: var(--color-page);
-	--paper: var(--color-paper);
-	--ink: var(--color-ink);
-	--muted: var(--color-muted);
-	--rule: var(--color-rule);
-	--accent: var(--color-accent);
-	--accent-ink: var(--color-accent-ink);
-	--mark: var(--color-mark);
-	--selection: var(--color-selection);
-	--shell-max: 70rem;
-	--space-3xs: var(--spacing-3xs);
-	--space-2xs: var(--spacing-2xs);
-	--space-xs: var(--spacing-xs);
-	--space-s: var(--spacing-s);
-	--space-m: var(--spacing-m);
-	--space-l: var(--spacing-l);
-	--space-xl: var(--spacing-xl);
 	--editor-block-space: clamp(3rem, 2.182rem + 3.636vw, 5rem);
 	--editor-inline-space: clamp(1rem, 0.591rem + 1.818vw, 2rem);
-	--control-size: var(--size-control);
-	--rail-width: var(--width-rail);
 }
 
 @media (prefers-reduced-motion: no-preference) {
