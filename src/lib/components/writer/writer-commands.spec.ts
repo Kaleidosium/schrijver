@@ -1,7 +1,27 @@
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { EditorSelection, EditorState, type StateCommand } from '@codemirror/state';
+import {
+	EditorSelection,
+	EditorState,
+	type StateCommand,
+	type Transaction,
+	type TransactionSpec
+} from '@codemirror/state';
 import { describe, expect, it } from 'vite-plus/test';
-import { insertParagraphBreak, paragraphNavigation } from './writer-commands';
+import {
+	insertCodeBlock,
+	insertFootnote,
+	insertHorizontalRule,
+	insertLink,
+	insertParagraphBreak,
+	paragraphNavigation,
+	toggleBlockquote,
+	toggleBulletList,
+	toggleHeading,
+	toggleInlineFormat,
+	toggleNumberedList,
+	toggleTaskList,
+	type MarkdownEditorContext
+} from './writer-commands';
 
 function runCommand(
 	document: string,
@@ -25,6 +45,34 @@ function runCommand(
 	});
 
 	return { applied, document: state.doc.toString(), selection: state.selection };
+}
+
+function createEditorContext(
+	initialDoc: string,
+	selection: { readonly anchor: number; readonly head?: number } = { anchor: 0 }
+): MarkdownEditorContext & { doc: string; selection: EditorSelection } {
+	let state = EditorState.create({
+		doc: initialDoc,
+		selection,
+		extensions: [markdown({ base: markdownLanguage })]
+	});
+
+	return {
+		get state() {
+			return state;
+		},
+		get doc() {
+			return state.doc.toString();
+		},
+		get selection() {
+			return state.selection;
+		},
+		dispatch(tr: Transaction | TransactionSpec) {
+			const transaction = 'state' in tr ? tr : state.update(tr);
+			state = transaction.state;
+		},
+		focus() {}
+	};
 }
 
 function applyParagraphBreak(document: string): {
@@ -148,5 +196,100 @@ describe('writer commands', () => {
 
 		expect(cursor(document, 'up', 4)).toEqual({ applied: true, position: 4 });
 		expect(cursor(document, 'down', 4)).toEqual({ applied: true, position: 4 });
+	});
+});
+
+describe('formatting commands', () => {
+	it('toggles inline formatting on selection (bold, italic, strikethrough, code)', () => {
+		const view = createEditorContext('Hello world', { anchor: 6, head: 11 });
+
+		toggleInlineFormat(view, '**');
+		expect(view.doc).toBe('Hello **world**');
+
+		// Toggle off
+		toggleInlineFormat(view, '**');
+		expect(view.doc).toBe('Hello world');
+	});
+
+	it('inserts inline formatting at cursor when selection is empty', () => {
+		const view = createEditorContext('Hello ', { anchor: 6 });
+
+		toggleInlineFormat(view, '*');
+		expect(view.doc).toBe('Hello **');
+		expect(view.selection.main.head).toBe(7);
+	});
+
+	it('toggles headings level 1 to 6', () => {
+		const view = createEditorContext('My Heading', { anchor: 0 });
+
+		toggleHeading(view, 1);
+		expect(view.doc).toBe('# My Heading');
+
+		toggleHeading(view, 5);
+		expect(view.doc).toBe('##### My Heading');
+
+		toggleHeading(view, 6);
+		expect(view.doc).toBe('###### My Heading');
+
+		toggleHeading(view, 6);
+		expect(view.doc).toBe('My Heading');
+	});
+
+	it('toggles blockquote on lines', () => {
+		const view = createEditorContext('Quote text', { anchor: 0 });
+
+		toggleBlockquote(view);
+		expect(view.doc).toBe('> Quote text');
+
+		toggleBlockquote(view);
+		expect(view.doc).toBe('Quote text');
+	});
+
+	it('toggles bullet list, numbered list, and task checklist', () => {
+		const view = createEditorContext('First line\nSecond line', { anchor: 0, head: 15 });
+
+		toggleBulletList(view);
+		expect(view.doc).toBe('- First line\n- Second line');
+
+		toggleNumberedList(view);
+		expect(view.doc).toBe('1. First line\n2. Second line');
+
+		toggleTaskList(view);
+		expect(view.doc).toBe('- [ ] First line\n- [ ] Second line');
+
+		toggleTaskList(view);
+		expect(view.doc).toBe('First line\nSecond line');
+	});
+
+	it('inserts links with smart selection handling', () => {
+		const view1 = createEditorContext('Check example', { anchor: 6, head: 13 });
+		insertLink(view1);
+		expect(view1.doc).toBe('Check [example](url)');
+
+		const view2 = createEditorContext('Visit https://example.com', { anchor: 6, head: 25 });
+		insertLink(view2);
+		expect(view2.doc).toBe('Visit [title](https://example.com)');
+	});
+
+	it('inserts code blocks and horizontal rules', () => {
+		const view = createEditorContext('Snippet', { anchor: 0, head: 7 });
+		insertCodeBlock(view);
+		expect(view.doc).toBe('```\nSnippet\n```\n');
+
+		const view2 = createEditorContext('Before', { anchor: 6 });
+		insertHorizontalRule(view2);
+		expect(view2.doc).toContain('---');
+	});
+
+	it('inserts auto-incrementing footnotes and definitions', () => {
+		const view = createEditorContext('Some claim here.', { anchor: 10 });
+		insertFootnote(view);
+		expect(view.doc).toBe('Some claim[^1] here.\n\n[^1]: ');
+
+		// Insert second footnote
+		const view2 = createEditorContext(view.doc, { anchor: 5 });
+		insertFootnote(view2);
+		expect(view2.doc).toContain('[^2]');
+		expect(view2.doc).toContain('[^2]: ');
 	});
 });

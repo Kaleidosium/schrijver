@@ -30,8 +30,12 @@
     import {
         activeParagraphRange,
         activeSentenceRange,
+        calculateDocumentStats,
+        calculateSelectionStats,
         countWords,
         maskMarkdownForProse,
+        type DocumentStats,
+        type SelectionStats,
         type TextRange,
     } from "$lib/writing";
     import {
@@ -60,8 +64,18 @@
     import { installSearchIcons } from "./writer-search-icons";
     import {
         APP_SHORTCUTS,
+        insertCodeBlock,
+        insertFootnote,
+        insertHorizontalRule,
+        insertLink,
         insertParagraphBreak,
         paragraphNavigationKeymap,
+        toggleBlockquote,
+        toggleBulletList,
+        toggleHeading,
+        toggleInlineFormat,
+        toggleNumberedList,
+        toggleTaskList,
         wrapSelection,
     } from "./writer-commands";
     import WriterPanels from "./WriterPanels.svelte";
@@ -362,35 +376,7 @@
         cliches: true,
         eprime: false,
     });
-    const saveLabel = $derived.by(() => {
-        if (!recoveryAvailable && dirty) {
-            return "Recovery unavailable";
-        }
-
-        if (storageConflict) {
-            return "Newer recovery in another tab";
-        }
-
-        if (saveState === "saving") {
-            return "Saving…";
-        }
-
-        if (saveState === "downloaded") {
-            return "Downloaded; recovery retained";
-        }
-
-        if (saveState === "error") {
-            return "Save failed; recovery retained";
-        }
-
-        if (dirty) {
-            return journalSaved
-                ? "Recovery saved locally"
-                : "Saving recovery…";
-        }
-
-        return saveState === "saved" ? `Saved to ${fileNameInputValue()}` : "No file selected";
-    });
+    let selectedText = $state("");
     let nlpParser: NlpParser | undefined;
     let writeGoodRunner: WriteGood | undefined;
     let directoryHandle: FileSystemDirectoryHandle | undefined;
@@ -405,13 +391,60 @@
     let recoveryRevision = 0;
     let lastFallbackSaveTime = 0;
     let loadingProject = false;
-    const wordCount = $derived(countWords(draft));
-    const characterCount = $derived(draft.length);
-    const stats = $derived(
-        `${wordCount} ${wordCount === 1 ? "word" : "words"} / ${characterCount} ${
-            characterCount === 1 ? "character" : "characters"
-        }`,
+    const documentStats = $derived(calculateDocumentStats(draft));
+    const selectionStats = $derived(
+        hasTextSelection && selectedText ? calculateSelectionStats(selectedText) : undefined,
     );
+    const toggleFormatAction = (open: string, close = open) => {
+        if (editor) {
+            toggleInlineFormat(editor, open, close);
+        }
+    };
+    const toggleHeadingAction = (level: number) => {
+        if (editor) {
+            toggleHeading(editor, level);
+        }
+    };
+    const toggleBlockquoteAction = () => {
+        if (editor) {
+            toggleBlockquote(editor);
+        }
+    };
+    const toggleBulletListAction = () => {
+        if (editor) {
+            toggleBulletList(editor);
+        }
+    };
+    const toggleNumberedListAction = () => {
+        if (editor) {
+            toggleNumberedList(editor);
+        }
+    };
+    const toggleTaskListAction = () => {
+        if (editor) {
+            toggleTaskList(editor);
+        }
+    };
+    const insertLinkAction = () => {
+        if (editor) {
+            insertLink(editor);
+        }
+    };
+    const insertCodeBlockAction = () => {
+        if (editor) {
+            insertCodeBlock(editor);
+        }
+    };
+    const insertHorizontalRuleAction = () => {
+        if (editor) {
+            insertHorizontalRule(editor);
+        }
+    };
+    const insertFootnoteAction = () => {
+        if (editor) {
+            insertFootnote(editor);
+        }
+    };
     const noteViews = $derived.by(buildNoteViews);
     const attachEditor: Attachment<HTMLDivElement> = (editorElement) =>
         untrack(() => {
@@ -489,9 +522,18 @@
                             }
                         }
 
-                        if (update.selectionSet) {
+                        if (update.selectionSet || update.docChanged) {
                             hasTextSelection = !update.state.selection.main.empty;
-                            scheduleRecovery();
+                            selectedText = hasTextSelection
+                                ? update.state.doc.sliceString(
+                                      update.state.selection.main.from,
+                                      update.state.selection.main.to,
+                                  )
+                                : "";
+
+                            if (update.selectionSet) {
+                                scheduleRecovery();
+                            }
                         }
                     }),
                     Prec.highest(
@@ -519,15 +561,15 @@
                         },
                         {
                             key: "Mod-b",
-                            run: (view) => wrapSelection(view, "**", "**"),
+                            run: (view) => toggleInlineFormat(view, "**"),
                         },
                         {
                             key: "Mod-i",
-                            run: (view) => wrapSelection(view, "*", "*"),
+                            run: (view) => toggleInlineFormat(view, "*"),
                         },
                         {
                             key: "Mod-k",
-                            run: (view) => wrapSelection(view, "[", "]()"),
+                            run: (view) => insertLink(view),
                         },
                         ...searchKeymap,
                         ...defaultKeymap,
@@ -540,6 +582,12 @@
 
         outline = outlineItems(editor.state);
         hasTextSelection = !editor.state.selection.main.empty;
+        selectedText = hasTextSelection
+            ? editor.state.doc.sliceString(
+                  editor.state.selection.main.from,
+                  editor.state.selection.main.to,
+              )
+            : "";
         requestAnimationFrame(() => {
             const scroller = editor?.scrollDOM;
 
@@ -2103,7 +2151,20 @@
         {/if}
     </Dialog.Root>
 
-    <WriterStatus {saveLabel} {stats} />
+    <WriterStatus
+        {documentStats}
+        {selectionStats}
+        onToggleFormat={toggleFormatAction}
+        onToggleHeading={toggleHeadingAction}
+        onToggleBlockquote={toggleBlockquoteAction}
+        onToggleBulletList={toggleBulletListAction}
+        onToggleNumberedList={toggleNumberedListAction}
+        onToggleTaskList={toggleTaskListAction}
+        onInsertLink={insertLinkAction}
+        onInsertCodeBlock={insertCodeBlockAction}
+        onInsertHorizontalRule={insertHorizontalRuleAction}
+        onInsertFootnote={insertFootnoteAction}
+    />
     <input
         {@attach attachFallbackInput}
         accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"

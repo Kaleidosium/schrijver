@@ -3,9 +3,17 @@ import {
 	EditorSelection,
 	type ChangeSpec,
 	type EditorState,
-	type StateCommand
+	type StateCommand,
+	type Transaction,
+	type TransactionSpec
 } from '@codemirror/state';
-import type { EditorView, KeyBinding } from '@codemirror/view';
+import type { KeyBinding } from '@codemirror/view';
+
+export interface MarkdownEditorContext {
+	readonly state: EditorState;
+	dispatch(tr: Transaction | TransactionSpec): void;
+	focus?(): void;
+}
 
 export const APP_SHORTCUTS = {
 	open: 'Mod+O',
@@ -39,7 +47,7 @@ export const COMMAND_HELP: readonly CommandHelp[] = [
 	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' }
 ];
 
-export function wrapSelection(view: EditorView, open: string, close: string): boolean {
+export function wrapSelection(view: MarkdownEditorContext, open: string, close: string): boolean {
 	const transaction = view.state.changeByRange((range) => {
 		const selected = view.state.doc.sliceString(range.from, range.to);
 		const changes: ChangeSpec[] = [
@@ -58,6 +66,451 @@ export function wrapSelection(view: EditorView, open: string, close: string): bo
 
 	view.dispatch(transaction);
 	return true;
+}
+
+export function toggleInlineFormat(
+	view: MarkdownEditorContext,
+	open: string,
+	close = open
+): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const doc = view.state.doc;
+	const transaction = view.state.changeByRange((range) => {
+		if (range.empty) {
+			const before = doc.sliceString(Math.max(0, range.from - open.length), range.from);
+			const after = doc.sliceString(range.to, Math.min(doc.length, range.to + close.length));
+
+			if (before === open && after === close) {
+				return {
+					changes: [
+						{ from: range.from - open.length, to: range.from, insert: '' },
+						{ from: range.to, to: range.to + close.length, insert: '' }
+					],
+					range: EditorSelection.cursor(range.from - open.length)
+				};
+			}
+
+			return {
+				changes: [
+					{ from: range.from, insert: open },
+					{ from: range.to, insert: close }
+				],
+				range: EditorSelection.cursor(range.from + open.length)
+			};
+		}
+
+		const selected = doc.sliceString(range.from, range.to);
+
+		if (
+			selected.startsWith(open) &&
+			selected.endsWith(close) &&
+			selected.length >= open.length + close.length
+		) {
+			const unwrapped = selected.slice(open.length, selected.length - close.length);
+			return {
+				changes: { from: range.from, to: range.to, insert: unwrapped },
+				range: EditorSelection.range(range.from, range.from + unwrapped.length)
+			};
+		}
+
+		const before = doc.sliceString(Math.max(0, range.from - open.length), range.from);
+		const after = doc.sliceString(range.to, Math.min(doc.length, range.to + close.length));
+
+		if (before === open && after === close) {
+			return {
+				changes: [
+					{ from: range.from - open.length, to: range.from, insert: '' },
+					{ from: range.to, to: range.to + close.length, insert: '' }
+				],
+				range: EditorSelection.range(range.from - open.length, range.to - open.length)
+			};
+		}
+
+		return {
+			changes: [
+				{ from: range.from, insert: open },
+				{ from: range.to, insert: close }
+			],
+			range: EditorSelection.range(range.from + open.length, range.to + open.length)
+		};
+	});
+
+	view.dispatch(transaction);
+	view.focus?.();
+	return true;
+}
+
+export function toggleHeading(view: MarkdownEditorContext, level: number): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const lines = getSelectedLines(view);
+	const targetPrefix = level > 0 ? `${'#'.repeat(level)} ` : '';
+	const headingRegex = /^(\s*)#{1,6}\s+/;
+
+	const allAlreadyTarget = lines.every((line) => {
+		const text = line.text;
+		return level > 0 ? text.startsWith(targetPrefix) : !headingRegex.test(text);
+	});
+
+	const changes: ChangeSpec[] = [];
+
+	for (const line of lines) {
+		const match = headingRegex.exec(line.text);
+		if (allAlreadyTarget) {
+			if (match) {
+				changes.push({
+					from: line.from + (match[1]?.length ?? 0),
+					to: line.from + match[0].length,
+					insert: ''
+				});
+			}
+		} else if (match) {
+			changes.push({
+				from: line.from + (match[1]?.length ?? 0),
+				to: line.from + match[0].length,
+				insert: targetPrefix
+			});
+		} else if (targetPrefix) {
+			const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
+			changes.push({ from: line.from + leadingSpaces.length, insert: targetPrefix });
+		}
+	}
+
+	if (changes.length > 0) {
+		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function toggleBlockquote(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const lines = getSelectedLines(view);
+	const quoteRegex = /^(\s*)>\s?/;
+	const allQuoted = lines.every((line) => quoteRegex.test(line.text));
+	const changes: ChangeSpec[] = [];
+
+	for (const line of lines) {
+		const match = quoteRegex.exec(line.text);
+		if (allQuoted && match) {
+			changes.push({
+				from: line.from + (match[1]?.length ?? 0),
+				to: line.from + match[0].length,
+				insert: ''
+			});
+		} else if (!allQuoted && !match) {
+			const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
+			changes.push({ from: line.from + leadingSpaces.length, insert: '> ' });
+		}
+	}
+
+	if (changes.length > 0) {
+		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function toggleBulletList(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const lines = getSelectedLines(view);
+	const bulletRegex = /^(\s*)[-*+]\s+(?!\[[ xX]\])/;
+	const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/;
+	const allBulleted = lines.every((line) => bulletRegex.test(line.text));
+	const changes: ChangeSpec[] = [];
+
+	for (const line of lines) {
+		const match = anyListRegex.exec(line.text);
+		if (allBulleted) {
+			if (match) {
+				changes.push({
+					from: line.from + (match[1]?.length ?? 0),
+					to: line.from + match[0].length,
+					insert: ''
+				});
+			}
+		} else if (match) {
+			changes.push({
+				from: line.from + (match[1]?.length ?? 0),
+				to: line.from + match[0].length,
+				insert: '- '
+			});
+		} else {
+			const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
+			changes.push({ from: line.from + leadingSpaces.length, insert: '- ' });
+		}
+	}
+
+	if (changes.length > 0) {
+		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function toggleNumberedList(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const lines = getSelectedLines(view);
+	const numberedRegex = /^(\s*)\d+[.)]\s+/;
+	const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/;
+	const allNumbered = lines.every((line) => numberedRegex.test(line.text));
+	const changes: ChangeSpec[] = [];
+	let index = 1;
+
+	for (const line of lines) {
+		const match = anyListRegex.exec(line.text);
+		if (allNumbered) {
+			if (match) {
+				changes.push({
+					from: line.from + (match[1]?.length ?? 0),
+					to: line.from + match[0].length,
+					insert: ''
+				});
+			}
+		} else if (match) {
+			changes.push({
+				from: line.from + (match[1]?.length ?? 0),
+				to: line.from + match[0].length,
+				insert: `${index}. `
+			});
+			index += 1;
+		} else {
+			const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
+			changes.push({ from: line.from + leadingSpaces.length, insert: `${index}. ` });
+			index += 1;
+		}
+	}
+
+	if (changes.length > 0) {
+		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function toggleTaskList(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const lines = getSelectedLines(view);
+	const taskRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+\[([ xX])\]\s+/;
+	const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+/;
+	const allTasks = lines.every((line) => taskRegex.test(line.text));
+	const changes: ChangeSpec[] = [];
+
+	for (const line of lines) {
+		const taskMatch = taskRegex.exec(line.text);
+		const listMatch = anyListRegex.exec(line.text);
+
+		if (allTasks && taskMatch) {
+			changes.push({
+				from: line.from + (taskMatch[1]?.length ?? 0),
+				to: line.from + taskMatch[0].length,
+				insert: ''
+			});
+		} else if (taskMatch) {
+			const isDone = (taskMatch[2]?.toLowerCase() ?? '') === 'x';
+			changes.push({
+				from: line.from + (taskMatch[1]?.length ?? 0),
+				to: line.from + taskMatch[0].length,
+				insert: isDone ? '- [ ] ' : '- [x] '
+			});
+		} else if (listMatch) {
+			changes.push({
+				from: line.from + (listMatch[1]?.length ?? 0),
+				to: line.from + listMatch[0].length,
+				insert: '- [ ] '
+			});
+		} else {
+			const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
+			changes.push({ from: line.from + leadingSpaces.length, insert: '- [ ] ' });
+		}
+	}
+
+	if (changes.length > 0) {
+		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function insertLink(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const main = view.state.selection.main;
+	const selected = view.state.doc.sliceString(main.from, main.to);
+	const isUrl = /^https?:\/\//i.test(selected);
+
+	let replacement: string;
+	let selectionOffset: { anchor: number; head: number };
+
+	if (main.empty) {
+		replacement = '[title](url)';
+		selectionOffset = { anchor: main.from + 1, head: main.from + 6 };
+	} else if (isUrl) {
+		replacement = `[title](${selected})`;
+		selectionOffset = { anchor: main.from + 1, head: main.from + 6 };
+	} else {
+		replacement = `[${selected}](url)`;
+		const urlStart = main.from + selected.length + 3;
+		selectionOffset = { anchor: urlStart, head: urlStart + 3 };
+	}
+
+	view.dispatch({
+		changes: { from: main.from, to: main.to, insert: replacement },
+		selection: EditorSelection.range(selectionOffset.anchor, selectionOffset.head),
+		scrollIntoView: true,
+		userEvent: 'input'
+	});
+
+	view.focus?.();
+	return true;
+}
+
+export function insertCodeBlock(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const main = view.state.selection.main;
+	const selected = view.state.doc.sliceString(main.from, main.to);
+
+	if (main.empty) {
+		const insert = '```\n\n```\n';
+		view.dispatch({
+			changes: { from: main.from, insert },
+			selection: EditorSelection.cursor(main.from + 4),
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+	} else {
+		const insert = `\`\`\`\n${selected}\n\`\`\`\n`;
+		view.dispatch({
+			changes: { from: main.from, to: main.to, insert },
+			selection: EditorSelection.range(main.from + 4, main.from + 4 + selected.length),
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function insertHorizontalRule(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const main = view.state.selection.main;
+	const doc = view.state.doc;
+	const currentLine = doc.lineAt(main.head);
+	const needsNewlineBefore = currentLine.from !== main.head && currentLine.text.length > 0;
+	const insert = `${needsNewlineBefore ? '\n' : ''}\n---\n\n`;
+
+	view.dispatch({
+		changes: { from: main.from, to: main.to, insert },
+		selection: EditorSelection.cursor(main.from + insert.length),
+		scrollIntoView: true,
+		userEvent: 'input'
+	});
+
+	view.focus?.();
+	return true;
+}
+
+export function insertFootnote(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const doc = view.state.doc;
+	const docText = doc.toString();
+	const main = view.state.selection.main;
+
+	let maxIndex = 0;
+
+	for (const match of docText.matchAll(/\[\^(\d+)\]/g)) {
+		const num = parseInt(match[1] ?? '0', 10);
+		if (num > maxIndex) {
+			maxIndex = num;
+		}
+	}
+
+	const nextIndex = maxIndex + 1;
+	const refTag = `[^${nextIndex}]`;
+	const endOfDoc = doc.length;
+	const needsNewline =
+		endOfDoc > 0 && !docText.endsWith('\n\n') ? (docText.endsWith('\n') ? '\n' : '\n\n') : '';
+	const defInsert = `${needsNewline}[^${nextIndex}]: `;
+
+	const changes: ChangeSpec[] = [
+		{ from: main.from, to: main.to, insert: refTag },
+		{ from: endOfDoc, insert: defInsert }
+	];
+
+	view.dispatch({
+		changes,
+		selection: EditorSelection.cursor(main.from + refTag.length),
+		scrollIntoView: true,
+		userEvent: 'input'
+	});
+
+	view.focus?.();
+	return true;
+}
+
+function getSelectedLines(view: MarkdownEditorContext): Array<{
+	readonly from: number;
+	readonly to: number;
+	readonly number: number;
+	readonly text: string;
+}> {
+	const doc = view.state.doc;
+	const lineNumbers = new Set<number>();
+	const lines: Array<{
+		readonly from: number;
+		readonly to: number;
+		readonly number: number;
+		readonly text: string;
+	}> = [];
+
+	for (const range of view.state.selection.ranges) {
+		const startLine = doc.lineAt(range.from).number;
+		const endLine = doc.lineAt(range.to).number;
+
+		for (let lineNum = startLine; lineNum <= endLine; lineNum += 1) {
+			if (!lineNumbers.has(lineNum)) {
+				lineNumbers.add(lineNum);
+				const line = doc.line(lineNum);
+				lines.push({ from: line.from, to: line.to, number: line.number, text: line.text });
+			}
+		}
+	}
+
+	return lines;
 }
 
 export const insertParagraphBreak: StateCommand = ({ state, dispatch }) => {

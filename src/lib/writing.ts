@@ -1,6 +1,32 @@
+import { estimate } from 'lesetid';
+
 export interface TextRange {
 	from: number;
 	to: number;
+}
+
+export interface TaskStats {
+	readonly total: number;
+	readonly completed: number;
+	readonly pending: number;
+}
+
+export interface DocumentStats {
+	readonly words: number;
+	readonly characters: number;
+	readonly charactersWithoutSpaces: number;
+	readonly sentences: number;
+	readonly paragraphs: number;
+	readonly readingTime: string;
+	readonly readingTimeMinutes: number;
+	readonly tasks: TaskStats;
+}
+
+export interface SelectionStats {
+	readonly words: number;
+	readonly characters: number;
+	readonly charactersWithoutSpaces: number;
+	readonly sentences: number;
 }
 
 export function countWords(markdown: string): number {
@@ -75,6 +101,12 @@ export function maskMarkdownForProse(markdown: string): string {
 			const indent = list[1] ?? '';
 			maskRange(line.from + indent.length, line.from + list[0].length);
 		}
+
+		const footnoteDef = /^(?: {0,3})\[\^[^\]\n]+\]:\s*/.exec(line.text);
+
+		if (footnoteDef) {
+			maskRange(line.from, line.from + footnoteDef[0].length);
+		}
 	}
 
 	maskPattern(chars, markdown, /`+[^`\n]+`+/g);
@@ -94,6 +126,7 @@ export function maskMarkdownForProse(markdown: string): string {
 		maskRange(from + closeLabel, from + text.length);
 	}
 
+	maskPattern(chars, markdown, /\[\^[^\]\n]+\]/g);
 	maskPattern(chars, markdown, /https?:\/\/[^\s)]+/g);
 	maskPattern(chars, markdown, /[*_~]/g);
 
@@ -205,4 +238,114 @@ function lineRanges(text: string): Array<TextRange & { text: string }> {
 		from = range.to + 1;
 		return range;
 	});
+}
+
+export function countCharacters(markdown: string): number {
+	return markdown.length;
+}
+
+export function countCharactersWithoutSpaces(markdown: string): number {
+	return markdown.replace(/\s/g, '').length;
+}
+
+export function countSentences(markdown: string): number {
+	const prose = maskMarkdownForProse(markdown);
+	const paragraphs = prose.split(/\n\s*\n/);
+	let count = 0;
+	const segmenter = new Intl.Segmenter(undefined, { granularity: 'sentence' });
+
+	for (const paragraph of paragraphs) {
+		const trimmed = paragraph.trim();
+
+		if (!trimmed) {
+			continue;
+		}
+
+		for (const segment of segmenter.segment(trimmed)) {
+			if (/\S/.test(segment.segment)) {
+				count += 1;
+			}
+		}
+	}
+
+	return count;
+}
+
+export function countParagraphs(markdown: string): number {
+	const prose = maskMarkdownForProse(markdown).trim();
+
+	if (prose.length === 0) {
+		return 0;
+	}
+
+	return prose.split(/\n\s*\n/).filter((block) => block.trim().length > 0).length;
+}
+
+export function countTasks(markdown: string): TaskStats {
+	const matches = markdown.matchAll(/^(\s*)(?:[-+*]|\d+[.)])\s+\[([ xX])\]/gm);
+	let total = 0;
+	let completed = 0;
+
+	for (const match of matches) {
+		total += 1;
+		const mark = match[2]?.toLowerCase();
+
+		if (mark === 'x') {
+			completed += 1;
+		}
+	}
+
+	return {
+		total,
+		completed,
+		pending: total - completed
+	};
+}
+
+export function estimateReadingTime(markdown: string): {
+	readonly minutes: number;
+	readonly text: string;
+} {
+	const prose = maskMarkdownForProse(markdown);
+	const estimation = estimate(prose);
+
+	return {
+		minutes: estimation.minutes,
+		text: estimation.text
+	};
+}
+
+export function calculateDocumentStats(markdown: string): DocumentStats {
+	const words = countWords(markdown);
+	const characters = countCharacters(markdown);
+	const charactersWithoutSpaces = countCharactersWithoutSpaces(markdown);
+	const sentences = countSentences(markdown);
+	const paragraphs = countParagraphs(markdown);
+	const reading = estimateReadingTime(markdown);
+	const tasks = countTasks(markdown);
+
+	return {
+		words,
+		characters,
+		charactersWithoutSpaces,
+		sentences,
+		paragraphs,
+		readingTime: reading.text,
+		readingTimeMinutes: reading.minutes,
+		tasks
+	};
+}
+
+export function calculateSelectionStats(selectedText: string): SelectionStats {
+	const words = countWords(selectedText);
+	const characters = countCharacters(selectedText);
+	const charactersWithoutSpaces = countCharactersWithoutSpaces(selectedText);
+	const sentences = countSentences(selectedText);
+
+	return {
+		words,
+		characters,
+		charactersWithoutSpaces,
+		sentences
+	};
 }

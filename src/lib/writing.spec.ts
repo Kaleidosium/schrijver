@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
 	activeParagraphRange,
 	activeSentenceRange,
+	calculateDocumentStats,
+	calculateSelectionStats,
+	countCharacters,
+	countCharactersWithoutSpaces,
+	countParagraphs,
+	countSentences,
+	countTasks,
 	countWords,
+	estimateReadingTime,
 	maskMarkdownForProse
 } from './writing';
 
@@ -52,6 +60,17 @@ describe('maskMarkdownForProse', () => {
 		expect(masked).not.toContain('---');
 		expect(masked).not.toContain('***');
 	});
+
+	it('masks footnote references and definition prefixes while preserving note content', () => {
+		const draft = 'A statement[^1] with context.\n\n[^1]: Footnote details here.';
+		const masked = maskMarkdownForProse(draft);
+
+		expect(masked).toHaveLength(draft.length);
+		expect(masked).toContain('A statement');
+		expect(masked).toContain('with context.');
+		expect(masked).toContain('Footnote details here.');
+		expect(masked).not.toContain('[^1]');
+	});
 });
 
 describe('countWords', () => {
@@ -69,6 +88,112 @@ describe('countWords', () => {
 
 	it('returns zero for empty drafts', () => {
 		expect(countWords('')).toBe(0);
+	});
+});
+
+describe('countCharacters', () => {
+	it('counts all characters including spaces', () => {
+		expect(countCharacters('Hello World')).toBe(11);
+		expect(countCharacters('')).toBe(0);
+	});
+});
+
+describe('countCharactersWithoutSpaces', () => {
+	it('counts characters excluding whitespace', () => {
+		expect(countCharactersWithoutSpaces('Hello World\n\t!')).toBe(11);
+		expect(countCharactersWithoutSpaces('   ')).toBe(0);
+	});
+});
+
+describe('countSentences', () => {
+	it('counts sentences in prose', () => {
+		const draft = 'First sentence. Second sentence! Is this the third?';
+		expect(countSentences(draft)).toBe(3);
+	});
+
+	it('ignores markdown noise and code fences', () => {
+		const draft = '# Heading One\n\nFirst sentence.\n```\ncode here.\n```\nSecond sentence.';
+		expect(countSentences(draft)).toBe(3);
+	});
+
+	it('returns 0 for empty or whitespace text', () => {
+		expect(countSentences('')).toBe(0);
+		expect(countSentences('   \n\n  ')).toBe(0);
+	});
+});
+
+describe('countParagraphs', () => {
+	it('counts non-empty paragraph blocks', () => {
+		const draft = 'Paragraph one.\n\nParagraph two.\n\nParagraph three.';
+		expect(countParagraphs(draft)).toBe(3);
+	});
+
+	it('returns 0 for empty drafts', () => {
+		expect(countParagraphs('')).toBe(0);
+		expect(countParagraphs('\n\n   \n')).toBe(0);
+	});
+});
+
+describe('countTasks', () => {
+	it('detects completed and pending markdown tasks', () => {
+		const draft = `
+# Tasks
+- [ ] First task
+- [x] Completed task
+* [X] Another completed
+1. [ ] Ordered task
+- Non-task item
+`;
+		const stats = countTasks(draft);
+		expect(stats.total).toBe(4);
+		expect(stats.completed).toBe(2);
+		expect(stats.pending).toBe(2);
+	});
+
+	it('returns 0 for drafts with no tasks', () => {
+		expect(countTasks('Just plain text and a regular - bullet item.')).toEqual({
+			total: 0,
+			completed: 0,
+			pending: 0
+		});
+	});
+});
+
+describe('estimateReadingTime', () => {
+	it('estimates reading time using lesetid', () => {
+		const shortDraft = 'A short sentence.';
+		const estimation = estimateReadingTime(shortDraft);
+		expect(estimation.minutes).toBeGreaterThanOrEqual(0);
+		expect(typeof estimation.text).toBe('string');
+	});
+});
+
+describe('calculateDocumentStats', () => {
+	it('calculates full document statistics accurately', () => {
+		const draft =
+			'# Project Title\n\nFirst paragraph with some words.\n\n- [ ] Task 1\n- [x] Task 2';
+		const stats = calculateDocumentStats(draft);
+
+		expect(stats.words).toBe(11);
+		expect(stats.characters).toBe(draft.length);
+		expect(stats.charactersWithoutSpaces).toBe(draft.replace(/\s/g, '').length);
+		expect(stats.paragraphs).toBe(3);
+		expect(stats.tasks.total).toBe(2);
+		expect(stats.tasks.completed).toBe(1);
+		expect(stats.tasks.pending).toBe(1);
+		expect(stats.readingTime).toBeDefined();
+	});
+});
+
+describe('calculateSelectionStats', () => {
+	it('calculates statistics for highlighted selection', () => {
+		const selected = 'Selected words for testing.';
+		const stats = calculateSelectionStats(selected);
+
+		expect(stats.words).toBe(4);
+		expect(stats.characters).toBe(selected.length);
+		expect(stats.charactersWithoutSpaces).toBe(selected.replace(/\s/g, '').length);
+		expect(stats.sentences).toBe(1);
 	});
 });
 
