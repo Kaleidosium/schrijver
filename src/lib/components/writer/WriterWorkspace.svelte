@@ -2019,7 +2019,6 @@
 	data-focused={focusMode && focusScope !== "all"}
 >
     <WriterToolbar
-        addNoteDisabled={!hasTextSelection}
         {focusMode}
         {focusScope}
         {hemingwayMode}
@@ -2030,7 +2029,6 @@
         {syntaxMode}
         {syntaxParts}
         {typewriterMode}
-        onAddNote={addNote}
         onFocusModeChange={setFocusModeValue}
         onFocusScopeChange={setFocusScopeValue}
         onGuideOpen={() => (guideOpen = true)}
@@ -2170,8 +2168,10 @@
     </Dialog.Root>
 
     <WriterStatus
+        addNoteDisabled={!hasTextSelection}
         {documentStats}
         {selectionStats}
+        onAddNote={addNote}
         onToggleFormat={toggleFormatAction}
         onToggleHeading={toggleHeadingAction}
         onToggleBlockquote={toggleBlockquoteAction}

@@ -14,13 +14,16 @@
 		ListTodo,
 		Minus,
 		Quote,
+		SquarePen,
 		Strikethrough
 	} from '@lucide/svelte';
 	import type { DocumentStats, SelectionStats } from '$lib/writing';
 
 	interface Props {
+		readonly addNoteDisabled?: boolean | undefined;
 		readonly documentStats: DocumentStats;
 		readonly selectionStats?: SelectionStats | undefined;
+		readonly onAddNote?: (() => void) | undefined;
 		readonly onToggleFormat: (open: string, close?: string) => void;
 		readonly onToggleHeading: (level: number) => void;
 		readonly onToggleBlockquote: () => void;
@@ -34,8 +37,10 @@
 	}
 
 	const {
+		addNoteDisabled = true,
 		documentStats,
 		selectionStats,
+		onAddNote,
 		onToggleFormat,
 		onToggleHeading,
 		onToggleBlockquote,
@@ -88,42 +93,42 @@
 							onclick={() => onToggleHeading(1)}
 						>
 							<span class="font-bold text-[0.88rem]">Heading 1</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">#</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(2)}
 						>
 							<span class="font-semibold text-[0.82rem]">Heading 2</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">##</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">##</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(3)}
 						>
 							<span class="font-medium text-[0.78rem]">Heading 3</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">###</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">###</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(4)}
 						>
 							<span class="text-[0.76rem]">Heading 4</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">####</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(5)}
 						>
 							<span class="text-[0.74rem]">Heading 5</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">#####</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(6)}
 						>
 							<span class="text-[0.72rem]">Heading 6</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">######</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">######</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-1 h-px bg-rule" />
 						<DropdownMenu.Item
@@ -158,10 +163,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Bold</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘B</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ B</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -185,10 +190,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Italic</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘I</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ I</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -212,7 +217,7 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Strikethrough</span>
 					</Tooltip.Content>
@@ -249,14 +254,14 @@
 							onclick={() => onToggleFormat('`')}
 						>
 							<span>Inline code</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">`</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">`</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.75rem] cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={onInsertCodeBlock}
 						>
 							<span>Code block</span>
-							<kbd class="font-mono text-[0.65rem] text-muted">```</kbd>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">```</kbd>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
@@ -281,10 +286,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Link</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘K</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ K</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -311,10 +316,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Bullet list</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">-</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">-</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -338,10 +343,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Numbered list</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">1.</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">1.</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -365,10 +370,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Task checklist</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">[ ]</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">[ ]</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -395,7 +400,7 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Blockquote</span>
 					</Tooltip.Content>
@@ -421,10 +426,10 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Footnote</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">[^1]</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">[^1]</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -448,9 +453,39 @@
 					<Tooltip.Content
 						side="top"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Horizontal rule</span>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+			<!-- Group 6: Note Annotation (Separated from markdown formatting) -->
+			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
+
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					{#snippet child({ props: tooltipProps })}
+						<button
+							{...tooltipProps}
+							class="flex h-6 min-h-[1.5rem] shrink-0 cursor-pointer items-center gap-1 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40"
+							disabled={addNoteDisabled}
+							type="button"
+							aria-label="Add note at selection"
+							onclick={onAddNote}
+						>
+							<SquarePen size={13} strokeWidth={2} />
+							<span>Note</span>
+						</button>
+					{/snippet}
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						side="top"
+						sideOffset={6}
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+					>
+						<span>Add note at selection</span>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ A</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>

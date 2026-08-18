@@ -38,7 +38,7 @@ export const COMMAND_HELP: readonly CommandHelp[] = [
 	{ label: 'Toggle focus', shortcut: APP_SHORTCUTS.focus, scope: 'App' },
 	{ label: 'Add Writer’s Note', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
 	{ label: 'Toggle outline', shortcut: APP_SHORTCUTS.outline, scope: 'App' },
-	{ label: 'Toggle review', shortcut: APP_SHORTCUTS.review, scope: 'App' },
+	{ label: 'Toggle style', shortcut: APP_SHORTCUTS.review, scope: 'App' },
 	{ label: 'Keyboard shortcuts', shortcut: APP_SHORTCUTS.guide, scope: 'App' },
 	{ label: 'Undo', shortcut: 'Mod+Z', scope: 'Editor' },
 	{ label: 'Redo', shortcut: 'Mod+Shift+Z', scope: 'Editor' },

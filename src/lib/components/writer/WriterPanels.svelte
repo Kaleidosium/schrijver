@@ -42,6 +42,28 @@
 		outline,
 		outlineOpen
 	}: Props = $props();
+	function parseShortcutKeys(shortcut: string): readonly string[] {
+		return shortcut.split('+').map((part) => {
+			const trimmed = part.trim();
+			switch (trimmed.toLowerCase()) {
+				case 'mod':
+				case 'cmd':
+				case 'command':
+					return '⌘';
+				case 'alt':
+				case 'option':
+				case 'opt':
+					return '⌥';
+				case 'shift':
+					return '⇧';
+				case 'ctrl':
+				case 'control':
+					return '⌃';
+				default:
+					return trimmed;
+			}
+		});
+	}
 </script>
 
 {#if outlineOpen}
@@ -164,14 +186,16 @@
 				</h3>
 				<dl class="mt-2xs mb-0">
 					{#each COMMAND_HELP.filter((command) => command.scope === scope) as command (command.label)}
-						<div class="flex items-center justify-between gap-s border-b border-rule py-1.5">
+						<div class="flex items-center justify-between gap-s border-b border-rule py-2">
 							<dt class="m-0 text-[0.84rem] text-ink">{command.label}</dt>
-							<dd class="m-0">
-								<kbd
-									class="rounded border border-rule border-b-2 bg-page px-1.5 py-0.5 font-mono text-[0.75rem] text-ink whitespace-nowrap"
-								>
-									{command.shortcut}
-								</kbd>
+							<dd class="m-0 flex items-center gap-1">
+								{#each parseShortcutKeys(command.shortcut) as key, i (i)}
+									<kbd
+										class="inline-flex min-w-[1.5rem] items-center justify-center rounded border border-rule border-b-2 bg-paper px-1.5 py-0.5 font-mono text-[0.74rem] font-medium text-ink shadow-[0_1px_2px_rgba(34,35,31,0.06)]"
+									>
+										{key}
+									</kbd>
+								{/each}
 							</dd>
 						</div>
 					{/each}

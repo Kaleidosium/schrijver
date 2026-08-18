@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { DropdownMenu, Toolbar, Tooltip } from 'bits-ui';
+	import { ChevronDown } from '@lucide/svelte';
 	import type { FocusScope, PartOfSpeech, ReviewCheck } from './writer-types';
 
 	interface SyntaxOption {
@@ -14,12 +15,10 @@
 	}
 
 	interface Props {
-		readonly addNoteDisabled: boolean;
 		readonly focusMode: boolean;
 		readonly focusScope: FocusScope;
 		readonly hemingwayMode: boolean;
 		readonly notesOpen: boolean;
-		readonly onAddNote: () => void;
 		readonly onFocusModeChange: (enabled: boolean) => void;
 		readonly onFocusScopeChange: (scope: string) => void;
 		readonly onGuideOpen: () => void;
@@ -62,12 +61,10 @@
 	];
 
 	const {
-		addNoteDisabled,
 		focusMode,
 		focusScope,
 		hemingwayMode,
 		notesOpen,
-		onAddNote,
 		onFocusModeChange,
 		onFocusScopeChange,
 		onGuideOpen,
@@ -92,153 +89,153 @@
 </script>
 
 <header
-	class="flex min-h-[calc(var(--control-size)+var(--spacing-2xs))] items-center justify-between border-b border-rule bg-page/92 px-2xs py-3xs font-sans text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--shell-max))/2+var(--spacing-s)))]"
+	class="flex min-h-[calc(var(--control-size)+0.5rem)] items-center justify-between border-b border-rule bg-page/92 px-2xs py-1.5 font-sans text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--shell-max))/2+var(--spacing-s)))]"
 	aria-label="Writing controls"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
 		<Toolbar.Root
-			class="flex w-full flex-nowrap items-center gap-0.5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
+			class="flex w-full flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-[42.01rem]:flex-wrap min-[42.01rem]:overflow-visible"
 			loop={false}
 		>
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							type="button"
-							onclick={() => void onOpen()}
-						>
-							Open
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Open manuscript</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘O</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			<!-- LEFT CLUSTER: File, Outline, Notes, Shortcuts -->
 
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							type="button"
-							onclick={() => void onSave()}
-						>
-							Save
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Save draft</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘S</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-
-			<span class="hidden min-[42.01rem]:block min-[42.01rem]:flex-1 min-[42.01rem]:min-w-xs"></span>
-
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							type="button"
-							onclick={onSearch}
-						>
-							Search
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Search in document</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘F</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-
+			<!-- 1. File (Dropdown Menu containing Open and Save) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							aria-pressed={syntaxMode}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							data-mode={syntaxMode ? 'on' : 'off'}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							type="button"
 						>
-							Syntax
+							<span>File</span>
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
-						align="end"
-						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						align="start"
+						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-							closeOnSelect={false}
-							onSelect={() => void onSyntaxModeChange(!syntaxMode)}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={() => void onOpen()}
 						>
-							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
-								{syntaxMode ? '✓' : ''}
-							</span>
-							<span>{syntaxMode ? 'Hide Syntax' : 'Show Syntax'}</span>
+							<span>Open manuscript</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ O</kbd>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
-						<DropdownMenu.Group>
-							{#each syntaxOptions as option (option.part)}
-								<DropdownMenu.CheckboxItem
-									checked={syntaxParts[option.part]}
-									class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-									closeOnSelect={false}
-									disabled={!syntaxMode}
-									onCheckedChange={(checked) => onSyntaxPartChange(option.part, checked)}
-								>
-									{#snippet children({ checked })}
-										<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
-											{checked ? '✓' : ''}
-										</span>
-										<span class={option.className}>{option.label}</span>
-									{/snippet}
-								</DropdownMenu.CheckboxItem>
-							{/each}
-						</DropdownMenu.Group>
+						<DropdownMenu.Item
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={() => void onSave()}
+						>
+							<span>Save draft</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ S</kbd>
+						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
+			<!-- 2. Outline (Toggle Button) -->
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					{#snippet child({ props: tooltipProps })}
+						<Toolbar.Button
+							{...tooltipProps}
+							aria-pressed={outlineOpen}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							data-mode={outlineOpen ? 'on' : 'off'}
+							type="button"
+							onclick={() => onOutlineOpenChange(!outlineOpen)}
+						>
+							Outline
+						</Toolbar.Button>
+					{/snippet}
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						side="bottom"
+						sideOffset={6}
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+					>
+						<span>Document outline</span>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ O</kbd>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+
+			<!-- 3. Notes (Toggle Button) -->
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					{#snippet child({ props: tooltipProps })}
+						<Toolbar.Button
+							{...tooltipProps}
+							aria-pressed={notesOpen}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							data-mode={notesOpen ? 'on' : 'off'}
+							type="button"
+							onclick={() => onNotesOpenChange(!notesOpen)}
+						>
+							Notes
+						</Toolbar.Button>
+					{/snippet}
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						side="bottom"
+						sideOffset={6}
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+					>
+						<span>Writer’s notes</span>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ N</kbd>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+
+			<!-- 4. Shortcuts (Dialog Trigger) -->
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					{#snippet child({ props: tooltipProps })}
+						<Toolbar.Button
+							{...tooltipProps}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
+							type="button"
+							onclick={onGuideOpen}
+						>
+							Shortcuts
+						</Toolbar.Button>
+					{/snippet}
+				</Tooltip.Trigger>
+				<Tooltip.Portal>
+					<Tooltip.Content
+						side="bottom"
+						sideOffset={6}
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+					>
+						<span>Keyboard shortcuts</span>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ /</kbd>
+					</Tooltip.Content>
+				</Tooltip.Portal>
+			</Tooltip.Root>
+
+			<!-- SPACER: Separates left group from right group on wide screens -->
+			<span class="hidden min-[42.01rem]:block min-[42.01rem]:flex-1 min-[42.01rem]:min-w-xs" aria-hidden="true"></span>
+
+			<!-- RIGHT CLUSTER: Focus, Hemingway, Syntax, Style, Search -->
+
+			<!-- 5. Focus (Dropdown Menu) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
 							aria-pressed={focusMode}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={focusMode ? 'on' : 'off'}
 						>
-							Focus
+							<span>Focus</span>
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -319,13 +316,14 @@
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
+			<!-- 6. Hemingway (Toggle Button) -->
 			<Tooltip.Root>
 				<Tooltip.Trigger>
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
 							aria-pressed={hemingwayMode}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={hemingwayMode ? 'on' : 'off'}
 							type="button"
 							onclick={() => onHemingwayModeChange(!hemingwayMode)}
@@ -338,24 +336,80 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
 						<span>Hemingway mode (write-only)</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌥H</kbd>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌥ H</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
 
+			<!-- 7. Syntax (Dropdown Menu) -->
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					{#snippet child({ props: triggerProps })}
+						<Toolbar.Button
+							{...triggerProps}
+							aria-pressed={syntaxMode}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							data-mode={syntaxMode ? 'on' : 'off'}
+						>
+							<span>Syntax</span>
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+						</Toolbar.Button>
+					{/snippet}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Portal>
+					<DropdownMenu.Content
+						align="end"
+						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						sideOffset={6}
+					>
+						<DropdownMenu.Item
+							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							closeOnSelect={false}
+							onSelect={() => void onSyntaxModeChange(!syntaxMode)}
+						>
+							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+								{syntaxMode ? '✓' : ''}
+							</span>
+							<span>{syntaxMode ? 'Hide Syntax' : 'Show Syntax'}</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Group>
+							{#each syntaxOptions as option (option.part)}
+								<DropdownMenu.CheckboxItem
+									checked={syntaxParts[option.part]}
+									class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+									closeOnSelect={false}
+									disabled={!syntaxMode}
+									onCheckedChange={(checked) => onSyntaxPartChange(option.part, checked)}
+								>
+									{#snippet children({ checked })}
+										<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+											{checked ? '✓' : ''}
+										</span>
+										<span class={option.className}>{option.label}</span>
+									{/snippet}
+								</DropdownMenu.CheckboxItem>
+							{/each}
+						</DropdownMenu.Group>
+					</DropdownMenu.Content>
+				</DropdownMenu.Portal>
+			</DropdownMenu.Root>
+
+			<!-- 8. Style (Dropdown Menu, formerly Review) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
 							aria-pressed={reviewMode}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							data-mode={reviewMode ? 'on' : 'off'}
 						>
-							Review
+							<span>Style</span>
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -373,7 +427,7 @@
 							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewMode ? '✓' : ''}
 							</span>
-							<span>{reviewMode ? 'Disable Review' : 'Enable Review'}</span>
+							<span>{reviewMode ? 'Disable Style' : 'Enable Style'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Group>
@@ -399,18 +453,17 @@
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
+			<!-- 9. Search (Action Button) -->
 			<Tooltip.Root>
 				<Tooltip.Trigger>
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
-							aria-pressed={outlineOpen}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							data-mode={outlineOpen ? 'on' : 'off'}
+							class="flex h-7 min-h-[1.75rem] shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
 							type="button"
-							onclick={() => onOutlineOpenChange(!outlineOpen)}
+							onclick={onSearch}
 						>
-							Outline
+							Search
 						</Toolbar.Button>
 					{/snippet}
 				</Tooltip.Trigger>
@@ -418,91 +471,14 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
 					>
-						<span>Document outline</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌥O</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							aria-pressed={notesOpen}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							data-mode={notesOpen ? 'on' : 'off'}
-							type="button"
-							onclick={() => onNotesOpenChange(!notesOpen)}
-						>
-							Notes
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Writer’s notes</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌥N</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							disabled={addNoteDisabled}
-							type="button"
-							onclick={onAddNote}
-						>
-							Add Note
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Add note at selection</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌥A</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<Toolbar.Button
-							{...tooltipProps}
-							class="flex min-h-control shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-3xs text-[0.72rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2xs min-[42.01rem]:text-[0.78rem]"
-							type="button"
-							onclick={onGuideOpen}
-						>
-							Shortcuts
-						</Toolbar.Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="bottom"
-						sideOffset={6}
-						class="z-50 flex items-center gap-1.5 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2 py-1 font-sans text-[0.72rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Keyboard shortcuts</span>
-						<kbd class="rounded border border-rule bg-page px-1 font-mono text-[0.68rem] text-muted">⌘/</kbd>
+						<span>Search in document</span>
+						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">⌘ F</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
 		</Toolbar.Root>
 	</Tooltip.Provider>
 </header>
+
