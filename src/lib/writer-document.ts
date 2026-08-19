@@ -50,11 +50,6 @@ export interface OutlineItem {
 	readonly label: string;
 }
 
-export interface FallbackFileNames {
-	readonly markdown: string;
-	readonly sidecar: string;
-}
-
 export function emptySidecar(markdownFile: string): WriterSidecar {
 	return {
 		version: 1,
@@ -78,7 +73,10 @@ export function normalizeMarkdownFileName(name: string): string {
 	return /\.(?:md|markdown|txt)$/i.test(trimmed) ? trimmed : `${trimmed}.md`;
 }
 
-export function fallbackFileNames(name: string, date: Date): FallbackFileNames {
+export function fallbackFileNames(
+	name: string,
+	date: Date
+): { readonly markdown: string; readonly sidecar: string } {
 	const normalized = normalizeMarkdownFileName(name);
 	const extension = normalized.match(/\.(?:md|markdown|txt)$/i)?.[0] ?? '.md';
 	const timestamp = date.toISOString().replace('T', '-').replace(/[:.]/g, '-');
@@ -164,19 +162,25 @@ export function resolveTextSelector(
 }
 
 export function parseSidecar(value: unknown, markdownFile: string): WriterSidecar {
-	if (!isRecord(value) || value.version !== 1 || typeof value.projectId !== 'string') {
+	const raw = value as Partial<WriterSidecar> | null | undefined;
+	if (
+		typeof raw !== 'object' ||
+		raw === null ||
+		raw.version !== 1 ||
+		typeof raw.projectId !== 'string'
+	) {
 		throw new Error('The Writer’s Notes file has an unsupported format.');
 	}
 
-	if (typeof value.markdownFile !== 'string' || !Array.isArray(value.notes)) {
+	if (typeof raw.markdownFile !== 'string' || !Array.isArray(raw.notes)) {
 		throw new Error('The Writer’s Notes file is incomplete.');
 	}
 
 	return {
 		version: 1,
-		projectId: value.projectId,
+		projectId: raw.projectId,
 		markdownFile,
-		notes: value.notes.map(parseNote)
+		notes: raw.notes.map(parseNote)
 	};
 }
 
@@ -186,40 +190,30 @@ export function parseRecovery(value: string | null): RecoveryJournal | undefined
 	}
 
 	try {
-		const parsed: unknown = JSON.parse(value);
+		const parsed = JSON.parse(value) as Partial<RecoveryJournal>;
+		const context = parsed?.context;
 
 		if (
-			!isRecord(parsed) ||
-			parsed.version !== 1 ||
+			parsed?.version !== 1 ||
 			typeof parsed.markdown !== 'string' ||
 			typeof parsed.fileName !== 'string' ||
 			typeof parsed.updatedAt !== 'string' ||
 			typeof parsed.revision !== 'number' ||
-			!isRecord(parsed.context)
+			typeof context?.anchor !== 'number' ||
+			typeof context?.head !== 'number' ||
+			typeof context?.scrollTop !== 'number' ||
+			typeof context?.outlineOpen !== 'boolean' ||
+			typeof context?.notesOpen !== 'boolean'
 		) {
 			return undefined;
 		}
-
-		const context = parsed.context;
-
-		if (
-			typeof context.anchor !== 'number' ||
-			typeof context.head !== 'number' ||
-			typeof context.scrollTop !== 'number' ||
-			typeof context.outlineOpen !== 'boolean' ||
-			typeof context.notesOpen !== 'boolean'
-		) {
-			return undefined;
-		}
-
-		const sidecar = parseSidecar(parsed.sidecar, parsed.fileName);
 
 		return {
 			version: 1,
 			markdown: parsed.markdown,
 			fileName: parsed.fileName,
 			...(typeof parsed.baselineHash === 'string' ? { baselineHash: parsed.baselineHash } : {}),
-			sidecar,
+			sidecar: parseSidecar(parsed.sidecar, parsed.fileName),
 			context: {
 				anchor: context.anchor,
 				head: context.head,
@@ -237,42 +231,43 @@ export function parseRecovery(value: string | null): RecoveryJournal | undefined
 }
 
 function parseNote(value: unknown): WriterNote {
+	const note = value as Partial<WriterNote> | null | undefined;
 	if (
-		!isRecord(value) ||
-		typeof value.id !== 'string' ||
-		typeof value.body !== 'string' ||
-		typeof value.createdAt !== 'string' ||
-		typeof value.updatedAt !== 'string' ||
-		typeof value.resolved !== 'boolean'
+		typeof note !== 'object' ||
+		note === null ||
+		typeof note.id !== 'string' ||
+		typeof note.body !== 'string' ||
+		typeof note.createdAt !== 'string' ||
+		typeof note.updatedAt !== 'string' ||
+		typeof note.resolved !== 'boolean'
 	) {
 		throw new Error('A Writer’s Note is incomplete.');
 	}
 
 	return {
-		id: value.id,
-		body: value.body,
-		createdAt: value.createdAt,
-		updatedAt: value.updatedAt,
-		resolved: value.resolved,
-		selection: parseTextSelector(value.selection)
+		id: note.id,
+		body: note.body,
+		createdAt: note.createdAt,
+		updatedAt: note.updatedAt,
+		resolved: note.resolved,
+		selection: parseTextSelector(note.selection)
 	};
 }
 
 function parseTextSelector(value: unknown): TextSelector {
+	const sel = value as Partial<TextSelector> | null | undefined;
 	if (
-		!isRecord(value) ||
-		typeof value.from !== 'number' ||
-		typeof value.to !== 'number' ||
-		typeof value.quote !== 'string' ||
-		value.from < 0 ||
-		value.to <= value.from ||
-		value.quote.length !== value.to - value.from
+		typeof sel !== 'object' ||
+		sel === null ||
+		typeof sel.from !== 'number' ||
+		typeof sel.to !== 'number' ||
+		typeof sel.quote !== 'string' ||
+		sel.from < 0 ||
+		sel.to <= sel.from ||
+		sel.quote.length !== sel.to - sel.from
 	) {
 		throw new Error('A Writer’s Note text selection is invalid.');
 	}
 
-	return { from: value.from, to: value.to, quote: value.quote };
-}
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null;
+	return { from: sel.from, to: sel.to, quote: sel.quote };
 }

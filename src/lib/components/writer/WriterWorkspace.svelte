@@ -4,9 +4,11 @@
         history,
         historyKeymap,
         insertNewlineAndIndent,
+        selectAll,
+        undo,
     } from "@codemirror/commands";
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
-    import { syntaxHighlighting } from "@codemirror/language";
+    import { syntaxHighlighting, syntaxTree } from "@codemirror/language";
     import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
     import {
         closeSearchPanel,
@@ -16,6 +18,7 @@
         searchPanelOpen,
     } from "@codemirror/search";
     import {
+        EditorSelection,
         EditorState,
         Prec,
         RangeSetBuilder,
@@ -60,6 +63,7 @@
         type WriterSidecar,
     } from "$lib/writer-document";
     import { Dialog } from "bits-ui";
+    import { marked } from "marked";
     import { createHotkeys } from "@tanstack/svelte-hotkeys";
     import { untrack } from "svelte";
     import type { Attachment } from "svelte/attachments";
@@ -69,6 +73,8 @@
     } from "./writer-editor-theme";
     import {
         APP_SHORTCUTS,
+        clearFormatting,
+        deleteSelection,
         insertCodeBlock,
         insertFootnote,
         insertHorizontalRule,
@@ -94,8 +100,13 @@
     } from "./writer-types";
 
     const RECOVERY_KEY = "schrijver:recovery:v1";
+    const ACTION_BAR_KEY = "schrijver:action-bar:v1";
+    const ZOOM_KEY = "schrijver:zoom:v1";
     const RECOVERY_DELAY = 600;
     const DEFAULT_FILE_NAME = "schrijver-draft.md";
+    const MIN_ZOOM = 50;
+    const MAX_ZOOM = 300;
+    const ZOOM_STEP = 10;
     type NlpParser = typeof import("compromise").default;
     type WriteGood = typeof import("write-good").default;
     interface PickerWindow extends Window {
@@ -369,6 +380,7 @@
     let notesOpen = $state(false);
     let guideOpen = $state(false);
     let searchOpen = $state(false);
+    let readerMode = $state(false);
     let activeNoteId = $state<string | undefined>();
     let autofocusNoteId = $state<string | undefined>();
     let hasTextSelection = $state(false);
@@ -413,12 +425,143 @@
     let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
     let recoveryRevision = 0;
     let lastFallbackSaveTime = 0;
+    let actionBarOpen = $state(loadInitialActionBar());
+    let zoomLevel = $state(loadInitialZoom());
     let loadingProject = false;
+
+    function loadInitialActionBar(): boolean {
+        try {
+            const raw = localStorage.getItem(ACTION_BAR_KEY);
+            return raw !== null ? raw === "true" : true;
+        } catch {
+            return true;
+        }
+    }
+
+    function setActionBarOpen(open: boolean): void {
+        actionBarOpen = open;
+        try {
+            localStorage.setItem(ACTION_BAR_KEY, String(open));
+        } catch {
+            // Ignore
+        }
+    }
+
+    function loadInitialZoom(): number {
+        try {
+            const raw = localStorage.getItem(ZOOM_KEY);
+            if (raw !== null) {
+                const parsed = Number(raw);
+                if (!Number.isNaN(parsed) && parsed >= MIN_ZOOM && parsed <= MAX_ZOOM) {
+                    return parsed;
+                }
+            }
+        } catch {
+            // Ignore
+        }
+        return 100;
+    }
+
+    function setZoom(nextZoom: number): void {
+        zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom));
+        try {
+            localStorage.setItem(ZOOM_KEY, String(zoomLevel));
+        } catch {
+            // Ignore
+        }
+    }
+
+    function zoomIn(): void {
+        setZoom(zoomLevel + ZOOM_STEP);
+    }
+
+    function zoomOut(): void {
+        setZoom(zoomLevel - ZOOM_STEP);
+    }
+
+    function zoomReset(): void {
+        setZoom(100);
+    }
+
+    function handleUndo(): void {
+        if (editor) {
+            undo(editor);
+            editor.focus();
+        }
+    }
+
+    async function handleCut(): Promise<void> {
+        if (!editor) {
+            return;
+        }
+        const selection = editor.state.selection.main;
+        if (selection.empty) {
+            return;
+        }
+        await navigator.clipboard.writeText(editor.state.doc.sliceString(selection.from, selection.to)).catch(() => {});
+        editor.dispatch({
+            changes: { from: selection.from, to: selection.to, insert: "" },
+            selection: EditorSelection.cursor(selection.from),
+            scrollIntoView: true,
+            userEvent: "delete.cut",
+        });
+        editor.focus();
+    }
+
+    async function handleCopy(): Promise<void> {
+        if (!editor) {
+            return;
+        }
+        const selection = editor.state.selection.main;
+        if (!selection.empty) {
+            await navigator.clipboard.writeText(editor.state.doc.sliceString(selection.from, selection.to)).catch(() => {});
+            editor.focus();
+        }
+    }
+
+    async function handlePaste(): Promise<void> {
+        if (!editor) {
+            return;
+        }
+        const text = await navigator.clipboard.readText().catch(() => "");
+        if (text) {
+            const selection = editor.state.selection.main;
+            editor.dispatch({
+                changes: { from: selection.from, to: selection.to, insert: text },
+                selection: EditorSelection.cursor(selection.from + text.length),
+                scrollIntoView: true,
+                userEvent: "input.paste",
+            });
+            editor.focus();
+        }
+    }
+
+    function handleDelete(): void {
+        if (editor) {
+            deleteSelection(editor);
+        }
+    }
+
+    function handleClearFormatting(): void {
+        if (editor) {
+            clearFormatting(editor);
+        }
+    }
+
+    function handleSelectAll(): void {
+        if (editor) {
+            selectAll(editor);
+            editor.focus();
+        }
+    }
     const documentStats = $derived(calculateDocumentStats(draft));
     const selectionStats = $derived(
         hasTextSelection && selectedText ? calculateSelectionStats(selectedText) : undefined,
     );
     const noteViews = $derived.by(buildNoteViews);
+    const renderedHtml = $derived(
+        marked.parse(draft, { async: false, gfm: true, breaks: true }) as string,
+    );
     const attachEditor: Attachment<HTMLDivElement> = (editorElement) =>
         untrack(() => {
         const recovery = loadInitialRecovery();
@@ -598,8 +741,30 @@
                 callback: () => void saveProject(),
             },
             {
+                hotkey: APP_SHORTCUTS.saveAs,
+                callback: () => void saveAsProject(),
+            },
+            {
+                hotkey: APP_SHORTCUTS.zoomIn,
+                callback: zoomIn,
+            },
+            {
+                hotkey: APP_SHORTCUTS.zoomOut,
+                callback: zoomOut,
+            },
+            {
+                hotkey: APP_SHORTCUTS.zoomReset,
+                callback: zoomReset,
+            },
+            {
                 hotkey: APP_SHORTCUTS.focus,
                 callback: () => setFocusModeValue(!focusMode),
+            },
+            {
+                hotkey: APP_SHORTCUTS.preview,
+                callback: () => {
+                    readerMode = !readerMode;
+                },
             },
             {
                 hotkey: APP_SHORTCUTS.addNote,
@@ -612,6 +777,10 @@
             {
                 hotkey: APP_SHORTCUTS.review,
                 callback: () => void setReviewModeValue(!reviewMode),
+            },
+            {
+                hotkey: APP_SHORTCUTS.hemingway,
+                callback: () => setHemingwayModeValue(!hemingwayMode),
             },
             {
                 hotkey: APP_SHORTCUTS.guide,
@@ -1083,6 +1252,56 @@
             markDirty();
             saveState = "error";
         }
+    }
+
+    async function saveAsProject(): Promise<void> {
+        const picker = window as PickerWindow;
+
+        if (picker.showDirectoryPicker) {
+            try {
+                const nextDirectory = await picker.showDirectoryPicker({
+                    mode: "readwrite",
+                });
+                const requestedName = prompt("File name", manuscriptLabel(fileName));
+
+                if (!requestedName) {
+                    return;
+                }
+
+                const nextFileName = normalizeMarkdownFileName(requestedName);
+
+                directoryHandle = nextDirectory;
+                fileName = nextFileName;
+                markdownHandle = await nextDirectory.getFileHandle(nextFileName, {
+                    create: true,
+                });
+                sidecarHandle = await nextDirectory.getFileHandle(
+                    sidecarName(nextFileName),
+                    { create: true },
+                );
+
+                await writeFile(markdownHandle, draft);
+                await writeFile(
+                    sidecarHandle,
+                    `${JSON.stringify(currentSidecar(), null, 2)}\n`,
+                );
+
+                baselineHash = hashText(draft);
+                dirty = false;
+                journalSaved = false;
+                recoveryRestored = false;
+                saveState = "saved";
+                clearRecovery();
+            } catch (error) {
+                if (!isAbortError(error)) {
+                    saveState = "error";
+                    alert(error instanceof Error ? error.message : "Could not save file.");
+                }
+            }
+            return;
+        }
+
+        downloadProject();
     }
 
     function downloadProject(): void {
@@ -1762,54 +1981,27 @@
 
     function buildHeadingDecorations(view: EditorView): DecorationSet {
         const builder = new RangeSetBuilder<Decoration>();
-        let codeFence: { mark: string; length: number } | undefined;
 
-        for (
-            let lineNumber = 1;
-            lineNumber <= view.state.doc.lines;
-            lineNumber += 1
-        ) {
-            const line = view.state.doc.line(lineNumber);
-            const fence = /^(?: {0,3})(`{3,}|~{3,})/.exec(line.text);
-
-            if (fence) {
-                const marker = fence[1];
-
-                if (!marker) {
-                    continue;
-                }
-
-                const mark = marker.charAt(0);
-
-                if (!codeFence) {
-                    codeFence = { mark, length: marker.length };
-                } else if (
-                    codeFence.mark === mark &&
-                    marker.length >= codeFence.length
-                ) {
-                    codeFence = undefined;
-                }
-
-                continue;
-            }
-
-            if (codeFence) {
-                continue;
-            }
-
-            const heading = /^(#{1,6})\s/.exec(line.text);
-
-            if (heading) {
-                const marker = heading[0];
-
-                builder.add(
-                    line.from,
-                    line.from + marker.length,
-                    Decoration.replace({
-                        widget: new HeadingMarkWidget(marker),
-                    }),
-                );
-            }
+        for (const { from, to } of view.visibleRanges) {
+            syntaxTree(view.state).iterate({
+                from,
+                to,
+                enter(node) {
+                    if (/^ATXHeading[1-6]$/.test(node.name)) {
+                        const line = view.state.doc.lineAt(node.from);
+                        const match = /^(#{1,6})\s/.exec(line.text);
+                        if (match) {
+                            builder.add(
+                                line.from,
+                                line.from + match[0].length,
+                                Decoration.replace({
+                                    widget: new HeadingMarkWidget(match[0]),
+                                }),
+                            );
+                        }
+                    }
+                },
+            });
         }
 
         return builder.finish();
@@ -1942,19 +2134,20 @@
 <main
 	class="group grid h-screen min-h-screen grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-page font-mono text-ink"
 	data-focused={focusMode && focusScope !== "all"}
+	style:--editor-zoom-factor={zoomLevel / 100}
 >
     <WriterToolbar
+        {actionBarOpen}
         {focusMode}
         {focusScope}
+        hasSelection={hasTextSelection}
         {hemingwayMode}
         {notesOpen}
-        {outlineOpen}
-        {reviewChecks}
-        {reviewMode}
-        {searchOpen}
-        {syntaxMode}
-        {syntaxParts}
-        {typewriterMode}
+        onActionBarToggle={() => setActionBarOpen(!actionBarOpen)}
+        onClearFormatting={handleClearFormatting}
+        onCopy={handleCopy}
+        onCut={handleCut}
+        onDelete={handleDelete}
         onFocusModeChange={setFocusModeValue}
         onFocusScopeChange={setFocusScopeValue}
         onGuideOpen={() => (guideOpen = true)}
@@ -1962,13 +2155,29 @@
         onNotesOpenChange={setNotesOpen}
         onOpen={openProject}
         onOutlineOpenChange={setOutlineOpen}
+        onPaste={handlePaste}
+        onReaderModeToggle={() => (readerMode = !readerMode)}
         onReviewCheckChange={setReviewCheckValue}
         onReviewModeChange={setReviewModeValue}
         onSave={saveProject}
+        onSaveAs={saveAsProject}
         onSearch={toggleSearch}
+        onSelectAll={handleSelectAll}
         onSyntaxModeChange={setSyntaxModeValue}
         onSyntaxPartChange={setSyntaxPartValue}
         onTypewriterModeChange={setTypewriterModeValue}
+        onUndo={handleUndo}
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        onZoomReset={zoomReset}
+        {outlineOpen}
+        {readerMode}
+        {reviewChecks}
+        {reviewMode}
+        {searchOpen}
+        {syntaxMode}
+        {syntaxParts}
+        {typewriterMode}
     />
 
     <section class="relative min-h-0 flex-1 overflow-hidden p-0" aria-label="Writing surface">
@@ -2027,11 +2236,28 @@
             {outline}
             {outlineOpen}
         />
+        {#if readerMode}
+            <div
+                class={[
+                    "h-full min-h-0 overflow-y-auto overscroll-y-contain transition-[padding] duration-150",
+                    outlineOpen && "lg:pl-rail",
+                    notesOpen && "lg:pr-rail",
+                ]}
+                data-reader-mode="true"
+            >
+                <article
+                    class="prose font-serif max-w-[70ch] mx-auto px-(--editor-inline-space) py-(--editor-block-space) leading-relaxed"
+                >
+                    {@html renderedHtml}
+                </article>
+            </div>
+        {/if}
         <div
             class={[
                 "h-full min-h-0 transition-[padding] duration-150",
                 outlineOpen && "lg:pl-rail",
                 notesOpen && "lg:pr-rail",
+                readerMode && "hidden",
             ]}
             {@attach attachEditor}
         ></div>
@@ -2096,22 +2322,25 @@
         {/if}
     </Dialog.Root>
 
-    <WriterStatus
-        addNoteDisabled={!hasTextSelection}
-        {documentStats}
-        {selectionStats}
-        onAddNote={addNote}
-        onToggleFormat={(open, close) => editor && toggleInlineFormat(editor, open, close)}
-        onToggleHeading={(level) => editor && toggleHeading(editor, level)}
-        onToggleBlockquote={() => editor && toggleBlockquote(editor)}
-        onToggleBulletList={() => editor && toggleBulletList(editor)}
-        onToggleNumberedList={() => editor && toggleNumberedList(editor)}
-        onToggleTaskList={() => editor && toggleTaskList(editor)}
-        onInsertLink={() => editor && insertLink(editor)}
-        onInsertCodeBlock={() => editor && insertCodeBlock(editor)}
-        onInsertHorizontalRule={() => editor && insertHorizontalRule(editor)}
-        onInsertFootnote={() => editor && insertFootnote(editor)}
-    />
+    {#if actionBarOpen}
+        <WriterStatus
+            addNoteDisabled={!hasTextSelection}
+            disabled={readerMode}
+            {documentStats}
+            {selectionStats}
+            onAddNote={addNote}
+            onToggleFormat={(open, close) => editor && toggleInlineFormat(editor, open, close)}
+            onToggleHeading={(level) => editor && toggleHeading(editor, level)}
+            onToggleBlockquote={() => editor && toggleBlockquote(editor)}
+            onToggleBulletList={() => editor && toggleBulletList(editor)}
+            onToggleNumberedList={() => editor && toggleNumberedList(editor)}
+            onToggleTaskList={() => editor && toggleTaskList(editor)}
+            onInsertLink={() => editor && insertLink(editor)}
+            onInsertCodeBlock={() => editor && insertCodeBlock(editor)}
+            onInsertHorizontalRule={() => editor && insertHorizontalRule(editor)}
+            onInsertFootnote={() => editor && insertFootnote(editor)}
+        />
+    {/if}
     <input
         {@attach attachFallbackInput}
         accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"

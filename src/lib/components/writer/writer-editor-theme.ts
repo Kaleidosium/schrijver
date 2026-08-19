@@ -80,7 +80,7 @@ export const writerTheme = EditorView.theme({
 		height: '100%',
 		minHeight: '100%',
 		fontFamily: 'monospace',
-		fontSize: '1.5em',
+		fontSize: 'calc(1.5em * var(--editor-zoom-factor, 1))',
 		lineHeight: '1.75',
 		overscrollBehavior: 'contain',
 		scrollPaddingBlock: 'clamp(2.5rem, 2rem + 1.5vw, 3.5rem)'

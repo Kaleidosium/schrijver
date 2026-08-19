@@ -23,6 +23,7 @@
 
 	interface Props {
 		readonly addNoteDisabled?: boolean | undefined;
+		readonly disabled?: boolean | undefined;
 		readonly documentStats: DocumentStats;
 		readonly selectionStats?: SelectionStats | undefined;
 		readonly onAddNote?: (() => void) | undefined;
@@ -40,6 +41,7 @@
 
 	const {
 		addNoteDisabled = true,
+		disabled = false,
 		documentStats,
 		selectionStats,
 		onAddNote,
@@ -63,7 +65,13 @@
 	aria-label="Formatting and document statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
-		<div class="flex items-center gap-0.5 overflow-x-auto overscroll-x-contain scrollbar-none [&::-webkit-scrollbar]:hidden">
+		<div
+			class={[
+				"flex items-center gap-0.5 overflow-x-auto overscroll-x-contain scrollbar-none [&::-webkit-scrollbar]:hidden",
+				disabled && "pointer-events-none opacity-40 select-none"
+			]}
+			aria-disabled={disabled}
+		>
 			<!-- Group 1: Headings Menu (H1 - H6 + Body) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -139,92 +147,93 @@
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
+			{#snippet toolBtn({
+				label,
+				shortcut,
+				onclick,
+				disabled: btnDisabled = false,
+				icon,
+				extraClass = '',
+				btnLabel
+			}: {
+				label: string;
+				shortcut?: string | undefined;
+				onclick?: (() => void) | undefined;
+				disabled?: boolean | undefined;
+				icon: import('svelte').Snippet;
+				extraClass?: string | undefined;
+				btnLabel?: string | undefined;
+			})}
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						{#snippet child({ props: tooltipProps })}
+							<button
+								{...tooltipProps}
+								class={[
+									'flex h-6 min-h-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40',
+									btnLabel ? 'gap-1 px-1.5 text-[0.74rem] font-medium' : 'w-6 text-[0.78rem]',
+									extraClass
+								]}
+								type="button"
+								aria-label={label}
+								disabled={btnDisabled}
+								{onclick}
+							>
+								{@render icon()}
+								{#if btnLabel}
+									<span>{btnLabel}</span>
+								{/if}
+							</button>
+						{/snippet}
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							side="top"
+							sideOffset={6}
+							class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						>
+							<span>{label}</span>
+							{#if shortcut}
+								<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">
+									{formatForDisplay(shortcut)}
+								</kbd>
+							{/if}
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+			{/snippet}
+
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
 			<!-- Group 2: Emphasis (Bold, Italic, Strikethrough) -->
-			<!-- Bold -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] font-bold leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Bold"
-							onclick={() => onToggleFormat('**')}
-						>
-							<Bold size={13} strokeWidth={2.5} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Bold</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+B')}</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Bold',
+				shortcut: 'Mod+B',
+				extraClass: 'font-bold',
+				onclick: () => onToggleFormat('**'),
+				icon: boldIcon
+			})}
+			{#snippet boldIcon()}<Bold size={13} strokeWidth={2.5} />{/snippet}
 
-			<!-- Italic -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] italic leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Italic"
-							onclick={() => onToggleFormat('*')}
-						>
-							<Italic size={13} strokeWidth={2.5} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Italic</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+I')}</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Italic',
+				shortcut: 'Mod+I',
+				extraClass: 'italic',
+				onclick: () => onToggleFormat('*'),
+				icon: italicIcon
+			})}
+			{#snippet italicIcon()}<Italic size={13} strokeWidth={2.5} />{/snippet}
 
-			<!-- Strikethrough -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Strikethrough"
-							onclick={() => onToggleFormat('~~')}
-						>
-							<Strikethrough size={13} strokeWidth={2.2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Strikethrough</span>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Strikethrough',
+				onclick: () => onToggleFormat('~~'),
+				icon: strikeIcon
+			})}
+			{#snippet strikeIcon()}<Strikethrough size={13} strokeWidth={2.2} />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
-			<!-- Group 3: Code & Link (Separated from Bold/Italic/Strikethrough) -->
+			<!-- Group 3: Code & Link -->
 			<!-- Code Menu -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -265,228 +274,78 @@
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
-			<!-- Link -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Link"
-							onclick={onInsertLink}
-						>
-							<LinkIcon size={13} strokeWidth={2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Link</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+K')}</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Link',
+				shortcut: 'Mod+K',
+				onclick: onInsertLink,
+				icon: linkIcon
+			})}
+			{#snippet linkIcon()}<LinkIcon size={13} strokeWidth={2} />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
 			<!-- Group 4: Structure (Lists: Bullet, Numbered, Task checklist) -->
-			<!-- Bullet list -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Bullet list"
-							onclick={onToggleBulletList}
-						>
-							<List size={13} strokeWidth={2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Bullet list</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">-</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Bullet list',
+				shortcut: '-',
+				onclick: onToggleBulletList,
+				icon: listIcon
+			})}
+			{#snippet listIcon()}<List size={13} strokeWidth={2} />{/snippet}
 
-			<!-- Numbered list -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Numbered list"
-							onclick={onToggleNumberedList}
-						>
-							<ListOrdered size={13} strokeWidth={2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Numbered list</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">1.</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Numbered list',
+				shortcut: '1.',
+				onclick: onToggleNumberedList,
+				icon: listOrdIcon
+			})}
+			{#snippet listOrdIcon()}<ListOrdered size={13} strokeWidth={2} />{/snippet}
 
-			<!-- Task checklist -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Task checklist"
-							onclick={onToggleTaskList}
-						>
-							<ListTodo size={13} strokeWidth={2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Task checklist</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">[ ]</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Task checklist',
+				shortcut: '[ ]',
+				onclick: onToggleTaskList,
+				icon: taskIcon
+			})}
+			{#snippet taskIcon()}<ListTodo size={13} strokeWidth={2} />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
 			<!-- Group 5: Blocks & Extras (Blockquote, Footnote, Horizontal Rule) -->
-			<!-- Blockquote -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Blockquote"
-							onclick={onToggleBlockquote}
-						>
-							<Quote size={13} strokeWidth={2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Blockquote</span>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Blockquote',
+				onclick: onToggleBlockquote,
+				icon: quoteIcon
+			})}
+			{#snippet quoteIcon()}<Quote size={13} strokeWidth={2} />{/snippet}
 
-			<!-- Footnote -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Footnote"
-							onclick={onInsertFootnote}
-						>
-							<Asterisk size={13} strokeWidth={2.2} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Footnote</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">[^1]</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Footnote',
+				shortcut: '[^1]',
+				onclick: onInsertFootnote,
+				icon: footnoteIcon
+			})}
+			{#snippet footnoteIcon()}<Asterisk size={13} strokeWidth={2.2} />{/snippet}
 
-			<!-- Horizontal Rule -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent text-[0.78rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
-							type="button"
-							aria-label="Horizontal rule"
-							onclick={onInsertHorizontalRule}
-						>
-							<Minus size={13} strokeWidth={2.5} />
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Horizontal rule</span>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
-			<!-- Group 6: Note Annotation (Separated from markdown formatting) -->
+			{@render toolBtn({
+				label: 'Horizontal rule',
+				onclick: onInsertHorizontalRule,
+				icon: hrIcon
+			})}
+			{#snippet hrIcon()}<Minus size={13} strokeWidth={2.5} />{/snippet}
+
+			<!-- Group 6: Note Annotation -->
 			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props: tooltipProps })}
-						<button
-							{...tooltipProps}
-							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40"
-							disabled={addNoteDisabled}
-							type="button"
-							aria-label="Add note at selection"
-							onclick={onAddNote}
-						>
-							<SquarePen size={13} strokeWidth={2} />
-							<span>Add Note</span>
-						</button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Portal>
-					<Tooltip.Content
-						side="top"
-						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
-					>
-						<span>Add note at selection</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.addNote)}</kbd>
-					</Tooltip.Content>
-				</Tooltip.Portal>
-			</Tooltip.Root>
+			{@render toolBtn({
+				label: 'Add note at selection',
+				shortcut: APP_SHORTCUTS.addNote,
+				btnLabel: 'Add Note',
+				disabled: addNoteDisabled,
+				onclick: onAddNote,
+				icon: noteIcon
+			})}
+			{#snippet noteIcon()}<SquarePen size={13} strokeWidth={2} />{/snippet}
 		</div>
 	</Tooltip.Provider>
 

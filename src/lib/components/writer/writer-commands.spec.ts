@@ -8,12 +8,17 @@ import {
 } from '@codemirror/state';
 import { describe, expect, it } from 'vite-plus/test';
 import {
+	APP_SHORTCUTS,
+	clearFormatting,
+	COMMAND_HELP,
+	deleteSelection,
 	insertCodeBlock,
 	insertFootnote,
 	insertHorizontalRule,
 	insertLink,
 	insertParagraphBreak,
 	paragraphNavigation,
+	stripMarkdownFormatting,
 	toggleBlockquote,
 	toggleBulletList,
 	toggleHeading,
@@ -291,5 +296,49 @@ describe('formatting commands', () => {
 		insertFootnote(view2);
 		expect(view2.doc).toContain('[^2]');
 		expect(view2.doc).toContain('[^2]: ');
+	});
+
+	it('strips markdown formatting using stripMarkdownFormatting', () => {
+		expect(stripMarkdownFormatting('**bold text**')).toBe('bold text');
+		expect(stripMarkdownFormatting('*italic text*')).toBe('italic text');
+		expect(stripMarkdownFormatting('~~strike~~')).toBe('strike');
+		expect(stripMarkdownFormatting('`code`')).toBe('code');
+		expect(stripMarkdownFormatting('# Heading 1')).toBe('Heading 1');
+		expect(stripMarkdownFormatting('> Blockquote')).toBe('Blockquote');
+		expect(stripMarkdownFormatting('- Bullet item')).toBe('Bullet item');
+		expect(stripMarkdownFormatting('1. Numbered item')).toBe('Numbered item');
+		expect(stripMarkdownFormatting('- [ ] Task item')).toBe('Task item');
+		expect(stripMarkdownFormatting('[link](https://example.com)')).toBe('link');
+		expect(stripMarkdownFormatting('![image](https://example.com/img.png)')).toBe('image');
+		expect(stripMarkdownFormatting('Note with footnote[^1]')).toBe('Note with footnote');
+	});
+
+	it('clears formatting on selection and whole lines', () => {
+		const view = createEditorContext('This is **bold** and *italic* text.', {
+			anchor: 8,
+			head: 16
+		});
+		clearFormatting(view);
+		expect(view.doc).toBe('This is bold and *italic* text.');
+
+		// On whole line when empty selection
+		const view2 = createEditorContext('# ## Header title', { anchor: 5 });
+		clearFormatting(view2);
+		expect(view2.doc).toBe('Header title');
+	});
+
+	it('deletes selection or character forward', () => {
+		const view = createEditorContext('Hello world', { anchor: 5, head: 11 });
+		deleteSelection(view);
+		expect(view.doc).toBe('Hello');
+
+		const view2 = createEditorContext('Hello', { anchor: 0 });
+		deleteSelection(view2);
+		expect(view2.doc).toBe('ello');
+	});
+
+	it('defines reader mode preview shortcut in help and shortcuts map', () => {
+		expect(APP_SHORTCUTS.preview).toBe('Mod+Alt+P');
+		expect(COMMAND_HELP.some((cmd) => cmd.label === 'Toggle reader mode')).toBe(true);
 	});
 });

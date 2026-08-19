@@ -18,27 +18,42 @@ export interface MarkdownEditorContext {
 export const APP_SHORTCUTS = {
 	open: 'Mod+O',
 	save: 'Mod+S',
+	saveAs: 'Mod+Shift+S',
 	focus: 'Mod+Shift+F',
 	addNote: 'Mod+Shift+M',
 	outline: 'Mod+Alt+O',
 	review: 'Mod+Alt+R',
-	guide: 'Mod+/'
+	hemingway: 'Alt+H',
+	guide: 'Mod+/',
+	preview: 'Mod+Alt+P',
+	zoomIn: 'Mod+=',
+	zoomOut: 'Mod+-',
+	zoomReset: 'Mod+0'
 } as const;
 
 export const COMMAND_HELP = [
 	{ label: 'Open folder', shortcut: APP_SHORTCUTS.open, scope: 'App' },
 	{ label: 'Save folder project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
+	{ label: 'Save as...', shortcut: APP_SHORTCUTS.saveAs, scope: 'App' },
 	{ label: 'Find', shortcut: 'Mod+F', scope: 'Editor' },
 	{ label: 'Toggle focus', shortcut: APP_SHORTCUTS.focus, scope: 'App' },
+	{ label: 'Toggle reader mode', shortcut: APP_SHORTCUTS.preview, scope: 'App' },
 	{ label: 'Add Writer’s Note', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
 	{ label: 'Toggle outline', shortcut: APP_SHORTCUTS.outline, scope: 'App' },
 	{ label: 'Toggle style', shortcut: APP_SHORTCUTS.review, scope: 'App' },
 	{ label: 'Keyboard shortcuts', shortcut: APP_SHORTCUTS.guide, scope: 'App' },
 	{ label: 'Undo', shortcut: 'Mod+Z', scope: 'Editor' },
 	{ label: 'Redo', shortcut: 'Mod+Shift+Z', scope: 'Editor' },
+	{ label: 'Cut', shortcut: 'Mod+X', scope: 'Editor' },
+	{ label: 'Copy', shortcut: 'Mod+C', scope: 'Editor' },
+	{ label: 'Paste', shortcut: 'Mod+V', scope: 'Editor' },
+	{ label: 'Select all', shortcut: 'Mod+A', scope: 'Editor' },
 	{ label: 'Bold', shortcut: 'Mod+B', scope: 'Editor' },
 	{ label: 'Italic', shortcut: 'Mod+I', scope: 'Editor' },
-	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' }
+	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' },
+	{ label: 'Zoom in', shortcut: APP_SHORTCUTS.zoomIn, scope: 'App' },
+	{ label: 'Zoom out', shortcut: APP_SHORTCUTS.zoomOut, scope: 'App' },
+	{ label: 'Restore zoom', shortcut: APP_SHORTCUTS.zoomReset, scope: 'App' }
 ] as const;
 
 export function toggleInlineFormat(
@@ -135,173 +150,86 @@ function applyLinePrefixChanges(
 	return true;
 }
 
-export function toggleHeading(view: MarkdownEditorContext, level: number): boolean {
+const ANY_LIST_RE = /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/;
+
+function toggleList(
+	view: MarkdownEditorContext,
+	itemRegex: RegExp,
+	getItemPrefix: (index: number) => string
+): boolean {
 	return applyLinePrefixChanges(view, (lines) => {
-		const targetPrefix = level > 0 ? `${'#'.repeat(level)} ` : '';
-		const headingRegex = /^(\s*)#{1,6}\s+/;
-		const allAlreadyTarget = lines.every((line) => {
-			const text = line.text;
-			return level > 0 ? text.startsWith(targetPrefix) : !headingRegex.test(text);
+		const allMatch = lines.every((line) => itemRegex.test(line.text));
+		let index = 1;
+		return lines.map((line) => {
+			const match = (allMatch ? itemRegex : ANY_LIST_RE).exec(line.text);
+			const leading = match
+				? (match[1]?.length ?? 0)
+				: (/^(\s*)/.exec(line.text)?.[1]?.length ?? 0);
+			const to = match ? line.from + match[0].length : line.from + leading;
+			const insert = allMatch ? '' : getItemPrefix(index++);
+			return { from: line.from + leading, to, insert };
 		});
+	});
+}
 
-		const changes: ChangeSpec[] = [];
-
-		for (const line of lines) {
+export function toggleHeading(view: MarkdownEditorContext, level: number): boolean {
+	const targetPrefix = level > 0 ? `${'#'.repeat(level)} ` : '';
+	const headingRegex = /^(\s*)#{1,6}\s+/;
+	return applyLinePrefixChanges(view, (lines) => {
+		const allTarget = lines.every((line) =>
+			level > 0 ? line.text.startsWith(targetPrefix) : !headingRegex.test(line.text)
+		);
+		return lines.map((line) => {
 			const match = headingRegex.exec(line.text);
-			if (allAlreadyTarget) {
-				if (match) {
-					changes.push({
-						from: line.from + (match[1]?.length ?? 0),
-						to: line.from + match[0].length,
-						insert: ''
-					});
-				}
-			} else if (match) {
-				changes.push({
-					from: line.from + (match[1]?.length ?? 0),
-					to: line.from + match[0].length,
-					insert: targetPrefix
-				});
-			} else if (targetPrefix) {
-				const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
-				changes.push({ from: line.from + leadingSpaces.length, insert: targetPrefix });
-			}
-		}
-
-		return changes;
+			const leading = match
+				? (match[1]?.length ?? 0)
+				: (/^(\s*)/.exec(line.text)?.[1]?.length ?? 0);
+			const to = match ? line.from + match[0].length : line.from + leading;
+			return { from: line.from + leading, to, insert: allTarget ? '' : targetPrefix };
+		});
 	});
 }
 
 export function toggleBlockquote(view: MarkdownEditorContext): boolean {
+	const quoteRegex = /^(\s*)>\s?/;
 	return applyLinePrefixChanges(view, (lines) => {
-		const quoteRegex = /^(\s*)>\s?/;
 		const allQuoted = lines.every((line) => quoteRegex.test(line.text));
-		const changes: ChangeSpec[] = [];
-
-		for (const line of lines) {
+		return lines.map((line) => {
 			const match = quoteRegex.exec(line.text);
-			if (allQuoted && match) {
-				changes.push({
-					from: line.from + (match[1]?.length ?? 0),
-					to: line.from + match[0].length,
-					insert: ''
-				});
-			} else if (!allQuoted && !match) {
-				const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
-				changes.push({ from: line.from + leadingSpaces.length, insert: '> ' });
-			}
-		}
-
-		return changes;
+			const leading = match
+				? (match[1]?.length ?? 0)
+				: (/^(\s*)/.exec(line.text)?.[1]?.length ?? 0);
+			const to = match ? line.from + match[0].length : line.from + leading;
+			return { from: line.from + leading, to, insert: allQuoted ? '' : '> ' };
+		});
 	});
 }
 
 export function toggleBulletList(view: MarkdownEditorContext): boolean {
-	return applyLinePrefixChanges(view, (lines) => {
-		const bulletRegex = /^(\s*)[-*+]\s+(?!\[[ xX]\])/;
-		const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/;
-		const allBulleted = lines.every((line) => bulletRegex.test(line.text));
-		const changes: ChangeSpec[] = [];
-
-		for (const line of lines) {
-			const match = anyListRegex.exec(line.text);
-			if (allBulleted) {
-				if (match) {
-					changes.push({
-						from: line.from + (match[1]?.length ?? 0),
-						to: line.from + match[0].length,
-						insert: ''
-					});
-				}
-			} else if (match) {
-				changes.push({
-					from: line.from + (match[1]?.length ?? 0),
-					to: line.from + match[0].length,
-					insert: '- '
-				});
-			} else {
-				const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
-				changes.push({ from: line.from + leadingSpaces.length, insert: '- ' });
-			}
-		}
-
-		return changes;
-	});
+	return toggleList(view, /^(\s*)[-*+]\s+(?!\[[ xX]\])/, () => '- ');
 }
 
 export function toggleNumberedList(view: MarkdownEditorContext): boolean {
-	return applyLinePrefixChanges(view, (lines) => {
-		const numberedRegex = /^(\s*)\d+[.)]\s+/;
-		const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/;
-		const allNumbered = lines.every((line) => numberedRegex.test(line.text));
-		const changes: ChangeSpec[] = [];
-		let index = 1;
-
-		for (const line of lines) {
-			const match = anyListRegex.exec(line.text);
-			if (allNumbered) {
-				if (match) {
-					changes.push({
-						from: line.from + (match[1]?.length ?? 0),
-						to: line.from + match[0].length,
-						insert: ''
-					});
-				}
-			} else if (match) {
-				changes.push({
-					from: line.from + (match[1]?.length ?? 0),
-					to: line.from + match[0].length,
-					insert: `${index}. `
-				});
-				index += 1;
-			} else {
-				const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
-				changes.push({ from: line.from + leadingSpaces.length, insert: `${index}. ` });
-				index += 1;
-			}
-		}
-
-		return changes;
-	});
+	return toggleList(view, /^(\s*)\d+[.)]\s+/, (index) => `${index}. `);
 }
 
 export function toggleTaskList(view: MarkdownEditorContext): boolean {
+	const taskRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+\[([ xX])\]\s+/;
 	return applyLinePrefixChanges(view, (lines) => {
-		const taskRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+\[([ xX])\]\s+/;
-		const anyListRegex = /^(\s*)(?:[-*+]|\d+[.)])\s+/;
 		const allTasks = lines.every((line) => taskRegex.test(line.text));
-		const changes: ChangeSpec[] = [];
-
-		for (const line of lines) {
+		return lines.map((line) => {
 			const taskMatch = taskRegex.exec(line.text);
-			const listMatch = anyListRegex.exec(line.text);
-
-			if (allTasks && taskMatch) {
-				changes.push({
-					from: line.from + (taskMatch[1]?.length ?? 0),
-					to: line.from + taskMatch[0].length,
-					insert: ''
-				});
-			} else if (taskMatch) {
-				const isDone = (taskMatch[2]?.toLowerCase() ?? '') === 'x';
-				changes.push({
-					from: line.from + (taskMatch[1]?.length ?? 0),
-					to: line.from + taskMatch[0].length,
-					insert: isDone ? '- [ ] ' : '- [x] '
-				});
-			} else if (listMatch) {
-				changes.push({
-					from: line.from + (listMatch[1]?.length ?? 0),
-					to: line.from + listMatch[0].length,
-					insert: '- [ ] '
-				});
-			} else {
-				const leadingSpaces = /^(\s*)/.exec(line.text)?.[1] ?? '';
-				changes.push({ from: line.from + leadingSpaces.length, insert: '- [ ] ' });
+			const listMatch = taskMatch ?? /^(\s*)(?:[-*+]|\d+[.)])\s+/.exec(line.text);
+			const leading = listMatch
+				? (listMatch[1]?.length ?? 0)
+				: (/^(\s*)/.exec(line.text)?.[1]?.length ?? 0);
+			const to = listMatch ? line.from + listMatch[0].length : line.from + leading;
+			let insert = '';
+			if (!allTasks) {
+				insert = taskMatch ? (taskMatch[2]?.toLowerCase() === 'x' ? '- [ ] ' : '- [x] ') : '- [ ] ';
 			}
-		}
-
-		return changes;
+			return { from: line.from + leading, to, insert };
+		});
 	});
 }
 
@@ -489,10 +417,6 @@ interface MarkdownBlock {
 	readonly to: number;
 }
 
-interface NavigationTarget {
-	readonly position: number;
-}
-
 export function paragraphNavigation(direction: ParagraphDirection, extend: boolean): StateCommand {
 	return ({ state, dispatch }) => {
 		if (!extend && state.selection.ranges.some((range) => !range.empty)) {
@@ -580,7 +504,7 @@ function navigationTarget(
 	blocks: readonly MarkdownBlock[],
 	position: number,
 	direction: ParagraphDirection
-): NavigationTarget | undefined {
+): { readonly position: number } | undefined {
 	const index = blocks.findIndex((block) => block.from <= position && position <= block.to);
 
 	if (index >= 0) {
@@ -682,4 +606,72 @@ function isProseOrHeading(state: EditorState, position: number): boolean {
 	}
 
 	return paragraph;
+}
+
+export function stripMarkdownFormatting(text: string): string {
+	return text
+		.replace(/\[\^[^\]]+\]:?/g, '')
+		.replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+		.replace(/^(?:#{1,6}\s*)+/gm, '')
+		.replace(/^>\s?/gm, '')
+		.replace(/^(\s*)(?:[-*+]|\d+[.)])\s+\[[ xX]\]\s+/gm, '$1')
+		.replace(/^(\s*)(?:[-*+]|\d+[.)])\s+/gm, '$1')
+		.replace(/(\*\*|__|\*|_|~~|`)/g, '');
+}
+
+export function clearFormatting(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const doc = view.state.doc;
+	const { main } = view.state.selection;
+
+	if (main.empty) {
+		const line = doc.lineAt(main.head);
+		const stripped = stripMarkdownFormatting(line.text);
+		if (stripped === line.text) {
+			return false;
+		}
+		view.dispatch({
+			changes: { from: line.from, to: line.to, insert: stripped },
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+	} else {
+		const selected = doc.sliceString(main.from, main.to);
+		const stripped = stripMarkdownFormatting(selected);
+		view.dispatch({
+			changes: { from: main.from, to: main.to, insert: stripped },
+			selection: EditorSelection.range(main.from, main.from + stripped.length),
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+	}
+
+	view.focus?.();
+	return true;
+}
+
+export function deleteSelection(view: MarkdownEditorContext): boolean {
+	if (view.state.readOnly) {
+		return false;
+	}
+
+	const { main } = view.state.selection;
+	const from = main.from;
+	const to = main.empty ? Math.min(view.state.doc.length, main.head + 1) : main.to;
+
+	if (from === to && main.empty) {
+		return false;
+	}
+
+	view.dispatch({
+		changes: { from, to, insert: '' },
+		selection: EditorSelection.cursor(from),
+		scrollIntoView: true,
+		userEvent: 'delete'
+	});
+	view.focus?.();
+	return true;
 }
