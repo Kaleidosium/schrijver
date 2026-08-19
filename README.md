@@ -4,13 +4,13 @@ schrijver is a distraction-free Markdown text editor designed for long-form writ
 
 ## Features
 
-- **Typography-first editing:** Custom paper-toned theme with proportional and monospace type, balanced headings, and reader mode.
-- **Focus modes:** Sentence and paragraph isolation dim peripheral paragraphs so you can stay in flow.
-- **Hemingway mode:** Disables backspace and deletion to keep you writing forward.
-- **Syntax and style analysis:** Highlights parts of speech (adjectives, nouns, adverbs, verbs, conjunctions) and stylistic patterns (weasel words, passive voice, wordy phrases, clichés).
-- **Writer’s notes:** Anchored annotations preserved in `.schrijver.json` sidecar files alongside standard Markdown documents.
-- **Local persistence:** Automatic crash recovery and multi-tab sync using local storage.
-- **File System Access:** Open and save local folders directly in supported browsers, with automatic fallback downloads.
+- **Typography-first editing**: Custom paper-toned theme with proportional and monospace type, balanced headings, and reader mode.
+- **Focus modes**: Sentence and paragraph isolation dim peripheral paragraphs so you can stay in flow.
+- **Hemingway mode**: Disables backspace and deletion to keep you writing forward.
+- **Syntax and style analysis**: Highlights parts of speech (adjectives, nouns, adverbs, verbs, conjunctions) and stylistic patterns (weasel words, passive voice, wordy phrases, clichés).
+- **Writer’s notes**: Anchored annotations preserved in `.schrijver.json` sidecar files alongside standard Markdown documents.
+- **Local persistence**: Automatic crash recovery and multi-tab sync using local storage.
+- **File system access**: Open and save local folders directly in supported browsers, with automatic fallback downloads.
 
 ## Development
 

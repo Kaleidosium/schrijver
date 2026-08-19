@@ -78,7 +78,7 @@
 					{#snippet child({ props: triggerProps })}
 						<button
 							{...triggerProps}
-							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 							type="button"
 							aria-label="Heading options"
 						>
@@ -95,42 +95,42 @@
 						class="z-50 min-w-44 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
 					>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(1)}
 						>
 							<span class="font-bold text-[0.88rem]">Heading 1</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(2)}
 						>
 							<span class="font-semibold text-[0.82rem]">Heading 2</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">##</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(3)}
 						>
 							<span class="font-medium text-[0.78rem]">Heading 3</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">###</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(4)}
 						>
 							<span class="text-[0.76rem]">Heading 4</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(5)}
 						>
 							<span class="text-[0.74rem]">Heading 5</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(6)}
 						>
 							<span class="text-[0.72rem]">Heading 6</span>
@@ -138,7 +138,7 @@
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-1 h-px bg-rule" />
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleHeading(0)}
 						>
 							<span class="text-[0.76rem] text-muted">Body text</span>
@@ -240,7 +240,7 @@
 					{#snippet child({ props: triggerProps })}
 						<button
 							{...triggerProps}
-							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 							type="button"
 							aria-label="Code options"
 						>
@@ -257,14 +257,14 @@
 						class="z-50 min-w-36 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
 					>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={() => onToggleFormat('`')}
 						>
 							<span>Inline code</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">`</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onclick={onInsertCodeBlock}
 						>
 							<span>Code block</span>
@@ -355,7 +355,7 @@
 			{#snippet child({ props: triggerProps })}
 				<button
 					{...triggerProps}
-					class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.75rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent"
+					class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.75rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 					type="button"
 					aria-label="Show document statistics"
 				>

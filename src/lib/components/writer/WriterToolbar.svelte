@@ -59,7 +59,7 @@
 	const reviewOptions = [
 		{ check: 'weasel', label: 'Weasel words' },
 		{ check: 'illusion', label: 'Repeated words' },
-		{ check: 'so', label: 'Starts with "so"' },
+		{ check: 'so', label: 'Starts with “so”' },
 		{ check: 'thereIs', label: 'There is or are' },
 		{ check: 'passive', label: 'Passive voice' },
 		{ check: 'adverb', label: 'Weak adverbs' },
