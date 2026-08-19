@@ -135,8 +135,11 @@ export const writerTheme = EditorView.theme({
 		rowGap: '0.35rem',
 		columnGap: '0.4rem',
 		alignItems: 'center',
-		padding:
-			'0.45rem max(var(--spacing-s), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-s)))',
+		paddingBlock: '0.45rem',
+		paddingRight:
+			'max(var(--spacing-s), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-s)))',
+		paddingLeft:
+			'calc(max(var(--spacing-s), calc((100vw - var(--max-width-shell)) / 2 + var(--spacing-s))) + 0.625rem)',
 		backgroundColor: 'color-mix(in srgb, var(--color-page) 92%, var(--color-paper))',
 		borderBottom: '1px solid var(--color-rule)',
 		fontFamily:
@@ -292,7 +295,9 @@ export const writerTheme = EditorView.theme({
 	},
 	'@media (max-width: 48rem)': {
 		'.cm-panel.cm-search': {
-			padding: '0.35rem 0.5rem'
+			paddingBlock: '0.35rem',
+			paddingRight: '0.5rem',
+			paddingLeft: '1rem'
 		},
 		'.cm-search-count-badge': {
 			minWidth: '2.2rem',
