@@ -4,8 +4,11 @@
         history,
         historyKeymap,
         insertNewlineAndIndent,
+        redo,
+        redoDepth,
         selectAll,
         undo,
+        undoDepth,
     } from "@codemirror/commands";
     import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
     import { syntaxHighlighting, syntaxTree } from "@codemirror/language";
@@ -388,6 +391,11 @@
     let activeNoteId = $state<string | undefined>();
     let autofocusNoteId = $state<string | undefined>();
     let hasTextSelection = $state(false);
+    let canUndo = $state(false);
+    let canRedo = $state(false);
+    let canJumpToTop = $state(false);
+    let canJumpToEnd = $state(false);
+    let canSelectAll = $derived(draft.length > 0);
     let outline = $state.raw<OutlineItem[]>([]);
     let notes = $state<WriterNote[]>([]);
     let noteTops = $state<Record<string, number>>({});
@@ -490,6 +498,13 @@
     function handleUndo(): void {
         if (editor) {
             undo(editor);
+            editor.focus();
+        }
+    }
+
+    function handleRedo(): void {
+        if (editor) {
+            redo(editor);
             editor.focus();
         }
     }
@@ -652,6 +667,10 @@
                                       update.state.selection.main.to,
                                   )
                                 : "";
+                            canUndo = undoDepth(update.state) > 0;
+                            canRedo = redoDepth(update.state) > 0;
+                            canJumpToTop = update.state.selection.main.anchor > 0;
+                            canJumpToEnd = update.state.selection.main.anchor < update.state.doc.length;
 
                             if (update.selectionSet) {
                                 scheduleRecovery();
@@ -709,6 +728,10 @@
                   editor.state.selection.main.to,
               )
             : "";
+        canUndo = undoDepth(editor.state) > 0;
+        canRedo = redoDepth(editor.state) > 0;
+        canJumpToTop = editor.state.selection.main.anchor > 0;
+        canJumpToEnd = editor.state.selection.main.anchor < editor.state.doc.length;
         requestAnimationFrame(() => {
             const scroller = editor?.scrollDOM;
 
@@ -921,6 +944,31 @@
         }
 
         scheduleRecovery();
+        editor.focus();
+    }
+
+    function jumpToTop(): void {
+        if (!editor) {
+            return;
+        }
+
+        editor.dispatch({
+            selection: { anchor: 0 },
+        });
+        scrollPositionIntoView(editor, 0, { y: "start" });
+        editor.focus();
+    }
+
+    function jumpToEnd(): void {
+        if (!editor) {
+            return;
+        }
+
+        const targetPos = editor.state.doc.length;
+        editor.dispatch({
+            selection: { anchor: targetPos },
+        });
+        scrollPositionIntoView(editor, targetPos, { y: "end" });
         editor.focus();
     }
 
@@ -2215,6 +2263,11 @@
 >
     <WriterToolbar
         {actionBarOpen}
+        {canJumpToEnd}
+        {canJumpToTop}
+        {canRedo}
+        {canSelectAll}
+        {canUndo}
         {focusMode}
         {focusScope}
         hasSelection={hasTextSelection}
@@ -2229,11 +2282,14 @@
         onFocusScopeChange={setFocusScopeValue}
         onGuideOpen={() => (guideOpen = true)}
         onHemingwayModeChange={setHemingwayModeValue}
+        onJumpToEnd={jumpToEnd}
+        onJumpToTop={jumpToTop}
         onNotesOpenChange={setNotesOpen}
         onOpen={openProject}
         onOutlineOpenChange={setOutlineOpen}
         onPaste={handlePaste}
         onReaderModeToggle={() => (readerMode = !readerMode)}
+        onRedo={handleRedo}
         onReviewCheckChange={setReviewCheckValue}
         onReviewModeChange={setReviewModeValue}
         onSave={saveProject}

@@ -7,6 +7,11 @@
 
 	interface Props {
 		readonly actionBarOpen: boolean;
+		readonly canJumpToEnd?: boolean;
+		readonly canJumpToTop?: boolean;
+		readonly canRedo?: boolean;
+		readonly canSelectAll?: boolean;
+		readonly canUndo?: boolean;
 		readonly focusMode: boolean;
 		readonly focusScope: FocusScope;
 		readonly hasSelection?: boolean;
@@ -21,11 +26,14 @@
 		readonly onFocusScopeChange: (scope: string) => void;
 		readonly onGuideOpen: () => void;
 		readonly onHemingwayModeChange: (enabled: boolean) => void;
+		readonly onJumpToEnd: () => void;
+		readonly onJumpToTop: () => void;
 		readonly onNotesOpenChange: (enabled: boolean) => void;
 		readonly onOpen: () => Promise<void>;
 		readonly onOutlineOpenChange: (enabled: boolean) => void;
 		readonly onPaste: () => void;
 		readonly onReaderModeToggle: () => void;
+		readonly onRedo: () => void;
 		readonly onReviewCheckChange: (check: ReviewCheck, enabled: boolean) => Promise<void>;
 		readonly onReviewModeChange: (enabled: boolean) => Promise<void>;
 		readonly onSave: () => Promise<void>;
@@ -70,6 +78,11 @@
 
 	const {
 		actionBarOpen,
+		canJumpToEnd = false,
+		canJumpToTop = false,
+		canRedo = false,
+		canSelectAll = false,
+		canUndo = false,
 		focusMode,
 		focusScope,
 		hasSelection = false,
@@ -84,11 +97,14 @@
 		onFocusScopeChange,
 		onGuideOpen,
 		onHemingwayModeChange,
+		onJumpToEnd,
+		onJumpToTop,
 		onNotesOpenChange,
 		onOpen,
 		onOutlineOpenChange,
 		onPaste,
 		onReaderModeToggle,
+		onRedo,
 		onReviewCheckChange,
 		onReviewModeChange,
 		onSave,
@@ -191,50 +207,80 @@
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!canUndo}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onUndo}
 						>
 							<span>Undo</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Z')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!canRedo}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={onRedo}
+						>
+							<span>Redo</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Shift+Z')}</kbd>
+						</DropdownMenu.Item>
+						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Item
+							disabled={!hasSelection}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onCut}
 						>
 							<span>Cut</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+X')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!hasSelection}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onCopy}
 						>
 							<span>Copy</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+C')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onPaste}
 						>
 							<span>Paste</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+V')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!hasSelection}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onDelete}
 						>
 							<span>Delete</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Delete')}</kbd>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!hasSelection}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onClearFormatting}
 						>
 							<span>Clear formatting</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							disabled={!canJumpToTop}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={onJumpToTop}
+						>
+							<span>Jump to beginning</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Home')}</kbd>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item
+							disabled={!canJumpToEnd}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={onJumpToEnd}
+						>
+							<span>Jump to end</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+End')}</kbd>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item
+							disabled={!canSelectAll}
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={onSelectAll}
 						>
 							<span>Select all</span>
