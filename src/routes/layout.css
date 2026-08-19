@@ -63,8 +63,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	html,
-	.cm-scroller {
+	html {
 		scroll-behavior: smooth;
 	}
 }
@@ -88,7 +87,6 @@ body {
 	background: var(--color-page);
 	color: var(--color-ink);
 	font-family: var(--font-mono);
-	overscroll-behavior: none;
 }
 
 .cm-writer-note-anchor {

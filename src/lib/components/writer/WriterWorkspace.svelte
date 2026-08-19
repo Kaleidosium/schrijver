@@ -188,6 +188,10 @@
     });
     const workspaceScroll = EditorState.transactionExtender.of(
         (transaction) => {
+            if (loadingProject) {
+                return null;
+            }
+
             const cursorMove =
                 transaction.selection !== undefined &&
                 transaction.newSelection.ranges.every((range) => range.empty);
@@ -588,11 +592,11 @@
                 doc: initialDraft,
                 selection: {
                     anchor: clampPosition(
-                        initialContext?.anchor ?? initialDraft.length,
+                        initialContext?.anchor ?? 0,
                         initialDraft.length,
                     ),
                     head: clampPosition(
-                        initialContext?.head ?? initialDraft.length,
+                        initialContext?.head ?? 0,
                         initialDraft.length,
                     ),
                 },
@@ -842,6 +846,62 @@
         editor?.focus();
     }
 
+    function scrollPositionIntoView(
+        view: EditorView,
+        pos: number,
+        options: { y?: "nearest" | "center" | "start" | "end"; yMargin?: number } = { y: "nearest", yMargin: 48 },
+        attempts = 5,
+    ): void {
+        const targetPos = Math.max(0, Math.min(pos, view.state.doc.length));
+        const isTypewriter = view.state.field(typewriterModeField);
+        const isEnd = targetPos === view.state.doc.length;
+        const effectiveOptions = isTypewriter
+            ? ({ y: "center" as const })
+            : isEnd
+              ? ({ y: "end" as const, yMargin: 48 })
+              : options;
+
+        if (!isTypewriter && isEnd) {
+            view.scrollDOM.scrollTop = view.scrollDOM.scrollHeight;
+        }
+
+        view.dispatch({
+            effects: EditorView.scrollIntoView(targetPos, effectiveOptions),
+        });
+
+        if (attempts <= 0) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            if (!editor || editor !== view) {
+                return;
+            }
+
+            const scroller = view.scrollDOM;
+            const scrollerRect = scroller.getBoundingClientRect();
+            const coords = view.coordsAtPos(targetPos);
+
+            if (!isTypewriter && isEnd) {
+                scroller.scrollTop = scroller.scrollHeight;
+            }
+
+            const isVisible =
+                coords !== null &&
+                coords.top >= scrollerRect.top &&
+                coords.bottom <= scrollerRect.bottom;
+
+            if (
+                !isVisible ||
+                (!isTypewriter &&
+                    isEnd &&
+                    scroller.scrollTop < scroller.scrollHeight - scroller.clientHeight - 2)
+            ) {
+                scrollPositionIntoView(view, targetPos, effectiveOptions, attempts - 1);
+            }
+        });
+    }
+
     function setHemingwayModeValue(nextHemingwayMode: boolean): void {
         hemingwayMode = nextHemingwayMode;
 
@@ -850,11 +910,12 @@
         }
 
         if (hemingwayMode) {
+            const targetPos = editor.state.doc.length;
             editor.dispatch({
                 effects: setHemingwayMode.of(true),
-                selection: { anchor: editor.state.doc.length },
-                scrollIntoView: true,
+                selection: { anchor: targetPos },
             });
+            scrollPositionIntoView(editor, targetPos);
         } else {
             editor.dispatch({ effects: setHemingwayMode.of(false) });
         }
@@ -1359,17 +1420,22 @@
         }).format(timestamp);
     }
 
-    function replaceDraft(text: string): void {
+    function replaceDraft(text: string, selectionAnchor = 0): void {
         if (!editor) {
             draft = text;
             return;
         }
 
+        const anchor = Math.max(0, Math.min(selectionAnchor, text.length));
         editor.dispatch({
             changes: { from: 0, to: editor.state.doc.length, insert: text },
             filter: false,
-            selection: { anchor: text.length },
+            selection: { anchor },
         });
+
+        if (anchor === 0 && editor.scrollDOM) {
+            editor.scrollDOM.scrollTop = 0;
+        }
     }
 
     function addNote(): void {
@@ -1479,17 +1545,21 @@
         if (range && editor) {
             editor.dispatch({
                 selection: { anchor: range.from, head: range.to },
-                effects: EditorView.scrollIntoView(range.from, { y: "center" }),
             });
+            scrollPositionIntoView(editor, range.from, { y: "center" });
         }
     }
 
     function jumpToHeading(item: OutlineItem): void {
-        editor?.dispatch({
+        if (!editor) {
+            return;
+        }
+
+        editor.dispatch({
             selection: { anchor: item.from },
-            effects: EditorView.scrollIntoView(item.from, { y: "center" }),
         });
-        editor?.focus();
+        scrollPositionIntoView(editor, item.from, { y: "center" });
+        editor.focus();
     }
 
     function notesChanged(): void {
@@ -2248,7 +2318,7 @@
         {#if readerMode}
             <div
                 class={[
-                    "h-full min-h-0 overflow-y-auto overscroll-y-contain transition-[padding] duration-150",
+                    "h-full min-h-0 overflow-y-auto transition-[padding] duration-150",
                     outlineOpen && "lg:pl-rail",
                     notesOpen && "lg:pr-rail",
                 ]}
