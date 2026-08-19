@@ -62,23 +62,23 @@ function getSearchPanelHtml(): string {
 	return `
 <div class="cm-search-row">
 	<div class="cm-search-input-box">
-		<input class="cm-textfield cm-search-input-field" name="search" placeholder="Search..." aria-label="Search" main-field="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		<input class="cm-textfield cm-search-input-field" name="search" placeholder="Search…" aria-label="Search" main-field="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 		<div class="cm-search-input-toggles" role="group" aria-label="Search options">
-			<button type="button" class="cm-search-toggle-btn" name="case" title="Match Case (${formatForDisplay('Mod+Alt+C')})" aria-label="Match Case" aria-pressed="false">Aa</button>
-			<button type="button" class="cm-search-toggle-btn cm-search-toggle-word" name="word" title="Match Whole Word (${formatForDisplay('Mod+Alt+W')})" aria-label="Match Whole Word" aria-pressed="false"><span class="cm-search-word-label">wd</span></button>
-			<button type="button" class="cm-search-toggle-btn" name="re" title="Use Regular Expression (${formatForDisplay('Mod+Alt+R')})" aria-label="Use Regular Expression" aria-pressed="false">.*</button>
+			<button type="button" class="cm-search-toggle-btn" name="case" title="Match case (${formatForDisplay('Mod+Alt+C')})" aria-label="Match case" aria-pressed="false">Aa</button>
+			<button type="button" class="cm-search-toggle-btn cm-search-toggle-word" name="word" title="Match whole word (${formatForDisplay('Mod+Alt+W')})" aria-label="Match whole word" aria-pressed="false"><span class="cm-search-word-label">wd</span></button>
+			<button type="button" class="cm-search-toggle-btn" name="re" title="Use regular expression (${formatForDisplay('Mod+Alt+R')})" aria-label="Use regular expression" aria-pressed="false">.*</button>
 		</div>
 	</div>
 	<div class="cm-search-actions">
-		<button type="button" class="cm-button cm-search-action-btn" name="select" title="Select All Matches (${formatForDisplay('Alt+Enter')})" aria-label="Select All Matches">
+		<button type="button" class="cm-button cm-search-action-btn" name="select" title="Select all matches (${formatForDisplay('Alt+Enter')})" aria-label="Select all matches">
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
 		</button>
 		<div class="cm-search-spacer" aria-hidden="true"></div>
 		<div class="cm-search-v-sep" aria-hidden="true"></div>
-		<button type="button" class="cm-button cm-search-action-btn" name="prev" title="Previous Match (${formatForDisplay('Shift+Enter')})" aria-label="Previous Match">
+		<button type="button" class="cm-button cm-search-action-btn" name="prev" title="Previous match (${formatForDisplay('Shift+Enter')})" aria-label="Previous match">
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
 		</button>
-		<button type="button" class="cm-button cm-search-action-btn" name="next" title="Next Match (Enter)" aria-label="Next Match">
+		<button type="button" class="cm-button cm-search-action-btn" name="next" title="Next match (Enter)" aria-label="Next match">
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
 		</button>
 		<span class="cm-search-count-badge" aria-live="polite" aria-label="Match count">0/0</span>
@@ -86,13 +86,13 @@ function getSearchPanelHtml(): string {
 </div>
 <div class="cm-replace-row">
 	<div class="cm-search-input-box cm-replace-input-box">
-		<input class="cm-textfield cm-search-input-field" name="replace" placeholder="Replace with..." aria-label="Replace with" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		<input class="cm-textfield cm-search-input-field" name="replace" placeholder="Replace with…" aria-label="Replace with" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 	</div>
 	<div class="cm-replace-actions">
-		<button type="button" class="cm-button cm-search-action-btn" name="replace" title="Replace Next (Enter in replace field)" aria-label="Replace Next">
+		<button type="button" class="cm-button cm-search-action-btn" name="replace" title="Replace next (Enter in replace field)" aria-label="Replace next">
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 10 5 5-5 5M4 4v7a4 4 0 0 0 4 4h12"/></svg>
 		</button>
-		<button type="button" class="cm-button cm-search-action-btn" name="replaceAll" title="Replace All (${formatForDisplay('Alt+Enter')} in replace field)" aria-label="Replace All">
+		<button type="button" class="cm-button cm-search-action-btn" name="replaceAll" title="Replace all (${formatForDisplay('Alt+Enter')} in replace field)" aria-label="Replace all">
 			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4c0-1.1.9-2 2-2M20 2a2 2 0 0 1 2 2M22 8a2 2 0 0 1-2 2M16 10a2 2 0 0 1-2-2M3 7l3 3 3-3M6 10V5a3 3 0 0 1 3-3h2M3 17l3 3 3-3M6 20v-5a3 3 0 0 1 3-3h2"/></svg>
 		</button>
 	</div>

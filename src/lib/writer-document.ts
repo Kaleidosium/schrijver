@@ -169,11 +169,11 @@ export function parseSidecar(value: unknown, markdownFile: string): WriterSideca
 		raw.version !== 1 ||
 		typeof raw.projectId !== 'string'
 	) {
-		throw new Error('The Writer’s Notes file has an unsupported format.');
+		throw new Error('The notes file has an unsupported format.');
 	}
 
 	if (typeof raw.markdownFile !== 'string' || !Array.isArray(raw.notes)) {
-		throw new Error('The Writer’s Notes file is incomplete.');
+		throw new Error('The notes file is incomplete.');
 	}
 
 	return {
@@ -241,7 +241,7 @@ function parseNote(value: unknown): WriterNote {
 		typeof note.updatedAt !== 'string' ||
 		typeof note.resolved !== 'boolean'
 	) {
-		throw new Error('A Writer’s Note is incomplete.');
+		throw new Error('A note is incomplete.');
 	}
 
 	return {
@@ -266,7 +266,7 @@ function parseTextSelector(value: unknown): TextSelector {
 		sel.to <= sel.from ||
 		sel.quote.length !== sel.to - sel.from
 	) {
-		throw new Error('A Writer’s Note text selection is invalid.');
+		throw new Error('A note text selection is invalid.');
 	}
 
 	return { from: sel.from, to: sel.to, quote: sel.quote };

@@ -1,42 +1,42 @@
-# sv
+# schrijver
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+schrijver is a distraction-free Markdown text editor designed for long-form writing. It combines plain-text simplicity with editorial tools, margin notes, syntax highlighting, and local recovery.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Typography-first editing:** Custom paper-toned theme with proportional and monospace type, balanced headings, and reader mode.
+- **Focus modes:** Sentence and paragraph isolation dim peripheral paragraphs so you can stay in flow.
+- **Hemingway mode:** Disables backspace and deletion to keep you writing forward.
+- **Syntax and style analysis:** Highlights parts of speech (adjectives, nouns, adverbs, verbs, conjunctions) and stylistic patterns (weasel words, passive voice, wordy phrases, clichés).
+- **Writer’s notes:** Anchored annotations preserved in `.schrijver.json` sidecar files alongside standard Markdown documents.
+- **Local persistence:** Automatic crash recovery and multi-tab sync using local storage.
+- **File System Access:** Open and save local folders directly in supported browsers, with automatic fallback downloads.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Development
 
-To recreate this project with the same configuration:
+This project uses [Vite+](https://viteplus.dev), which unifies the toolchain through the `vp` CLI.
 
-```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --types ts --add sveltekit-adapter="adapter:static" vitest="usages:unit,component" prettier eslint tailwindcss="plugins:typography" mcp="ide:other+setup:remote" --no-install schrijver
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Install dependencies
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+vp install
 ```
 
-## Building
-
-To create a production version of your app:
+### Start development server
 
 ```sh
-npm run build
+vp dev
 ```
 
-You can preview the production build with `npm run preview`.
+### Run quality checks and tests
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+vp check
+vp test
+```
+
+### Build for production
+
+```sh
+vp build
+```

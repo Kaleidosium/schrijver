@@ -207,7 +207,7 @@ export const writerTheme = EditorView.theme({
 		fontWeight: '600',
 		cursor: 'pointer',
 		userSelect: 'none',
-		transition: 'all 0.12s ease'
+		transition: 'background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease'
 	},
 	'.cm-search-toggle-btn:hover': {
 		backgroundColor: 'color-mix(in srgb, var(--color-page) 80%, var(--color-paper))',
@@ -251,7 +251,7 @@ export const writerTheme = EditorView.theme({
 		background: 'transparent',
 		color: 'var(--color-muted)',
 		cursor: 'pointer',
-		transition: 'all 0.12s ease'
+		transition: 'background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease'
 	},
 	'.cm-search-action-btn:hover': {
 		backgroundColor: 'var(--color-paper)',
@@ -277,6 +277,7 @@ export const writerTheme = EditorView.theme({
 		padding: '0 0.25rem',
 		fontFamily: 'inherit',
 		fontSize: '0.74rem',
+		fontVariantNumeric: 'tabular-nums',
 		color: 'var(--color-muted)',
 		userSelect: 'none'
 	},

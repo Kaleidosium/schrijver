@@ -82,8 +82,8 @@
 							type="button"
 							aria-label="Heading options"
 						>
-							<Heading size={13} strokeWidth={2} />
-							<ChevronDown size={10} class="opacity-60" />
+							<Heading size={13} strokeWidth={2} aria-hidden="true" />
+							<ChevronDown size={10} class="opacity-60" aria-hidden="true" />
 						</button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -213,7 +213,7 @@
 				onclick: () => onToggleFormat('**'),
 				icon: boldIcon
 			})}
-			{#snippet boldIcon()}<Bold size={13} strokeWidth={2.5} />{/snippet}
+			{#snippet boldIcon()}<Bold size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Italic',
@@ -222,14 +222,14 @@
 				onclick: () => onToggleFormat('*'),
 				icon: italicIcon
 			})}
-			{#snippet italicIcon()}<Italic size={13} strokeWidth={2.5} />{/snippet}
+			{#snippet italicIcon()}<Italic size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Strikethrough',
 				onclick: () => onToggleFormat('~~'),
 				icon: strikeIcon
 			})}
-			{#snippet strikeIcon()}<Strikethrough size={13} strokeWidth={2.2} />{/snippet}
+			{#snippet strikeIcon()}<Strikethrough size={13} strokeWidth={2.2} aria-hidden="true" />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
@@ -244,8 +244,8 @@
 							type="button"
 							aria-label="Code options"
 						>
-							<Code size={13} strokeWidth={2} />
-							<ChevronDown size={10} class="opacity-60" />
+							<Code size={13} strokeWidth={2} aria-hidden="true" />
+							<ChevronDown size={10} class="opacity-60" aria-hidden="true" />
 						</button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -280,7 +280,7 @@
 				onclick: onInsertLink,
 				icon: linkIcon
 			})}
-			{#snippet linkIcon()}<LinkIcon size={13} strokeWidth={2} />{/snippet}
+			{#snippet linkIcon()}<LinkIcon size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
@@ -291,7 +291,7 @@
 				onclick: onToggleBulletList,
 				icon: listIcon
 			})}
-			{#snippet listIcon()}<List size={13} strokeWidth={2} />{/snippet}
+			{#snippet listIcon()}<List size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Numbered list',
@@ -299,7 +299,7 @@
 				onclick: onToggleNumberedList,
 				icon: listOrdIcon
 			})}
-			{#snippet listOrdIcon()}<ListOrdered size={13} strokeWidth={2} />{/snippet}
+			{#snippet listOrdIcon()}<ListOrdered size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Task checklist',
@@ -307,7 +307,7 @@
 				onclick: onToggleTaskList,
 				icon: taskIcon
 			})}
-			{#snippet taskIcon()}<ListTodo size={13} strokeWidth={2} />{/snippet}
+			{#snippet taskIcon()}<ListTodo size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
@@ -317,7 +317,7 @@
 				onclick: onToggleBlockquote,
 				icon: quoteIcon
 			})}
-			{#snippet quoteIcon()}<Quote size={13} strokeWidth={2} />{/snippet}
+			{#snippet quoteIcon()}<Quote size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Footnote',
@@ -325,14 +325,14 @@
 				onclick: onInsertFootnote,
 				icon: footnoteIcon
 			})}
-			{#snippet footnoteIcon()}<Asterisk size={13} strokeWidth={2.2} />{/snippet}
+			{#snippet footnoteIcon()}<Asterisk size={13} strokeWidth={2.2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Horizontal rule',
 				onclick: onInsertHorizontalRule,
 				icon: hrIcon
 			})}
-			{#snippet hrIcon()}<Minus size={13} strokeWidth={2.5} />{/snippet}
+			{#snippet hrIcon()}<Minus size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			<!-- Group 6: Note Annotation -->
 			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
@@ -340,12 +340,12 @@
 			{@render toolBtn({
 				label: 'Add note at selection',
 				shortcut: APP_SHORTCUTS.addNote,
-				btnLabel: 'Add Note',
+				btnLabel: 'Add note',
 				disabled: addNoteDisabled,
 				onclick: onAddNote,
 				icon: noteIcon
 			})}
-			{#snippet noteIcon()}<SquarePen size={13} strokeWidth={2} />{/snippet}
+			{#snippet noteIcon()}<SquarePen size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
 		</div>
 	</Tooltip.Provider>
 
@@ -359,8 +359,8 @@
 					type="button"
 					aria-label="Show document statistics"
 				>
-					<span>{documentStats.words} {documentStats.words === 1 ? 'word' : 'words'}</span>
-					<ChevronDown size={11} class={['transition-transform duration-150', statsOpen && 'rotate-180']} />
+					<span class="tabular-nums">{documentStats.words.toLocaleString()} {documentStats.words === 1 ? 'word' : 'words'}</span>
+					<ChevronDown size={11} class={['transition-transform duration-150', statsOpen && 'rotate-180']} aria-hidden="true" />
 				</button>
 			{/snippet}
 		</Popover.Trigger>
@@ -374,7 +374,7 @@
 				<div class="mb-2.5 flex items-center justify-between border-b border-rule pb-2">
 					<span class="font-medium text-ink">Statistics</span>
 					<span class="flex items-center gap-1 text-[0.72rem] font-medium text-accent-ink">
-						<Clock size={12} />
+						<Clock size={12} aria-hidden="true" />
 						{documentStats.readingTime}
 					</span>
 				</div>
@@ -382,27 +382,27 @@
 				<div class="grid grid-cols-2 gap-x-3 gap-y-2 text-[0.76rem]">
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">Words</span>
-						<span class="font-mono font-medium">{documentStats.words.toLocaleString()}</span>
+						<span class="font-mono font-medium tabular-nums">{documentStats.words.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">Sentences</span>
-						<span class="font-mono font-medium">{documentStats.sentences.toLocaleString()}</span>
+						<span class="font-mono font-medium tabular-nums">{documentStats.sentences.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">Characters</span>
-						<span class="font-mono font-medium">{documentStats.characters.toLocaleString()}</span>
+						<span class="font-mono font-medium tabular-nums">{documentStats.characters.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">No spaces</span>
-						<span class="font-mono font-medium">{documentStats.charactersWithoutSpaces.toLocaleString()}</span>
+						<span class="font-mono font-medium tabular-nums">{documentStats.charactersWithoutSpaces.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">Paragraphs</span>
-						<span class="font-mono font-medium">{documentStats.paragraphs.toLocaleString()}</span>
+						<span class="font-mono font-medium tabular-nums">{documentStats.paragraphs.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
 						<span class="text-muted">Tasks</span>
-						<span class="font-mono font-medium">
+						<span class="font-mono font-medium tabular-nums">
 							{#if documentStats.tasks.total > 0}
 								{documentStats.tasks.completed}/{documentStats.tasks.total}
 							{:else}
@@ -418,19 +418,19 @@
 						<div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[0.74rem]">
 							<div class="flex items-baseline justify-between">
 								<span class="text-muted">Words</span>
-								<span class="font-mono font-medium">{selectionStats.words}</span>
+								<span class="font-mono font-medium tabular-nums">{selectionStats.words.toLocaleString()}</span>
 							</div>
 							<div class="flex items-baseline justify-between">
 								<span class="text-muted">Sentences</span>
-								<span class="font-mono font-medium">{selectionStats.sentences}</span>
+								<span class="font-mono font-medium tabular-nums">{selectionStats.sentences.toLocaleString()}</span>
 							</div>
 							<div class="flex items-baseline justify-between">
 								<span class="text-muted">Characters</span>
-								<span class="font-mono font-medium">{selectionStats.characters}</span>
+								<span class="font-mono font-medium tabular-nums">{selectionStats.characters.toLocaleString()}</span>
 							</div>
 							<div class="flex items-baseline justify-between">
 								<span class="text-muted">No spaces</span>
-								<span class="font-mono font-medium">{selectionStats.charactersWithoutSpaces}</span>
+								<span class="font-mono font-medium tabular-nums">{selectionStats.charactersWithoutSpaces.toLocaleString()}</span>
 							</div>
 						</div>
 					</div>

@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Schrijver</title>
+	<title>schrijver</title>
 	<meta
 		name="description"
 		content="A focused local Markdown writing surface with autosave and flexible focus modes."

@@ -1011,7 +1011,7 @@
         );
 
         if (!markdownFile) {
-            alert("Choose a Markdown file. Select its matching Writer’s Notes file too if you have one.");
+            alert("Choose a Markdown file. Select its matching notes file if you have one.");
             return;
         }
 
@@ -1220,7 +1220,7 @@
         if (!(await ensureReadWritePermission(directoryHandle ?? markdownHandle))) {
             markDirty();
             saveState = "error";
-            alert("Allow folder editing to save the manuscript and Writer’s Notes.");
+            alert("Allow folder editing to save the manuscript and notes.");
             return;
         }
 
@@ -1233,7 +1233,7 @@
             );
 
             if (!sidecarHandle) {
-                throw new Error("Could not create the Writer’s Notes file.");
+                throw new Error("Could not create the notes file.");
             }
 
             await writeFile(markdownHandle, draft);
@@ -1295,7 +1295,7 @@
             } catch (error) {
                 if (!isAbortError(error)) {
                     saveState = "error";
-                    alert(error instanceof Error ? error.message : "Could not save file.");
+                    alert(error instanceof Error ? error.message : "Could not save the file.");
                 }
             }
             return;
@@ -1376,7 +1376,7 @@
         const selection = editor?.state.selection.main;
 
         if (!editor || !selection || selection.empty) {
-            alert("Select the text you want to attach the Writer’s Note to.");
+            alert("Select the text you want to attach a note to.");
             return;
         }
 
@@ -1426,7 +1426,7 @@
     }
 
     function deleteNote(id: string): void {
-        if (!confirm("Delete this Writer’s Note?")) {
+        if (!confirm("Delete this note?")) {
             return;
         }
 
@@ -2131,6 +2131,13 @@
 />
 <svelte:document onvisibilitychange={handleVisibilityChange} />
 
+<a
+	href="#writing-surface"
+	class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:border focus:border-rule focus:bg-paper focus:px-3 focus:py-1.5 focus:font-sans focus:text-[0.78rem] focus:font-medium focus:text-accent-ink focus:shadow-md focus:outline-2 focus:outline-accent"
+>
+	Skip to writing surface
+</a>
+
 <main
 	class="group grid h-screen min-h-screen grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-page font-mono text-ink"
 	data-focused={focusMode && focusScope !== "all"}
@@ -2180,11 +2187,12 @@
         {typewriterMode}
     />
 
-    <section class="relative min-h-0 flex-1 overflow-hidden p-0" aria-label="Writing surface">
+    <section id="writing-surface" class="relative min-h-0 flex-1 overflow-hidden p-0" aria-label="Writing surface">
         {#if recoveryRestored}
             <div
                 class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-accent)_35%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
                 role="status"
+                aria-live="polite"
             >
                 <span class="flex-1">Unsaved changes restored from this browser.</span>
                 <button
@@ -2200,6 +2208,7 @@
             <div
                 class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-mark)_45%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
                 role="alert"
+                aria-live="assertive"
             >
                 <span class="flex-1">Another tab has newer recovered work.</span>
                 <button
@@ -2275,11 +2284,11 @@
                 >
                     <header class="flex items-start justify-between gap-s">
                         <div>
-                            <Dialog.Title class="text-[1.1rem] font-bold">
+                            <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
                                 Choose manuscript
                             </Dialog.Title>
                             <Dialog.Description class="mt-3xs text-[0.82rem] leading-relaxed text-muted">
-                                Most recently modified first. Writer’s Notes load from the matching sidecar.
+                                Most recently modified first. Notes load from the matching sidecar.
                             </Dialog.Description>
                         </div>
                         <Dialog.Close

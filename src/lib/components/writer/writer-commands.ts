@@ -33,12 +33,12 @@ export const APP_SHORTCUTS = {
 
 export const COMMAND_HELP = [
 	{ label: 'Open folder', shortcut: APP_SHORTCUTS.open, scope: 'App' },
-	{ label: 'Save folder project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
-	{ label: 'Save as...', shortcut: APP_SHORTCUTS.saveAs, scope: 'App' },
+	{ label: 'Save project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
+	{ label: 'Save as…', shortcut: APP_SHORTCUTS.saveAs, scope: 'App' },
 	{ label: 'Find', shortcut: 'Mod+F', scope: 'Editor' },
 	{ label: 'Toggle focus', shortcut: APP_SHORTCUTS.focus, scope: 'App' },
 	{ label: 'Toggle reader mode', shortcut: APP_SHORTCUTS.preview, scope: 'App' },
-	{ label: 'Add Writer’s Note', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
+	{ label: 'Add writer’s note', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
 	{ label: 'Toggle outline', shortcut: APP_SHORTCUTS.outline, scope: 'App' },
 	{ label: 'Toggle style', shortcut: APP_SHORTCUTS.review, scope: 'App' },
 	{ label: 'Keyboard shortcuts', shortcut: APP_SHORTCUTS.guide, scope: 'App' },
@@ -53,7 +53,7 @@ export const COMMAND_HELP = [
 	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' },
 	{ label: 'Zoom in', shortcut: APP_SHORTCUTS.zoomIn, scope: 'App' },
 	{ label: 'Zoom out', shortcut: APP_SHORTCUTS.zoomOut, scope: 'App' },
-	{ label: 'Restore zoom', shortcut: APP_SHORTCUTS.zoomReset, scope: 'App' }
+	{ label: 'Restore default zoom', shortcut: APP_SHORTCUTS.zoomReset, scope: 'App' }
 ] as const;
 
 export function toggleInlineFormat(

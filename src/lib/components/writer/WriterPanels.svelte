@@ -55,13 +55,14 @@
 		aria-label="Document outline"
 		data-rail="outline"
 	>
-		<header class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">Outline</header>
+		<h2 class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">Outline</h2>
 		{#if outline.length === 0}
 			<p class="m-0 leading-relaxed">Headings appear here.</p>
 		{:else}
 			<nav class="grid gap-0.5" aria-label="Document headings">
 				{#each outline as item (item.id)}
 					<button
+						aria-label={`Jump to heading: ${item.label}`}
 						class="w-full truncate rounded-xs border-0 bg-transparent py-1.5 pr-1.5 text-left text-[0.8rem] text-muted cursor-pointer hover:bg-paper hover:text-accent-ink hover:outline hover:outline-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 						style:padding-left={`calc(0.4rem + ${(item.level - 1) * 0.65}rem)`}
 						type="button"
@@ -78,12 +79,12 @@
 {#if notesOpen}
 	<aside
 		class="absolute top-0 right-0 bottom-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
-		aria-label="Writer’s Notes"
+		aria-label="Writer’s notes"
 		data-rail="notes"
 	>
-		<header class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">
-			Writer’s Notes
-		</header>
+		<h2 class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">
+			Writer’s notes
+		</h2>
 		{#if noteViews.length === 0}
 			<p class="m-0 leading-relaxed">Select text and add a note.</p>
 		{:else}
@@ -91,7 +92,7 @@
 				{#each noteViews as view (view.note.id)}
 					<article
 						class={[
-							'mb-2xs grid min-h-36 gap-3xs rounded border border-rule border-l-[3px] border-l-accent bg-paper p-2xs shadow-xs transition-all lg:absolute lg:right-0 lg:left-0 lg:top-(--note-top) lg:mb-0',
+							'mb-2xs grid min-h-36 gap-3xs rounded border border-rule border-l-[3px] border-l-accent bg-paper p-2xs shadow-xs transition-[border-color,background-color,opacity,top] duration-150 lg:absolute lg:right-0 lg:left-0 lg:top-(--note-top) lg:mb-0',
 							activeNoteId === view.note.id && 'border-accent',
 							view.orphaned && 'border-l-mark',
 							view.note.resolved && 'opacity-55'
@@ -101,6 +102,7 @@
 						onfocusin={() => onActivateNote(view.note.id)}
 					>
 						<button
+							aria-label={`Jump to note: ${view.orphaned ? 'Anchor missing' : view.anchorLabel}`}
 							class="truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 							type="button"
 							onclick={() => onJumpToNote(view.note.id)}
@@ -116,6 +118,7 @@
 						<div class="flex justify-end gap-3xs">
 							{#if view.orphaned}
 								<button
+									aria-label={`Reattach note: ${view.anchorLabel}`}
 									class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 									type="button"
 									onclick={() => onReattachNote(view.note.id)}
@@ -124,6 +127,7 @@
 								</button>
 							{:else}
 								<button
+									aria-label={`${view.note.resolved ? 'Reopen' : 'Resolve'} note: ${view.anchorLabel}`}
 									class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 									type="button"
 									onclick={() => onResolveNote(view.note.id, !view.note.resolved)}
@@ -132,6 +136,7 @@
 								</button>
 							{/if}
 							<button
+								aria-label={`Delete note: ${view.anchorLabel}`}
 								class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 								type="button"
 								onclick={() => onDeleteNote(view.note.id)}
@@ -153,7 +158,7 @@
 			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
 		>
 			<header class="flex items-center justify-between gap-s">
-				<Dialog.Title class="m-0 text-[1.1rem] font-bold">Keyboard shortcuts</Dialog.Title>
+				<Dialog.Title class="m-0 text-[1.1rem] font-bold text-pretty">Keyboard shortcuts</Dialog.Title>
 				<Dialog.Close
 					aria-label="Close keyboard shortcuts"
 					class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"

@@ -57,14 +57,14 @@
 		{ part: 'Conjunction', label: 'Conjunctions', className: 'text-syntax-conjunction' }
 	] as const satisfies readonly { part: PartOfSpeech; label: string; className: string }[];
 	const reviewOptions = [
-		{ check: 'weasel', label: 'Weasel Words' },
-		{ check: 'illusion', label: 'Repeated Words' },
-		{ check: 'so', label: 'Starts With "So"' },
-		{ check: 'thereIs', label: 'There Is/Are' },
-		{ check: 'passive', label: 'Passive Voice' },
-		{ check: 'adverb', label: 'Weak Adverbs' },
-		{ check: 'tooWordy', label: 'Wordy Phrases' },
-		{ check: 'cliches', label: 'Cliches' },
+		{ check: 'weasel', label: 'Weasel words' },
+		{ check: 'illusion', label: 'Repeated words' },
+		{ check: 'so', label: 'Starts with "so"' },
+		{ check: 'thereIs', label: 'There is or are' },
+		{ check: 'passive', label: 'Passive voice' },
+		{ check: 'adverb', label: 'Weak adverbs' },
+		{ check: 'tooWordy', label: 'Wordy phrases' },
+		{ check: 'cliches', label: 'Clichés' },
 		{ check: 'eprime', label: 'E-Prime' }
 	] as const satisfies readonly { check: ReviewCheck; label: string }[];
 
@@ -134,7 +134,7 @@
 							type="button"
 						>
 							<span>File</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -162,7 +162,7 @@
 							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={() => void onSaveAs()}
 						>
-							<span>Save as...</span>
+							<span>Save as…</span>
 							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.saveAs)}</kbd>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
@@ -180,7 +180,7 @@
 							type="button"
 						>
 							<span>Edit</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -254,7 +254,7 @@
 							type="button"
 						>
 							<span>View</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -393,7 +393,7 @@
 							data-mode={focusMode ? 'on' : 'off'}
 						>
 							<span>Focus</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -411,7 +411,7 @@
 							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{focusMode ? '✓' : ''}
 							</span>
-							<span>{focusMode ? 'Disable Focus' : 'Enable Focus'}</span>
+							<span>{focusMode ? 'Disable focus' : 'Enable focus'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.RadioGroup value={focusScope} onValueChange={onFocusScopeChange}>
@@ -515,7 +515,7 @@
 							data-mode={syntaxMode ? 'on' : 'off'}
 						>
 							<span>Syntax</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -533,7 +533,7 @@
 							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{syntaxMode ? '✓' : ''}
 							</span>
-							<span>{syntaxMode ? 'Hide Syntax' : 'Show Syntax'}</span>
+							<span>{syntaxMode ? 'Hide syntax' : 'Show syntax'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Group>
@@ -570,7 +570,7 @@
 							data-mode={reviewMode ? 'on' : 'off'}
 						>
 							<span>Style</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -588,7 +588,7 @@
 							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewMode ? '✓' : ''}
 							</span>
-							<span>{reviewMode ? 'Disable Style' : 'Enable Style'}</span>
+							<span>{reviewMode ? 'Disable style' : 'Enable style'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Group>

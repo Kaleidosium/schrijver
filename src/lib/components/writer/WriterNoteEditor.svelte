@@ -124,7 +124,7 @@
 
 			editor.contentDOM.setAttribute(
 				'aria-label',
-				`Writer’s Note for ${anchor || 'selected text'}`
+				`Writer’s note for ${anchor || 'selected text'}`
 			);
 
 			if (body === editor.state.doc.toString()) {
