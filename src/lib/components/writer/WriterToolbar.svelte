@@ -29,6 +29,7 @@
 		readonly onJumpToEnd: () => void;
 		readonly onJumpToTop: () => void;
 		readonly onNotesOpenChange: (enabled: boolean) => void;
+		readonly onNew: () => void;
 		readonly onOpen: () => Promise<void>;
 		readonly onOutlineOpenChange: (enabled: boolean) => void;
 		readonly onPaste: () => void;
@@ -99,6 +100,7 @@
 		onHemingwayModeChange,
 		onJumpToEnd,
 		onJumpToTop,
+		onNew,
 		onNotesOpenChange,
 		onOpen,
 		onOutlineOpenChange,
@@ -140,7 +142,7 @@
 		>
 			<!-- LEFT CLUSTER: File, Edit, View, Outline, Notes -->
 
-			<!-- 1. File (Dropdown Menu containing Open, Save, Save as) -->
+			<!-- 1. File (Dropdown Menu containing New, Open, Save, Save as) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
@@ -160,6 +162,13 @@
 						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
+						<DropdownMenu.Item
+							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							onSelect={onNew}
+						>
+							<span>New</span>
+							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.newDocument)}</kbd>
+						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							onSelect={() => void onOpen()}

@@ -16,6 +16,7 @@ export interface MarkdownEditorContext {
 }
 
 export const APP_SHORTCUTS = {
+	newDocument: 'Mod+Alt+N',
 	open: 'Mod+O',
 	save: 'Mod+S',
 	saveAs: 'Mod+Shift+S',
@@ -32,6 +33,7 @@ export const APP_SHORTCUTS = {
 } as const;
 
 export const COMMAND_HELP = [
+	{ label: 'New manuscript', shortcut: APP_SHORTCUTS.newDocument, scope: 'App' },
 	{ label: 'Open folder', shortcut: APP_SHORTCUTS.open, scope: 'App' },
 	{ label: 'Save project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
 	{ label: 'Save as…', shortcut: APP_SHORTCUTS.saveAs, scope: 'App' },

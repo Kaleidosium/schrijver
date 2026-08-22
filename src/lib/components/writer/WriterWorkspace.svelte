@@ -432,6 +432,7 @@
     let pendingOpenDirectory: FileSystemDirectoryHandle | undefined;
     let manuscriptCandidates = $state.raw<ManuscriptCandidate[]>([]);
     let manuscriptDialogOpen = $state(false);
+    let unsavedDialogOpen = $state(false);
     let manuscriptOpening = $state(false);
     let fallbackInput: HTMLInputElement | undefined;
     let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -759,6 +760,10 @@
 
     createHotkeys(
         [
+            {
+                hotkey: APP_SHORTCUTS.newDocument,
+                callback: handleNew,
+            },
             {
                 hotkey: APP_SHORTCUTS.open,
                 callback: () => void openProject(),
@@ -1288,7 +1293,63 @@
         return true;
     }
 
-    async function saveProject(): Promise<void> {
+    function createBlankDocument(): void {
+        loadingProject = true;
+        replaceDraft("", 0);
+        loadingProject = false;
+        fileName = DEFAULT_FILE_NAME;
+        projectId = emptySidecar(DEFAULT_FILE_NAME).projectId;
+        notes = [];
+        noteTops = {};
+        baselineHash = undefined;
+        directoryHandle = undefined;
+        markdownHandle = undefined;
+        sidecarHandle = undefined;
+        dirty = false;
+        journalSaved = false;
+        recoveryRestored = false;
+        storageConflict = false;
+        saveState = "idle";
+        activeNoteId = undefined;
+        autofocusNoteId = undefined;
+        readerMode = false;
+        clearRecovery();
+        refreshNoteDisplay();
+        if (editor) {
+            outline = outlineItems(editor.state);
+            editor.focus();
+        }
+    }
+
+    function handleNew(): void {
+        if (dirty) {
+            unsavedDialogOpen = true;
+        } else {
+            createBlankDocument();
+        }
+    }
+
+    function handleDiscardAndNew(): void {
+        unsavedDialogOpen = false;
+        createBlankDocument();
+    }
+
+    function handleCancelNew(): void {
+        unsavedDialogOpen = false;
+        editor?.focus();
+    }
+
+    async function handleSaveAndNew(): Promise<void> {
+        unsavedDialogOpen = false;
+        const saved = await saveProject();
+        if (saved) {
+            createBlankDocument();
+        } else {
+            editor?.focus();
+        }
+    }
+
+    async function saveProject(): Promise<boolean> {
         const picker = window as PickerWindow;
 
         if (!markdownHandle && picker.showDirectoryPicker) {
@@ -1299,7 +1360,7 @@
                 const requestedName = prompt("File name", manuscriptLabel(fileName));
 
                 if (!requestedName) {
-                    return;
+                    return false;
                 }
 
                 const nextFileName = normalizeMarkdownFileName(requestedName);
@@ -1317,20 +1378,19 @@
                 if (!isAbortError(error)) {
                     saveState = "error";
                 }
-                return;
+                return false;
             }
         }
 
         if (!markdownHandle) {
-            downloadProject();
-            return;
+            return downloadProject();
         }
 
         if (!(await ensureReadWritePermission(directoryHandle ?? markdownHandle))) {
             markDirty();
             saveState = "error";
             alert("Allow folder editing to save the manuscript and notes.");
-            return;
+            return false;
         }
 
         saveState = "saving";
@@ -1357,9 +1417,11 @@
             recoveryRestored = false;
             saveState = "saved";
             clearRecovery();
+            return true;
         } catch {
             markDirty();
             saveState = "error";
+            return false;
         }
     }
 
@@ -1413,11 +1475,11 @@
         downloadProject();
     }
 
-    function downloadProject(): void {
+    function downloadProject(): boolean {
         const requestedName = prompt("File name", manuscriptLabel(fileName));
 
         if (!requestedName) {
-            return;
+            return false;
         }
 
         try {
@@ -1437,9 +1499,11 @@
             dirty = true;
             journalSaved = false;
             flushRecovery();
+            return true;
         } catch (error) {
             saveState = "error";
             alert(error instanceof Error ? error.message : "Could not name the download.");
+            return false;
         }
     }
 
@@ -2284,6 +2348,7 @@
         onHemingwayModeChange={setHemingwayModeValue}
         onJumpToEnd={jumpToEnd}
         onJumpToTop={jumpToTop}
+        onNew={handleNew}
         onNotesOpenChange={setNotesOpen}
         onOpen={openProject}
         onOutlineOpenChange={setOutlineOpen}
@@ -2455,6 +2520,57 @@
                 </Dialog.Content>
             </Dialog.Portal>
         {/if}
+    </Dialog.Root>
+
+    <Dialog.Root
+        open={unsavedDialogOpen}
+        onOpenChange={(open) => {
+            unsavedDialogOpen = open;
+            if (!open) {
+                editor?.focus();
+            }
+        }}
+    >
+        <Dialog.Portal>
+            <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+            <Dialog.Content
+                class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+            >
+                <header class="flex items-start justify-between gap-s">
+                    <div>
+                        <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
+                            Unsaved changes
+                        </Dialog.Title>
+                        <Dialog.Description class="mt-2xs text-[0.82rem] leading-relaxed text-muted">
+                            Do you want to save the changes to “{manuscriptLabel(fileName)}” before creating a new document?
+                        </Dialog.Description>
+                    </div>
+                </header>
+                <div class="mt-m flex items-center justify-end gap-2xs">
+                    <button
+                        class="cursor-pointer rounded-xs border border-rule bg-paper px-2.5 py-1.5 text-[0.78rem] font-medium text-muted hover:border-mark hover:text-mark focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        type="button"
+                        onclick={handleDiscardAndNew}
+                    >
+                        Discard
+                    </button>
+                    <button
+                        class="cursor-pointer rounded-xs border border-rule bg-paper px-2.5 py-1.5 text-[0.78rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        type="button"
+                        onclick={handleCancelNew}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        class="cursor-pointer rounded-xs border border-accent bg-accent px-3 py-1.5 text-[0.78rem] font-medium text-paper hover:bg-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        type="button"
+                        onclick={() => void handleSaveAndNew()}
+                    >
+                        Save
+                    </button>
+                </div>
+            </Dialog.Content>
+        </Dialog.Portal>
     </Dialog.Root>
 
     {#if actionBarOpen}

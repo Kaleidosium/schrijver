@@ -341,4 +341,9 @@ describe('formatting commands', () => {
 		expect(APP_SHORTCUTS.preview).toBe('Mod+Alt+P');
 		expect(COMMAND_HELP.some((cmd) => cmd.label === 'Toggle reader mode')).toBe(true);
 	});
+
+	it('defines new manuscript shortcut in help and shortcuts map', () => {
+		expect(APP_SHORTCUTS.newDocument).toBe('Mod+Alt+N');
+		expect(COMMAND_HELP.some((cmd) => cmd.label === 'New manuscript')).toBe(true);
+	});
 });
