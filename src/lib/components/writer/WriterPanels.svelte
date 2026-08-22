@@ -23,6 +23,7 @@
 		readonly onUpdateNote: (id: string, body: string) => void;
 		readonly outline: readonly OutlineItem[];
 		readonly outlineOpen: boolean;
+		readonly searchOpen?: boolean;
 	}
 
 	const {
@@ -41,7 +42,8 @@
 		onResolveNote,
 		onUpdateNote,
 		outline,
-		outlineOpen
+		outlineOpen,
+		searchOpen = false
 	}: Props = $props();
 
 	function parseShortcutKeys(shortcut: string): string[] {
@@ -51,7 +53,10 @@
 
 {#if outlineOpen}
 	<aside
-		class="absolute top-0 bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
+		class={[
+			'absolute bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] transition-[top] duration-150 lg:w-rail lg:shadow-none',
+			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
+		]}
 		aria-label="Document outline"
 		data-rail="outline"
 	>
@@ -78,7 +83,10 @@
 
 {#if notesOpen}
 	<aside
-		class="absolute top-0 right-0 bottom-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] lg:w-rail lg:shadow-none"
+		class={[
+			'absolute bottom-0 right-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] transition-[top] duration-150 lg:w-rail lg:shadow-none',
+			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
+		]}
 		aria-label="Writer’s notes"
 		data-rail="notes"
 	>

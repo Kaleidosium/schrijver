@@ -60,6 +60,13 @@
 	color-scheme: light;
 	--editor-block-space: clamp(3rem, 2.182rem + 3.636vw, 5rem);
 	--editor-inline-space: clamp(1rem, 0.591rem + 1.818vw, 2rem);
+	--search-panel-height: 5.25rem;
+}
+
+@media (max-width: 48rem) {
+	:root {
+		--search-panel-height: 5.05rem;
+	}
 }
 
 @media (prefers-reduced-motion: no-preference) {

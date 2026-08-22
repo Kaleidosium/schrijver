@@ -81,7 +81,8 @@ export const writerTheme = EditorView.theme({
 		fontFamily: 'monospace',
 		fontSize: 'calc(1.5em * var(--editor-zoom-factor, 1))',
 		lineHeight: '1.75',
-		scrollPaddingBlock: 'clamp(2.5rem, 2rem + 1.5vw, 3.5rem)'
+		scrollPaddingBlock: 'clamp(2.5rem, 2rem + 1.5vw, 3.5rem)',
+		transition: 'padding 150ms ease'
 	},
 	'.cm-content': {
 		flex: '0 1 70ch',
@@ -117,7 +118,11 @@ export const writerTheme = EditorView.theme({
 		fontSize: '0.9rem'
 	},
 	'.cm-panels-top': {
-		zIndex: '10',
+		position: 'absolute',
+		top: '0',
+		left: '0',
+		right: '0',
+		zIndex: '20',
 		borderBottom: '1px solid var(--color-rule)',
 		boxShadow: '0 0.35rem 0.9rem rgba(34, 35, 31, 0.05)'
 	},

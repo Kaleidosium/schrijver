@@ -646,7 +646,11 @@
                         spellcheck: "true",
                     }),
                     EditorView.updateListener.of((update) => {
-                        searchOpen = searchPanelOpen(update.state);
+                        const nextSearchOpen = searchPanelOpen(update.state);
+                        if (searchOpen !== nextSearchOpen) {
+                            searchOpen = nextSearchOpen;
+                            requestAnimationFrame(updateNotePositions);
+                        }
 
                         if (update.docChanged) {
                             draft = update.state.doc.toString();
@@ -1003,6 +1007,7 @@
             openSearchPanel(editor);
             searchOpen = true;
         }
+        requestAnimationFrame(updateNotePositions);
     }
 
     async function setReviewModeValue(nextReviewMode: boolean): Promise<void> {
@@ -1757,13 +1762,23 @@
             return;
         }
 
-        const surface = editor.dom.closest(".writing-surface");
+        const surface =
+            editor.dom.closest("#writing-surface") ??
+            editor.dom.closest(".writing-surface");
 
         if (!(surface instanceof HTMLElement)) {
             return;
         }
 
         const surfaceTop = surface.getBoundingClientRect().top;
+        const searchOffset = searchOpen
+            ? parseFloat(
+                  getComputedStyle(surface).getPropertyValue(
+                      "--search-panel-height",
+                  ),
+              ) || 84
+            : 0;
+        const asideTop = surfaceTop + searchOffset;
         const ordered = notes
             .map((note) => ({ note, range: noteRange(note) }))
             .filter(
@@ -1780,7 +1795,7 @@
             const coordinates = editor.coordsAtPos(range.from);
             const anchorTop = Math.max(
                 0,
-                (coordinates?.top ?? surfaceTop) - surfaceTop,
+                (coordinates?.top ?? asideTop) - asideTop,
             );
             const top = Math.max(anchorTop, previousBottom);
 
@@ -2435,6 +2450,7 @@
             onUpdateNote={updateNote}
             {outline}
             {outlineOpen}
+            {searchOpen}
         />
         {#if readerMode}
             <div
@@ -2454,9 +2470,10 @@
         {/if}
         <div
             class={[
-                "h-full min-h-0 transition-[padding] duration-150",
-                outlineOpen && "lg:pl-rail",
-                notesOpen && "lg:pr-rail",
+                "h-full min-h-0",
+                searchOpen && "[&_.cm-scroller]:scroll-pt-[calc(var(--search-panel-height)+1rem)]",
+                outlineOpen && "lg:[&_.cm-scroller]:pl-rail",
+                notesOpen && "lg:[&_.cm-scroller]:pr-rail",
                 readerMode && "hidden",
             ]}
             {@attach attachEditor}
