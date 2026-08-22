@@ -346,4 +346,15 @@ describe('formatting commands', () => {
 		expect(APP_SHORTCUTS.newDocument).toBe('Mod+Alt+N');
 		expect(COMMAND_HELP.some((cmd) => cmd.label === 'New manuscript')).toBe(true);
 	});
+
+	it('indents and unindents lines with indentMore and indentLess', async () => {
+		const { indentLess, indentMore } = await import('@codemirror/commands');
+		const indented = runCommand('Hello world', indentMore, { anchor: 5 });
+		expect(indented.document).toBe('  Hello world');
+		expect(indented.selection.main.head).toBe(7);
+
+		const unindented = runCommand('  Hello world', indentLess, { anchor: 7 });
+		expect(unindented.document).toBe('Hello world');
+		expect(unindented.selection.main.head).toBe(5);
+	});
 });

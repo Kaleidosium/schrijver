@@ -3,6 +3,7 @@
 		defaultKeymap,
 		history,
 		historyKeymap,
+		indentWithTab,
 		insertNewlineAndIndent
 	} from '@codemirror/commands';
 	import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
@@ -80,7 +81,7 @@
 							{ key: 'Shift-Enter', run: insertNewlineAndIndent }
 						])
 					),
-					keymap.of([...defaultKeymap, ...historyKeymap])
+					keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap])
 				]
 			})
 		});

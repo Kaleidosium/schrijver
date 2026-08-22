@@ -3,6 +3,7 @@
         defaultKeymap,
         history,
         historyKeymap,
+        indentWithTab,
         insertNewlineAndIndent,
         redo,
         redoDepth,
@@ -693,6 +694,7 @@
                         ]),
                     ),
                     keymap.of([
+                        indentWithTab,
                         {
                             key: "Mod-z",
                             run: (view) => view.state.field(hemingwayModeField),

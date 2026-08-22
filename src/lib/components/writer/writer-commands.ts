@@ -53,6 +53,8 @@ export const COMMAND_HELP = [
 	{ label: 'Bold', shortcut: 'Mod+B', scope: 'Editor' },
 	{ label: 'Italic', shortcut: 'Mod+I', scope: 'Editor' },
 	{ label: 'Link', shortcut: 'Mod+K', scope: 'Editor' },
+	{ label: 'Indent line', shortcut: 'Tab', scope: 'Editor' },
+	{ label: 'Unindent line', shortcut: 'Shift+Tab', scope: 'Editor' },
 	{ label: 'Zoom in', shortcut: APP_SHORTCUTS.zoomIn, scope: 'App' },
 	{ label: 'Zoom out', shortcut: APP_SHORTCUTS.zoomOut, scope: 'App' },
 	{ label: 'Restore default zoom', shortcut: APP_SHORTCUTS.zoomReset, scope: 'App' }
