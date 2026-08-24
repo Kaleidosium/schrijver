@@ -11,7 +11,8 @@ import {
 	countTasks,
 	countWords,
 	estimateReadingTime,
-	maskMarkdownForProse
+	maskMarkdownForProse,
+	renderMarkdown
 } from './writing';
 
 describe('maskMarkdownForProse', () => {
@@ -238,5 +239,67 @@ describe('activeSentenceRange', () => {
 		const draft = 'First sentence.\n\nSecond sentence.';
 
 		expect(activeSentenceRange(draft, 16)).toEqual({ from: 16, to: 16 });
+	});
+});
+
+describe('renderMarkdown', () => {
+	it('returns empty string for empty markdown', () => {
+		expect(renderMarkdown('')).toBe('');
+		expect(renderMarkdown('   ')).toBe('');
+	});
+
+	it('renders markdown paragraphs, headings, and lists', () => {
+		const md = '# Title\n\nParagraph with **bold** text.\n\n- item 1\n- item 2';
+		const html = renderMarkdown(md);
+
+		expect(html).toContain('<h1>Title</h1>');
+		expect(html).toContain('<p>Paragraph with <strong>bold</strong> text.</p>');
+		expect(html).toContain('<li>item 1</li>');
+	});
+
+	it('renders footnote references and definitions as a structured footnotes section', () => {
+		const md = 'Statement with note[^1].\n\n[^1]: Footnote content here.';
+		const html = renderMarkdown(md);
+
+		expect(html).toContain('<sup><a id="footnote-ref-1" href="#footnote-1" data-footnote-ref');
+		expect(html).toContain('<section class="footnotes" data-footnotes>');
+		expect(html).toContain('<li id="footnote-1">');
+		expect(html).toContain('Footnote content here.');
+		expect(html).toContain('data-footnote-backref');
+	});
+
+	it('renders multiple footnotes in order of appearance in text', () => {
+		const md =
+			'Second ref[^beta] and first ref[^alpha].\n\n[^alpha]: Definition alpha\n[^beta]: Definition beta';
+		const html = renderMarkdown(md);
+
+		expect(html).toContain(
+			'<sup><a id="footnote-ref-beta" href="#footnote-beta" data-footnote-ref'
+		);
+		expect(html).toContain(
+			'<sup><a id="footnote-ref-alpha" href="#footnote-alpha" data-footnote-ref'
+		);
+		expect(html.indexOf('id="footnote-beta"')).toBeLessThan(html.indexOf('id="footnote-alpha"'));
+	});
+
+	it('renders formatting within footnotes', () => {
+		const md = 'Text[^1].\n\n[^1]: Note with **bold**, *italic*, and `code`.';
+		const html = renderMarkdown(md);
+
+		expect(html).toContain('<strong>bold</strong>');
+		expect(html).toContain('<em>italic</em>');
+		expect(html).toContain('<code>code</code>');
+	});
+
+	it('does not treat code block contents as footnote definitions', () => {
+		const md = '```\n[^1]: Not a footnote\n```\n\nReal[^real].\n\n[^real]: Real note.';
+		const html = renderMarkdown(md);
+
+		expect(html).toContain('<code>[^1]: Not a footnote\n</code>');
+		expect(html).toContain(
+			'<sup><a id="footnote-ref-real" href="#footnote-real" data-footnote-ref'
+		);
+		expect(html).not.toContain('<li id="footnote-1">');
+		expect(html).toContain('<li id="footnote-real">');
 	});
 });

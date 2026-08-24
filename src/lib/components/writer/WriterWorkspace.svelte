@@ -46,6 +46,7 @@
         calculateSelectionStats,
         countWords,
         maskMarkdownForProse,
+        renderMarkdown,
         type DocumentStats,
         type SelectionStats,
         type TextRange,
@@ -66,7 +67,6 @@
         type WriterSidecar,
     } from "$lib/writer-document";
     import { Dialog } from "bits-ui";
-    import { marked } from "marked";
     import { createHotkeys } from "@tanstack/svelte-hotkeys";
     import { untrack } from "svelte";
     import type { Attachment } from "svelte/attachments";
@@ -546,14 +546,123 @@
             editor.focus();
         }
     }
+
+    interface FootnotePopoverState {
+        readonly html: string;
+        readonly x: number;
+        readonly y: number;
+        readonly placement: "top" | "bottom";
+    }
+
+    let footnotePopover = $state<FootnotePopoverState | null>(null);
+    let footnoteHideTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const attachReaderNav: Attachment<HTMLDivElement> = (node) => {
+        let activeTrigger: HTMLElement | null = null;
+
+        const clearHideTimer = () => {
+            if (footnoteHideTimer) {
+                clearTimeout(footnoteHideTimer);
+                footnoteHideTimer = undefined;
+            }
+        };
+
+        const scheduleHide = () => {
+            clearHideTimer();
+            footnoteHideTimer = setTimeout(() => {
+                footnotePopover = null;
+                activeTrigger = null;
+            }, 180);
+        };
+
+        const onPointerOver = (event: PointerEvent) => {
+            const refLink = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>("a[data-footnote-ref]");
+            if (!refLink) {return;}
+
+            clearHideTimer();
+            if (activeTrigger === refLink) {return;}
+
+            const href = refLink.getAttribute("href");
+            if (!href?.startsWith("#")) {return;}
+
+            const id = href.slice(1);
+            const targetElement = document.getElementById(id);
+            if (!targetElement) {return;}
+
+            activeTrigger = refLink;
+            const cleanHtml = targetElement.innerHTML
+                .replace(/<a[^>]*data-footnote-backref[^>]*>[\s\S]*?<\/a>/gi, "")
+                .trim();
+
+            const rect = refLink.getBoundingClientRect();
+            const placement = rect.top > 200 ? "top" : "bottom";
+            const clampedX = Math.max(160, Math.min(window.innerWidth - 160, rect.left + rect.width / 2));
+
+            footnotePopover = {
+                html: cleanHtml,
+                x: clampedX,
+                y: placement === "top" ? rect.top - 8 : rect.bottom + 8,
+                placement,
+            };
+        };
+
+        const onPointerOut = (event: PointerEvent) => {
+            const refLink = (event.target as HTMLElement | null)?.closest("a[data-footnote-ref]");
+            if (refLink) {
+                scheduleHide();
+            }
+        };
+
+        const onScroll = () => {
+            if (footnotePopover) {
+                footnotePopover = null;
+                activeTrigger = null;
+            }
+        };
+
+        const onClick = (event: MouseEvent) => {
+            const link = (event.target as HTMLElement | null)?.closest("a");
+            if (!link) {return;}
+
+            const href = link.getAttribute("href");
+            if (!href?.startsWith("#")) {return;}
+
+            event.preventDefault();
+            footnotePopover = null;
+            activeTrigger = null;
+            const id = href.slice(1);
+            const targetElement = document.getElementById(id);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                });
+                targetElement.classList.add("footnote-target-highlight");
+                setTimeout(() => {
+                    targetElement.classList.remove("footnote-target-highlight");
+                }, 600);
+            }
+        };
+
+        node.addEventListener("pointerover", onPointerOver);
+        node.addEventListener("pointerout", onPointerOut);
+        node.addEventListener("scroll", onScroll, { passive: true });
+        node.addEventListener("click", onClick);
+
+        return () => {
+            clearHideTimer();
+            node.removeEventListener("pointerover", onPointerOver);
+            node.removeEventListener("pointerout", onPointerOut);
+            node.removeEventListener("scroll", onScroll);
+            node.removeEventListener("click", onClick);
+        };
+    };
     const documentStats = $derived(calculateDocumentStats(draft));
     const selectionStats = $derived(
         hasTextSelection && selectedText ? calculateSelectionStats(selectedText) : undefined,
     );
     const noteViews = $derived.by(buildNoteViews);
-    const renderedHtml = $derived(
-        marked.parse(draft, { async: false, gfm: true, breaks: true }) as string,
-    );
+    const renderedHtml = $derived(renderMarkdown(draft));
     const attachEditor: Attachment<HTMLDivElement> = (editorElement) =>
         untrack(() => {
         const recovery = loadInitialRecovery();
@@ -2598,12 +2707,40 @@
                     notesOpen && "lg:pr-rail",
                 ]}
                 data-reader-mode="true"
+                {@attach attachReaderNav}
             >
                 <article
                     class="prose font-serif max-w-[70ch] mx-auto px-(--editor-inline-space) py-(--editor-block-space) leading-relaxed"
+                    style:font-size="calc(1.2rem * var(--editor-zoom-factor, 1))"
                 >
                     {@html renderedHtml}
                 </article>
+            </div>
+        {/if}
+        {#if readerMode && footnotePopover}
+            <div
+                class={[
+                    "fixed z-50 w-[min(22rem,calc(100vw-2rem))] rounded-md border border-rule bg-paper/98 px-3 py-2.5 font-serif text-[0.85rem] leading-relaxed text-ink shadow-[0_10px_28px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md transition-opacity duration-150",
+                    footnotePopover.placement === "top"
+                        ? "-translate-x-1/2 -translate-y-full"
+                        : "-translate-x-1/2",
+                ]}
+                style:left="{footnotePopover.x}px"
+                style:top="{footnotePopover.y}px"
+                role="tooltip"
+                onpointerenter={() => {
+                    if (footnoteHideTimer) {
+                        clearTimeout(footnoteHideTimer);
+                        footnoteHideTimer = undefined;
+                    }
+                }}
+                onpointerleave={() => {
+                    footnotePopover = null;
+                }}
+            >
+                <div class="prose prose-sm font-serif max-h-48 overflow-y-auto overscroll-contain text-[0.85rem] [&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0">
+                    {@html footnotePopover.html}
+                </div>
             </div>
         {/if}
         <div

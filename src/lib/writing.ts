@@ -1,4 +1,6 @@
 import { estimate } from 'lesetid';
+import { Marked } from 'marked';
+import markedFootnote from 'marked-footnote';
 
 export interface TextRange {
 	from: number;
@@ -341,4 +343,17 @@ export function calculateSelectionStats(selectedText: string): SelectionStats {
 		charactersWithoutSpaces,
 		sentences
 	};
+}
+
+const markdownParser = new Marked({
+	gfm: true,
+	breaks: true
+}).use(markedFootnote());
+
+export function renderMarkdown(markdown: string): string {
+	if (!markdown || !markdown.trim()) {
+		return '';
+	}
+
+	return markdownParser.parse(markdown) as string;
 }

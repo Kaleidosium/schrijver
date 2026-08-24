@@ -53,6 +53,7 @@
 		"compromise": "^14.16.0",
 		"lesetid": "^2.1.1",
 		"marked": "^18.0.10",
+		"marked-footnote": "^1.4.0",
 		"write-good": "^1.0.8"
 	}
 }
