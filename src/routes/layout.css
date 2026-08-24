@@ -2,21 +2,21 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-	--color-page: #f4f6f2;
-	--color-paper: #fffdfa;
-	--color-ink: #22231f;
-	--color-muted: #6d7167;
-	--color-rule: #d9ded1;
-	--color-accent: #258f86;
-	--color-accent-ink: #287a73;
-	--color-mark: #9f4d5d;
-	--color-selection: rgba(37, 143, 134, 0.18);
+	--color-page: #f6f5f2;
+	--color-paper: #f9fafb;
+	--color-ink: #0c0c0c;
+	--color-muted: #717069;
+	--color-rule: #e5e4de;
+	--color-accent: #18796d;
+	--color-accent-ink: #136359;
+	--color-mark: #a6384b;
+	--color-selection: rgba(24, 121, 109, 0.14);
 
-	--color-syntax-adjective: #8a6500;
-	--color-syntax-noun: #b84a4a;
-	--color-syntax-adverb: #7657a6;
-	--color-syntax-verb: #2f6db5;
-	--color-syntax-conjunction: #2f7d4a;
+	--color-syntax-adjective: #8f6200;
+	--color-syntax-noun: #b03838;
+	--color-syntax-adverb: #6e4ea1;
+	--color-syntax-verb: #2566ab;
+	--color-syntax-conjunction: #267749;
 
 	--spacing-3xs: clamp(0.25rem, 0.224rem + 0.114vw, 0.313rem);
 	--spacing-2xs: clamp(0.5rem, 0.449rem + 0.227vw, 0.625rem);
@@ -30,9 +30,12 @@
 	--size-control: clamp(1.65rem, 1.609rem + 0.182vw, 1.75rem);
 	--max-width-shell: 70rem;
 
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-	--font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-	--font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+	--font-mono:
+		'SF Mono', ui-monospace, 'Geist Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', system-ui,
+		sans-serif;
+	--font-serif: 'Newsreader', 'Charter', 'Sitka Text', Cambria, Georgia, serif;
 }
 
 .prose {
@@ -54,6 +57,18 @@
 
 .prose :is(h1, h2, h3, h4, h5, h6) {
 	text-wrap: balance;
+	letter-spacing: -0.02em;
+}
+
+.prose a {
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1px;
+}
+
+.prose blockquote {
+	font-style: italic;
+	border-left-width: 2px;
+	border-left-color: var(--color-rule);
 }
 
 :root {
@@ -94,12 +109,16 @@ body {
 	background: var(--color-page);
 	color: var(--color-ink);
 	font-family: var(--font-mono);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 }
 
 .cm-writer-note-anchor {
-	background: color-mix(in srgb, var(--color-accent) 13%, transparent);
-	box-shadow: inset 0 -2px color-mix(in srgb, var(--color-accent) 48%, transparent);
+	background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+	box-shadow: inset 0 -2px color-mix(in srgb, var(--color-accent) 55%, transparent);
 	cursor: pointer;
+	border-radius: 1px;
 }
 
 .cm-writer-note-anchor-active {

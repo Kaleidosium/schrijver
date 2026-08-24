@@ -6,11 +6,11 @@ export const markdownHighlightStyle = HighlightStyle.define([
 	{
 		tag: tags.heading,
 		color: 'var(--color-ink)',
-		fontWeight: '700',
+		fontWeight: '600',
 		textDecoration: 'none'
 	},
 	{ tag: tags.emphasis, fontStyle: 'italic' },
-	{ tag: tags.strong, fontWeight: '700' },
+	{ tag: tags.strong, fontWeight: '600' },
 	{ tag: tags.strikethrough, textDecoration: 'line-through' },
 	{
 		tag: [tags.link, tags.url, tags.monospace],
@@ -39,7 +39,7 @@ export const writerNoteTheme = EditorView.theme({
 	},
 	'.cm-scroller': {
 		overflow: 'auto',
-		fontFamily: 'monospace',
+		fontFamily: 'inherit',
 		lineHeight: '1.45'
 	},
 	'.cm-content': {
@@ -54,7 +54,7 @@ export const writerNoteTheme = EditorView.theme({
 		backgroundColor: 'var(--color-selection)'
 	},
 	'.cm-cursor': {
-		borderLeft: '1px solid var(--color-accent)',
+		borderLeft: '1.5px solid var(--color-accent)',
 		borderLeftColor: 'var(--color-accent)'
 	},
 	'.cm-placeholder': {
@@ -78,7 +78,7 @@ export const writerTheme = EditorView.theme({
 		justifyContent: 'center',
 		height: '100%',
 		minHeight: '100%',
-		fontFamily: 'monospace',
+		fontFamily: 'inherit',
 		fontSize: 'calc(1.5em * var(--editor-zoom-factor, 1))',
 		lineHeight: '1.75',
 		scrollPaddingBlock: 'clamp(2.5rem, 2rem + 1.5vw, 3.5rem)',
@@ -107,14 +107,14 @@ export const writerTheme = EditorView.theme({
 		backgroundColor: 'var(--color-selection)'
 	},
 	'.cm-cursor': {
+		borderLeft: '2px solid var(--color-accent)',
 		borderLeftColor: 'var(--color-accent)'
 	},
 	'.cm-panels': {
 		borderColor: 'var(--color-rule)',
 		backgroundColor: 'var(--color-page)',
 		color: 'var(--color-muted)',
-		fontFamily:
-			"ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+		fontFamily: 'var(--font-sans)',
 		fontSize: '0.9rem'
 	},
 	'.cm-panels-top': {
@@ -316,13 +316,13 @@ export const writerTheme = EditorView.theme({
 	},
 	'.cm-tooltip-lint': {
 		margin: '0',
-		padding: '0.55rem 0.7rem',
-		border: '1px solid color-mix(in srgb, var(--color-rule) 72%, var(--color-paper))',
-		backgroundColor: 'color-mix(in srgb, var(--color-paper) 92%, var(--color-page))',
-		boxShadow: '0 0.35rem 1rem rgba(34, 35, 31, 0.08)',
+		padding: '0.55rem 0.75rem',
+		border: '1px solid var(--color-rule)',
+		borderRadius: '6px',
+		backgroundColor: 'color-mix(in srgb, var(--color-paper) 96%, var(--color-page))',
+		boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
 		color: 'var(--color-ink)',
-		fontFamily:
-			"ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+		fontFamily: 'var(--font-sans)',
 		fontSize: '0.82rem',
 		lineHeight: '1.45',
 		listStyle: 'none',

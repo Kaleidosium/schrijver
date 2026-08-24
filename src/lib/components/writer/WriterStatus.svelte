@@ -96,53 +96,53 @@
 						collisionPadding={8}
 						side="top"
 						sideOffset={6}
-						class="z-50 min-w-44 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
+						class="z-50 min-w-48 rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.78rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 					>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(1)}
 						>
 							<span class="font-bold text-[0.88rem]">Heading 1</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">#</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(2)}
 						>
 							<span class="font-semibold text-[0.82rem]">Heading 2</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">##</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">##</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(3)}
 						>
 							<span class="font-medium text-[0.78rem]">Heading 3</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">###</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">###</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(4)}
 						>
 							<span class="text-[0.76rem]">Heading 4</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">####</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(5)}
 						>
 							<span class="text-[0.74rem]">Heading 5</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">#####</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">#####</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(6)}
 						>
 							<span class="text-[0.72rem]">Heading 6</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">######</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">######</kbd>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-1 h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none hover:bg-page focus:bg-page data-highlighted:bg-page"
 							onclick={() => onToggleHeading(0)}
 						>
 							<span class="text-[0.76rem] text-muted">Body text</span>
@@ -194,11 +194,11 @@
 						<Tooltip.Content
 							side="top"
 							sideOffset={6}
-							class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+							class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 						>
 							<span>{label}</span>
 							{#if shortcut}
-								<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">
+								<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.70rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">
 									{formatForDisplay(shortcut)}
 								</kbd>
 							{/if}
@@ -336,9 +336,9 @@
 				align="end"
 				side="top"
 				sideOffset={8}
-				class="z-50 w-72 max-w-[calc(100vw-1.5rem)] rounded-lg border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-3.5 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
+				class="z-50 w-72 max-w-[calc(100vw-1.5rem)] rounded-md border border-rule bg-paper/98 p-4 font-sans text-[0.78rem] text-ink shadow-[0_12px_32px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 			>
-				<div class="mb-2.5 flex items-center justify-between border-b border-rule pb-2">
+				<div class="mb-3 flex items-center justify-between border-b border-rule pb-2.5">
 					<span class="font-medium text-ink">Statistics</span>
 					<span class="flex items-center gap-1 text-[0.72rem] font-medium text-accent-ink">
 						<Clock size={12} aria-hidden="true" />
@@ -380,7 +380,7 @@
 				</div>
 
 				{#if selectionStats && (selectionStats.words > 0 || selectionStats.characters > 0)}
-					<div class="mt-3 border-t border-rule pt-2">
+					<div class="mt-3 border-t border-rule pt-2.5">
 						<div class="mb-1.5 text-[0.68rem] font-semibold tracking-wider text-muted uppercase">Selection</div>
 						<div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[0.74rem]">
 							<div class="flex items-baseline justify-between">

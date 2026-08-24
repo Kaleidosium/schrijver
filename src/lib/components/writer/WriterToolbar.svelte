@@ -148,7 +148,7 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink"
 							type="button"
 						>
 							<span>File</span>
@@ -160,36 +160,36 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onNew}
 						>
 							<span>New</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.newDocument)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.newDocument)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={() => void onOpen()}
 						>
 							<span>Open manuscript</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.open)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.open)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={() => void onSave()}
 						>
 							<span>Save draft</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.save)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.save)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={() => void onSaveAs()}
 						>
 							<span>Save as…</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.saveAs)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.saveAs)}</kbd>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
@@ -202,7 +202,7 @@
 						<Toolbar.Button
 							{...triggerProps}
 							disabled={readerMode}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							type="button"
 						>
 							<span>Edit</span>
@@ -214,88 +214,88 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
 							disabled={!canUndo}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onUndo}
 						>
 							<span>Undo</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Z')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+Z')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!canRedo}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onRedo}
 						>
 							<span>Redo</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Shift+Z')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+Shift+Z')}</kbd>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Item
 							disabled={!hasSelection}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onCut}
 						>
 							<span>Cut</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+X')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+X')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!hasSelection}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onCopy}
 						>
 							<span>Copy</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+C')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+C')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onPaste}
 						>
 							<span>Paste</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+V')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+V')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!hasSelection}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onDelete}
 						>
 							<span>Delete</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Delete')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Delete')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!hasSelection}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onClearFormatting}
 						>
 							<span>Clear formatting</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Item
 							disabled={!canJumpToTop}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onJumpToTop}
 						>
 							<span>Jump to beginning</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+Home')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+Home')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!canJumpToEnd}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onJumpToEnd}
 						>
 							<span>Jump to end</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+End')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+End')}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							disabled={!canSelectAll}
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-disabled:pointer-events-none data-disabled:opacity-35 data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onSelectAll}
 						>
 							<span>Select all</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+A')}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+A')}</kbd>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>
@@ -307,7 +307,7 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink"
 							type="button"
 						>
 							<span>View</span>
@@ -319,55 +319,55 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onZoomIn}
 						>
 							<span>Zoom in</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.zoomIn)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.zoomIn)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onZoomOut}
 						>
 							<span>Zoom out</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.zoomOut)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.zoomOut)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-pointer items-center justify-between gap-s rounded px-2 select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onZoomReset}
 						>
 							<span>Restore default zoom</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.zoomReset)}</kbd>
+							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.zoomReset)}</kbd>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.CheckboxItem
 							checked={readerMode}
-							class="flex min-h-[1.9rem] cursor-default items-center justify-between gap-s rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-default items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							closeOnSelect={false}
 							onCheckedChange={onReaderModeToggle}
 						>
 							{#snippet children({ checked })}
-								<div class="flex items-center gap-2xs">
-									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+								<div class="flex items-center gap-2">
+									<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 										{checked ? '✓' : ''}
 									</span>
 									<span>Reader mode</span>
 								</div>
-								<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.preview)}</kbd>
+								<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.preview)}</kbd>
 							{/snippet}
 						</DropdownMenu.CheckboxItem>
 						<DropdownMenu.CheckboxItem
 							checked={actionBarOpen}
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-default items-center gap-2 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							closeOnSelect={false}
 							onCheckedChange={onActionBarToggle}
 						>
 							{#snippet children({ checked })}
-								<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+								<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 									{checked ? '✓' : ''}
 								</span>
 								<span>Action bar</span>
@@ -384,7 +384,7 @@
 						<Toolbar.Button
 							{...tooltipProps}
 							aria-pressed={outlineOpen}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink"
 							data-mode={outlineOpen ? 'on' : 'off'}
 							type="button"
 							onclick={() => onOutlineOpenChange(!outlineOpen)}
@@ -397,10 +397,10 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
 						<span>Document outline</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.outline)}</kbd>
+						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.outline)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -413,7 +413,7 @@
 							{...tooltipProps}
 							aria-pressed={notesOpen}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={notesOpen ? 'on' : 'off'}
 							type="button"
 							onclick={() => onNotesOpenChange(!notesOpen)}
@@ -426,10 +426,10 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
 						<span>Writer’s notes</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.addNote)}</kbd>
+						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.addNote)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -447,7 +447,7 @@
 							{...triggerProps}
 							aria-pressed={focusMode || typewriterMode}
 							disabled={readerMode}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={focusMode || typewriterMode ? 'on' : 'off'}
 						>
 							<span>Focus</span>
@@ -459,7 +459,7 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-50 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.RadioGroup
@@ -473,51 +473,51 @@
 							}}
 						>
 							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								class="flex min-h-8 cursor-pointer items-center gap-2 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 								closeOnSelect={false}
 								value="off"
 							>
 								{#snippet children({ checked })}
-									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+									<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 										{checked ? '✓' : ''}
 									</span>
 									<span>Off</span>
 								{/snippet}
 							</DropdownMenu.RadioItem>
 							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								class="flex min-h-8 cursor-pointer items-center gap-2 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 								closeOnSelect={false}
 								value="sentence"
 							>
 								{#snippet children({ checked })}
-									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+									<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 										{checked ? '✓' : ''}
 									</span>
 									<span>Sentence</span>
 								{/snippet}
 							</DropdownMenu.RadioItem>
 							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								class="flex min-h-8 cursor-pointer items-center gap-2 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 								closeOnSelect={false}
 								value="paragraph"
 							>
 								{#snippet children({ checked })}
-									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+									<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 										{checked ? '✓' : ''}
 									</span>
 									<span>Paragraph</span>
 								{/snippet}
 							</DropdownMenu.RadioItem>
 						</DropdownMenu.RadioGroup>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.CheckboxItem
 							checked={typewriterMode}
-							class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-pointer items-center gap-2 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							closeOnSelect={false}
 							onCheckedChange={onTypewriterModeChange}
 						>
 							{#snippet children({ checked })}
-								<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+								<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 									{checked ? '✓' : ''}
 								</span>
 								<span>Typewriter mode</span>
@@ -535,7 +535,7 @@
 							{...tooltipProps}
 							aria-pressed={hemingwayMode}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={hemingwayMode ? 'on' : 'off'}
 							type="button"
 							onclick={() => onHemingwayModeChange(!hemingwayMode)}
@@ -548,10 +548,10 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
 						<span>Hemingway mode (write-only)</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.hemingway)}</kbd>
+						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.hemingway)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -564,7 +564,7 @@
 							{...triggerProps}
 							aria-pressed={syntaxMode}
 							disabled={readerMode}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={syntaxMode ? 'on' : 'off'}
 						>
 							<span>Syntax</span>
@@ -576,31 +576,31 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-56 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-default items-center gap-2 rounded px-1 py-1 select-none outline-none data-disabled:opacity-40 data-highlighted:bg-page data-highlighted:text-ink"
 							closeOnSelect={false}
 							onSelect={() => void onSyntaxModeChange(!syntaxMode)}
 						>
-							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+							<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{syntaxMode ? '✓' : ''}
 							</span>
 							<span>{syntaxMode ? 'Hide syntax' : 'Show syntax'}</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Group>
 							{#each syntaxOptions as option (option.part)}
 								<DropdownMenu.CheckboxItem
 									checked={syntaxParts[option.part]}
-									class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+									class="flex min-h-8 cursor-default items-center gap-2 rounded px-1 py-1 select-none outline-none data-disabled:opacity-40 data-highlighted:bg-page data-highlighted:text-ink"
 									closeOnSelect={false}
 									disabled={!syntaxMode}
 									onCheckedChange={(checked) => onSyntaxPartChange(option.part, checked)}
 								>
 									{#snippet children({ checked })}
-										<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+										<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 											{checked ? '✓' : ''}
 										</span>
 										<span class={option.className}>{option.label}</span>
@@ -620,7 +620,7 @@
 							{...triggerProps}
 							aria-pressed={reviewMode}
 							disabled={readerMode}
-							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={reviewMode ? 'on' : 'off'}
 						>
 							<span>Style</span>
@@ -632,32 +632,32 @@
 					<DropdownMenu.Content
 						align="start"
 						collisionPadding={8}
-						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						class="z-50 min-w-56 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-paper/98 px-1 py-1.5 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none"
 						sideOffset={6}
 					>
 						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-8 cursor-default items-center gap-2 rounded px-1 py-1 select-none outline-none data-disabled:opacity-40 data-highlighted:bg-page data-highlighted:text-ink"
 							closeOnSelect={false}
 							onSelect={() => void onReviewModeChange(!reviewMode)}
 						>
-							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+							<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewMode ? '✓' : ''}
 							</span>
 							<span>{reviewMode ? 'Disable style check' : 'Enable style check'}</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
+						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Group>
 							{#each reviewOptions as option (option.check)}
 								<DropdownMenu.CheckboxItem
 									checked={reviewChecks[option.check]}
-									class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+									class="flex min-h-8 cursor-default items-center gap-2 rounded px-1 py-1 select-none outline-none data-disabled:opacity-40 data-highlighted:bg-page data-highlighted:text-ink"
 									closeOnSelect={false}
 									disabled={!reviewMode}
 									onCheckedChange={(checked) =>
 										void onReviewCheckChange(option.check, checked)}
 								>
 									{#snippet children({ checked })}
-										<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+										<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 											{checked ? '✓' : ''}
 										</span>
 										<span>{option.label}</span>
@@ -677,7 +677,7 @@
 							{...tooltipProps}
 							aria-pressed={searchOpen}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink disabled:pointer-events-none disabled:opacity-40"
 							data-mode={searchOpen ? 'on' : 'off'}
 							type="button"
 							onclick={onSearch}
@@ -690,10 +690,10 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
 						<span>Search in document</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay('Mod+F')}</kbd>
+						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+F')}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>
@@ -704,7 +704,7 @@
 					{#snippet child({ props: tooltipProps })}
 						<Toolbar.Button
 							{...tooltipProps}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 min-[42.01rem]:px-2.5"
+							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 							type="button"
 							onclick={onGuideOpen}
 						>
@@ -716,10 +716,10 @@
 					<Tooltip.Content
 						side="bottom"
 						sideOffset={6}
-						class="z-50 flex items-center gap-2 rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_0.25rem_0.75rem_rgba(34,35,31,0.08)] select-none outline-none"
+						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
 						<span>Keyboard shortcuts</span>
-						<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.72rem] font-medium tracking-wide text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">{formatForDisplay(APP_SHORTCUTS.guide)}</kbd>
+						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.guide)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
 			</Tooltip.Root>

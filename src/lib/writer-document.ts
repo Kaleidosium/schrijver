@@ -1,4 +1,4 @@
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import type { EditorState } from '@codemirror/state';
 
 export interface TextSelector {
@@ -100,7 +100,8 @@ export function hashText(text: string): string {
 
 export function outlineItems(state: EditorState): OutlineItem[] {
 	const items: OutlineItem[] = [];
-	const cursor = syntaxTree(state).cursor();
+	const tree = ensureSyntaxTree(state, state.doc.length) ?? syntaxTree(state);
+	const cursor = tree.cursor();
 
 	do {
 		const match = /^(?:ATX|Setext)Heading([1-6])$/.exec(cursor.name);

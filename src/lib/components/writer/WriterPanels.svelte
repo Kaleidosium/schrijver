@@ -59,7 +59,7 @@
 {#if outlineOpen}
 	<aside
 		class={[
-			'absolute bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] transition-[top] duration-150 lg:w-rail lg:shadow-none',
+			'absolute bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-page/96 p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(0,0,0,0.06)] backdrop-blur-md transition-[top] duration-150 lg:w-rail lg:shadow-none',
 			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
 		]}
 		aria-label="Document outline"
@@ -73,7 +73,7 @@
 				{#each outline as item (item.id)}
 					<button
 						aria-label={`Jump to heading: ${item.label}`}
-						class="w-full truncate rounded-xs border-0 bg-transparent py-1.5 pr-1.5 text-left text-[0.8rem] text-muted cursor-pointer hover:bg-paper hover:text-accent-ink hover:outline hover:outline-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+						class="w-full truncate rounded border-0 bg-transparent py-1.5 pr-2 text-left text-[0.8rem] text-muted cursor-pointer hover:bg-paper hover:text-ink focus-visible:bg-paper focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 						style:padding-left={`calc(0.4rem + ${(item.level - 1) * 0.65}rem)`}
 						type="button"
 						onclick={() => onJumpToHeading(item)}
@@ -89,7 +89,7 @@
 {#if notesOpen}
 	<aside
 		class={[
-			'absolute bottom-0 right-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-[color-mix(in_srgb,var(--color-page)_94%,var(--color-paper))] px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(34,35,31,0.12)] transition-[top] duration-150 lg:w-rail lg:shadow-none',
+			'absolute bottom-0 right-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-page/96 px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(0,0,0,0.06)] backdrop-blur-md transition-[top] duration-150 lg:w-rail lg:shadow-none',
 			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
 		]}
 		aria-label="Writer’s notes"
@@ -102,7 +102,7 @@
 			{#if onAddNote}
 				<button
 					aria-label="Add document note"
-					class="flex shrink-0 cursor-pointer items-center gap-1 rounded-xs border border-rule bg-paper px-1.5 py-0.5 text-[0.72rem] font-medium text-muted whitespace-nowrap hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+					class="flex shrink-0 cursor-pointer items-center gap-1 rounded border border-rule bg-paper px-2 py-0.5 text-[0.72rem] font-medium text-muted whitespace-nowrap hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 					type="button"
 					onclick={onAddNote}
 				>
@@ -118,9 +118,9 @@
 				{#each noteViews as view (view.note.id)}
 					<article
 						class={[
-							'mb-2xs grid min-h-36 gap-3xs rounded border border-rule border-l-[3px] border-l-accent bg-paper p-2xs shadow-xs transition-[border-color,background-color,opacity,top] duration-150 lg:absolute lg:right-0 lg:left-0 lg:top-(--note-top) lg:mb-0',
-							activeNoteId === view.note.id && 'border-accent',
-							view.orphaned && 'border-l-mark',
+							'mb-2xs grid min-h-36 gap-3xs rounded-md border border-rule bg-paper p-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-[border-color,background-color,opacity,top,box-shadow] duration-150 lg:absolute lg:right-0 lg:left-0 lg:top-(--note-top) lg:mb-0',
+							activeNoteId === view.note.id && 'border-accent shadow-[0_2px_8px_rgba(0,0,0,0.04)]',
+							view.orphaned && 'border-mark/60',
 							view.note.resolved && 'opacity-55'
 						]}
 						data-active-note={activeNoteId === view.note.id}
@@ -130,7 +130,10 @@
 						{#if view.note.selection}
 							<button
 								aria-label={`Jump to note: ${view.orphaned ? 'Anchor missing' : view.anchorLabel}`}
-								class="truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+								class={[
+									'truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1',
+									view.orphaned && 'text-mark'
+								]}
 								type="button"
 								onclick={() => onJumpToNote(view.note.id)}
 							>
@@ -152,7 +155,7 @@
 							{#if view.orphaned}
 								<button
 									aria-label={`Reattach note: ${view.anchorLabel}`}
-									class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+									class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 									type="button"
 									onclick={() => onReattachNote(view.note.id)}
 								>
@@ -161,7 +164,7 @@
 							{:else}
 								<button
 									aria-label={`${view.note.resolved ? 'Reopen' : 'Resolve'} note: ${view.anchorLabel}`}
-									class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+									class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 									type="button"
 									onclick={() => onResolveNote(view.note.id, !view.note.resolved)}
 								>
@@ -170,7 +173,7 @@
 							{/if}
 							<button
 								aria-label={`Delete note: ${view.anchorLabel}`}
-								class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+								class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 								type="button"
 								onclick={() => onDeleteNote(view.note.id)}
 							>
@@ -186,15 +189,15 @@
 
 <Dialog.Root open={guideOpen} onOpenChange={(open) => { if (!open) onCloseGuide(); }}>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+		<Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
 		<Dialog.Content
-			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+			class="fixed top-1/2 left-1/2 z-51 max-h-[min(38rem,calc(100svh-2rem))] w-[min(31rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
 		>
 			<header class="flex items-center justify-between gap-s">
 				<Dialog.Title class="m-0 text-[1.1rem] font-bold text-pretty">Keyboard shortcuts</Dialog.Title>
 				<Dialog.Close
 					aria-label="Close keyboard shortcuts"
-					class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+					class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 					type="button"
 				>
 					Close
@@ -214,7 +217,7 @@
 							<dd class="m-0 flex items-center gap-1">
 								{#each parseShortcutKeys(command.shortcut) as key, i (`${command.label}-${key}-${i}`)}
 									<kbd
-										class="inline-flex min-w-6 items-center justify-center rounded border border-rule border-b-2 bg-paper px-1.5 py-0.5 font-mono text-[0.74rem] font-medium text-ink shadow-[0_1px_2px_rgba(34,35,31,0.06)]"
+										class="inline-flex min-w-6 items-center justify-center rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.72rem] font-medium text-ink shadow-[0_1px_0_rgba(0,0,0,0.04)]"
 									>
 										{key}
 									</kbd>

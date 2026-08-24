@@ -2554,13 +2554,13 @@
     <section id="writing-surface" class="relative min-h-0 flex-1 overflow-hidden p-0" aria-label="Writing surface">
         {#if recoveryRestored}
             <div
-                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-accent)_35%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
+                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-rule bg-paper/98 px-3 py-2 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
                 role="status"
                 aria-live="polite"
             >
                 <span class="flex-1">Unsaved changes restored from this browser.</span>
                 <button
-                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
                     onclick={() => (recoveryRestored = false)}
                 >
@@ -2570,20 +2570,20 @@
         {/if}
         {#if storageConflict}
             <div
-                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-mark)_45%,var(--color-rule))] bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-accent))] px-xs py-2xs font-sans text-[0.82rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.09)] max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
+                class="absolute top-xs left-1/2 z-30 flex max-w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2xs rounded-md border border-[color-mix(in_srgb,var(--color-mark)_45%,var(--color-rule))] bg-paper/98 px-3 py-2 font-sans text-[0.82rem] text-ink shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md max-[42rem]:right-2xs max-[42rem]:left-2xs max-[42rem]:translate-x-0 max-[42rem]:flex-wrap"
                 role="alert"
                 aria-live="assertive"
             >
                 <span class="flex-1">Another tab has newer recovered work.</span>
                 <button
-                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
                     onclick={reloadOtherRecovery}
                 >
                     Load it
                 </button>
                 <button
-                    class="cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                    class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
                     onclick={keepThisTab}
                 >
@@ -2649,9 +2649,9 @@
     >
         {#if manuscriptCandidates.length > 0}
             <Dialog.Portal>
-                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
                 <Dialog.Content
-                    class="fixed top-1/2 left-1/2 z-51 grid max-h-[min(36rem,calc(100svh-2rem))] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_minmax(0,1fr)] overscroll-contain rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+                    class="fixed top-1/2 left-1/2 z-51 grid max-h-[min(36rem,calc(100svh-2rem))] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_minmax(0,1fr)] overscroll-contain rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
                 >
                     <header class="flex items-start justify-between gap-s">
                         <div>
@@ -2663,34 +2663,34 @@
                             </Dialog.Description>
                         </div>
                         <Dialog.Close
-                            class="shrink-0 cursor-pointer rounded-xs border border-rule bg-paper px-2 py-1 text-[0.76rem] text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50"
+                            class="shrink-0 cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50 transition-colors"
                             disabled={manuscriptOpening}
                             type="button"
                         >
                             Cancel
                         </Dialog.Close>
                     </header>
-                    <div class="mt-s grid min-h-0 gap-3xs overflow-y-auto overscroll-y-contain">
+                    <div class="mt-s grid min-h-0 gap-2 overflow-y-auto overscroll-y-contain">
                         {#each manuscriptCandidates as candidate (candidate.name)}
                             <button
                                 aria-label={`Open ${candidate.name}`}
-                                class="grid w-full cursor-pointer gap-3xs rounded border border-rule bg-[color-mix(in_srgb,var(--color-paper)_82%,var(--color-page))] p-2xs text-left text-ink transition-colors hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50"
+                                class="grid w-full cursor-pointer gap-1.5 rounded border border-rule bg-page/60 p-3 text-left text-ink transition-all hover:border-accent hover:bg-paper hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 disabled:cursor-default disabled:opacity-50"
                                 disabled={manuscriptOpening}
                                 type="button"
                                 onclick={() => void chooseManuscriptCandidate(candidate)}
                             >
                                 <span class="flex items-baseline justify-between gap-s">
-                                    <span class="truncate font-bold">{candidate.label}</span>
+                                    <span class="truncate font-semibold text-[0.88rem]">{candidate.label}</span>
                                     <span
                                         class={[
-                                            "shrink-0 text-[0.72rem]",
+                                            "shrink-0 text-[0.72rem] font-medium",
                                             candidate.sidecarHandle ? "text-accent-ink" : "text-muted",
                                         ]}
                                     >
                                         {candidate.sidecarHandle ? "Notes found" : "No notes yet"}
                                     </span>
                                 </span>
-                                <span class="flex items-baseline justify-between gap-s text-[0.72rem] text-muted">
+                                <span class="flex items-baseline justify-between gap-s text-[0.72rem] text-muted font-mono">
                                     <span>{candidate.name}</span>
                                     <span>Modified {formatModified(candidate.modifiedAt)}</span>
                                 </span>
@@ -2712,37 +2712,37 @@
         }}
     >
         <Dialog.Portal>
-            <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs" />
+            <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
             <Dialog.Content
-                class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-m font-sans text-ink shadow-[0_1rem_3rem_rgba(34,35,31,0.16)] outline-none"
+                class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
             >
                 <header class="flex items-start justify-between gap-s">
                     <div>
                         <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
                             Unsaved changes
                         </Dialog.Title>
-                        <Dialog.Description class="mt-2xs text-[0.82rem] leading-relaxed text-muted">
+                        <Dialog.Description class="mt-2 text-[0.82rem] leading-relaxed text-muted">
                             Do you want to save the changes to “{manuscriptLabel(fileName)}” before creating a new document?
                         </Dialog.Description>
                     </div>
                 </header>
-                <div class="mt-m flex items-center justify-end gap-2xs">
+                <div class="mt-6 flex items-center justify-end gap-2">
                     <button
-                        class="cursor-pointer rounded-xs border border-rule bg-paper px-2.5 py-1.5 text-[0.78rem] font-medium text-muted hover:border-mark hover:text-mark focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        class="cursor-pointer rounded border border-rule bg-paper px-3 py-1.5 text-[0.78rem] font-medium text-muted hover:border-mark hover:text-mark focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                         type="button"
                         onclick={handleDiscardAndNew}
                     >
                         Discard
                     </button>
                     <button
-                        class="cursor-pointer rounded-xs border border-rule bg-paper px-2.5 py-1.5 text-[0.78rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        class="cursor-pointer rounded border border-rule bg-paper px-3 py-1.5 text-[0.78rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                         type="button"
                         onclick={handleCancelNew}
                     >
                         Cancel
                     </button>
                     <button
-                        class="cursor-pointer rounded-xs border border-accent bg-accent px-3 py-1.5 text-[0.78rem] font-medium text-paper hover:bg-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+                        class="cursor-pointer rounded border border-accent bg-accent px-3.5 py-1.5 text-[0.78rem] font-medium text-paper hover:bg-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                         type="button"
                         onclick={() => void handleSaveAndNew()}
                     >
