@@ -81,7 +81,6 @@
         deleteSelection,
         insertCodeBlock,
         insertFootnote,
-        insertHorizontalRule,
         insertLink,
         insertParagraphBreak,
         paragraphNavigationKeymap,
@@ -2403,6 +2402,10 @@
     );
 </script>
 
+<svelte:head>
+	<title>{dirty ? '• ' : ''}{fileName ? `${fileName} - schrijver` : 'schrijver'}</title>
+</svelte:head>
+
 <svelte:window
 	onbeforeunload={handleBeforeUnload}
 	onpagehide={handlePageHide}
@@ -2687,7 +2690,6 @@
             onToggleTaskList={() => editor && toggleTaskList(editor)}
             onInsertLink={() => editor && insertLink(editor)}
             onInsertCodeBlock={() => editor && insertCodeBlock(editor)}
-            onInsertHorizontalRule={() => editor && insertHorizontalRule(editor)}
             onInsertFootnote={() => editor && insertFootnote(editor)}
         />
     {/if}

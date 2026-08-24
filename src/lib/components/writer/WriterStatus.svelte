@@ -13,7 +13,6 @@
 		List,
 		ListOrdered,
 		ListTodo,
-		Minus,
 		Quote,
 		SquarePen,
 		Strikethrough
@@ -36,7 +35,6 @@
 		readonly onToggleTaskList: () => void;
 		readonly onInsertLink: () => void;
 		readonly onInsertCodeBlock: () => void;
-		readonly onInsertHorizontalRule: () => void;
 		readonly onInsertFootnote: () => void;
 	}
 
@@ -55,7 +53,6 @@
 		onToggleTaskList,
 		onInsertLink,
 		onInsertCodeBlock,
-		onInsertHorizontalRule,
 		onInsertFootnote
 	}: Props = $props();
 
@@ -316,7 +313,7 @@
 
 			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
-			<!-- Group 5: Blocks & Extras (Blockquote, Footnote, Horizontal Rule) -->
+			<!-- Group 5: Blocks & Extras (Blockquote, Footnote) -->
 			{@render toolBtn({
 				label: 'Blockquote',
 				onclick: onToggleBlockquote,
@@ -331,13 +328,6 @@
 				icon: footnoteIcon
 			})}
 			{#snippet footnoteIcon()}<Asterisk size={13} strokeWidth={2.2} aria-hidden="true" />{/snippet}
-
-			{@render toolBtn({
-				label: 'Horizontal rule',
-				onclick: onInsertHorizontalRule,
-				icon: hrIcon
-			})}
-			{#snippet hrIcon()}<Minus size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			<!-- Group 6: Note Annotation -->
 			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
