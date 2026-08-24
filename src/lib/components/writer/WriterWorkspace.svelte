@@ -106,7 +106,7 @@
     const ACTION_BAR_KEY = "schrijver:action-bar:v1";
     const ZOOM_KEY = "schrijver:zoom:v1";
     const RECOVERY_DELAY = 600;
-    const DEFAULT_FILE_NAME = "schrijver-draft.md";
+    const DEFAULT_FILE_NAME = "draft.md";
     const MIN_ZOOM = 50;
     const MAX_ZOOM = 300;
     const ZOOM_STEP = 10;
@@ -2475,7 +2475,7 @@
 </script>
 
 <svelte:head>
-	<title>{dirty ? '• ' : ''}{fileName ? `${fileName} - schrijver` : 'schrijver'}</title>
+	<title>{dirty ? '• ' : ''}{fileName && fileName !== DEFAULT_FILE_NAME ? manuscriptLabel(fileName) : 'draft'} - schrijver</title>
 </svelte:head>
 
 <svelte:window
