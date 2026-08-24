@@ -121,11 +121,11 @@
 
 		$effect(() => {
 			const body = note.body;
-			const anchor = note.selection.quote.replace(/\s+/g, ' ').trim().slice(0, 54);
+			const anchor = note.selection?.quote.replace(/\s+/g, ' ').trim().slice(0, 54);
 
 			editor.contentDOM.setAttribute(
 				'aria-label',
-				`Writer’s note for ${anchor || 'selected text'}`
+				anchor ? `Writer’s note for ${anchor}` : 'Writer’s note'
 			);
 
 			if (body === editor.state.doc.toString()) {

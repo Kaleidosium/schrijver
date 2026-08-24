@@ -5,6 +5,8 @@ export interface TextSelector {
 	readonly from: number;
 	readonly to: number;
 	readonly quote: string;
+	readonly prefix?: string;
+	readonly suffix?: string;
 }
 
 export interface WriterNote {
@@ -13,7 +15,7 @@ export interface WriterNote {
 	updatedAt: string;
 	body: string;
 	resolved: boolean;
-	selection: TextSelector;
+	selection?: TextSelector;
 }
 
 export interface WriterSidecar {
@@ -129,7 +131,8 @@ export function outlineItems(state: EditorState): OutlineItem[] {
 
 export function resolveTextSelector(
 	selector: TextSelector,
-	document: string
+	document: string,
+	searchRadius = 250
 ): { readonly from: number; readonly to: number } | undefined {
 	if (
 		selector.from >= 0 &&
@@ -140,25 +143,60 @@ export function resolveTextSelector(
 		return { from: selector.from, to: selector.to };
 	}
 
-	if (!selector.quote) {
+	if (!selector.quote || selector.from < 0 || selector.to <= selector.from) {
 		return undefined;
 	}
 
-	let nearest: number | undefined;
-	let position = document.indexOf(selector.quote);
+	const quoteLen = selector.quote.length;
+	const searchStart = Math.max(0, selector.from - searchRadius);
+	const searchEnd = Math.min(document.length, selector.to + searchRadius);
 
-	while (position !== -1) {
-		if (
-			nearest === undefined ||
-			Math.abs(position - selector.from) < Math.abs(nearest - selector.from)
-		) {
-			nearest = position;
-		}
-
-		position = document.indexOf(selector.quote, position + 1);
+	if (searchStart >= searchEnd) {
+		return undefined;
 	}
 
-	return nearest === undefined ? undefined : { from: nearest, to: nearest + selector.quote.length };
+	const windowText = document.slice(searchStart, searchEnd);
+	let bestPos: number | undefined;
+	let bestScore = -1;
+	let index = windowText.indexOf(selector.quote);
+
+	while (index !== -1) {
+		const absolutePos = searchStart + index;
+		let score = 100 - (Math.abs(absolutePos - selector.from) / searchRadius) * 50;
+
+		if (selector.prefix) {
+			const actualPrefix = document.slice(
+				Math.max(0, absolutePos - selector.prefix.length),
+				absolutePos
+			);
+			if (actualPrefix === selector.prefix) {
+				score += 50;
+			} else if (actualPrefix.endsWith(selector.prefix.slice(-10))) {
+				score += 25;
+			}
+		}
+
+		if (selector.suffix) {
+			const actualSuffix = document.slice(
+				absolutePos + quoteLen,
+				absolutePos + quoteLen + selector.suffix.length
+			);
+			if (actualSuffix === selector.suffix) {
+				score += 50;
+			} else if (actualSuffix.startsWith(selector.suffix.slice(0, 10))) {
+				score += 25;
+			}
+		}
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestPos = absolutePos;
+		}
+
+		index = windowText.indexOf(selector.quote, index + 1);
+	}
+
+	return bestPos !== undefined ? { from: bestPos, to: bestPos + quoteLen } : undefined;
 }
 
 export function parseSidecar(value: unknown, markdownFile: string): WriterSidecar {
@@ -250,7 +288,9 @@ function parseNote(value: unknown): WriterNote {
 		createdAt: note.createdAt,
 		updatedAt: note.updatedAt,
 		resolved: note.resolved,
-		selection: parseTextSelector(note.selection)
+		...(note.selection !== undefined && note.selection !== null
+			? { selection: parseTextSelector(note.selection) }
+			: {})
 	};
 }
 
@@ -263,11 +303,17 @@ function parseTextSelector(value: unknown): TextSelector {
 		typeof sel.to !== 'number' ||
 		typeof sel.quote !== 'string' ||
 		sel.from < 0 ||
-		sel.to <= sel.from ||
-		sel.quote.length !== sel.to - sel.from
+		sel.to < sel.from ||
+		(sel.to > sel.from && sel.quote.length !== sel.to - sel.from)
 	) {
 		throw new Error('A note text selection is invalid.');
 	}
 
-	return { from: sel.from, to: sel.to, quote: sel.quote };
+	return {
+		from: sel.from,
+		to: sel.to,
+		quote: sel.quote,
+		...(typeof sel.prefix === 'string' ? { prefix: sel.prefix } : {}),
+		...(typeof sel.suffix === 'string' ? { suffix: sel.suffix } : {})
+	};
 }

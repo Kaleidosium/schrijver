@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { OutlineItem } from '$lib/writer-document';
+	import { NotebookPen } from '@lucide/svelte';
 	import { formatForDisplay } from '@tanstack/svelte-hotkeys';
 	import { Dialog } from 'bits-ui';
 	import { COMMAND_HELP } from './writer-commands';
@@ -13,6 +14,7 @@
 		readonly noteViews: readonly NoteView[];
 		readonly notesOpen: boolean;
 		readonly onActivateNote: (id: string) => void;
+		readonly onAddNote?: (() => void) | undefined;
 		readonly onAutofocusNote: (id: string) => void;
 		readonly onCloseGuide: () => void;
 		readonly onDeleteNote: (id: string) => void;
@@ -33,6 +35,7 @@
 		noteViews,
 		notesOpen,
 		onActivateNote,
+		onAddNote,
 		onAutofocusNote,
 		onCloseGuide,
 		onDeleteNote,
@@ -90,11 +93,24 @@
 		aria-label="Writer’s notes"
 		data-rail="notes"
 	>
-		<h2 class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">
-			Writer’s notes
-		</h2>
+		<div class="mb-xs flex items-center justify-between gap-xs">
+			<h2 class="shrink-0 text-[0.72rem] font-bold tracking-wider text-ink uppercase whitespace-nowrap">
+				Writer’s notes
+			</h2>
+			{#if onAddNote}
+				<button
+					aria-label="Add document note"
+					class="flex shrink-0 cursor-pointer items-center gap-1 rounded-xs border border-rule bg-paper px-1.5 py-0.5 text-[0.72rem] font-medium text-muted whitespace-nowrap hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+					type="button"
+					onclick={onAddNote}
+				>
+					<NotebookPen size={12} strokeWidth={2} aria-hidden="true" />
+					<span>Add note</span>
+				</button>
+			{/if}
+		</div>
 		{#if noteViews.length === 0}
-			<p class="m-0 leading-relaxed">Select text and add a note.</p>
+			<p class="m-0 leading-relaxed">Add a document note or select text to annotate.</p>
 		{:else}
 			<div class="relative min-h-auto lg:min-h-full">
 				{#each noteViews as view (view.note.id)}
@@ -109,14 +125,20 @@
 						style:--note-top={`${view.top}px`}
 						onfocusin={() => onActivateNote(view.note.id)}
 					>
-						<button
-							aria-label={`Jump to note: ${view.orphaned ? 'Anchor missing' : view.anchorLabel}`}
-							class="truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
-							type="button"
-							onclick={() => onJumpToNote(view.note.id)}
-						>
-							{view.orphaned ? 'Anchor missing' : view.anchorLabel}
-						</button>
+						{#if view.note.selection}
+							<button
+								aria-label={`Jump to note: ${view.orphaned ? 'Anchor missing' : view.anchorLabel}`}
+								class="truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+								type="button"
+								onclick={() => onJumpToNote(view.note.id)}
+							>
+								{view.orphaned ? 'Anchor missing' : view.anchorLabel}
+							</button>
+						{:else}
+							<span class="truncate text-[0.7rem] font-medium text-muted">
+								{view.anchorLabel}
+							</span>
+						{/if}
 						<WriterNoteEditor
 							autofocus={autofocusNoteId === view.note.id}
 							note={view.note}

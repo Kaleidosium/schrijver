@@ -37,8 +37,8 @@
 		readonly onRedo: () => void;
 		readonly onReviewCheckChange: (check: ReviewCheck, enabled: boolean) => Promise<void>;
 		readonly onReviewModeChange: (enabled: boolean) => Promise<void>;
-		readonly onSave: () => Promise<void>;
-		readonly onSaveAs: () => Promise<void>;
+		readonly onSave: () => Promise<unknown> | void;
+		readonly onSaveAs: () => Promise<unknown> | void;
 		readonly onSearch: () => void;
 		readonly onSelectAll: () => void;
 		readonly onSyntaxModeChange: (enabled: boolean) => Promise<void>;

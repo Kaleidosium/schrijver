@@ -26,6 +26,7 @@
 		readonly disabled?: boolean | undefined;
 		readonly documentStats: DocumentStats;
 		readonly selectionStats?: SelectionStats | undefined;
+		readonly onAddAnnotation?: (() => void) | undefined;
 		readonly onAddNote?: (() => void) | undefined;
 		readonly onToggleFormat: (open: string, close?: string | undefined) => void;
 		readonly onToggleHeading: (level: number) => void;
@@ -40,10 +41,11 @@
 	}
 
 	const {
-		addNoteDisabled = true,
+		addNoteDisabled = false,
 		disabled = false,
 		documentStats,
 		selectionStats,
+		onAddAnnotation,
 		onAddNote,
 		onToggleFormat,
 		onToggleHeading,
@@ -58,6 +60,9 @@
 	}: Props = $props();
 
 	let statsOpen = $state(false);
+	const hasSelection = $derived(
+		Boolean(selectionStats && (selectionStats.words > 0 || selectionStats.characters > 0))
+	);
 </script>
 
 <footer
@@ -338,11 +343,11 @@
 			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
 
 			{@render toolBtn({
-				label: 'Add note at selection',
+				label: hasSelection ? 'Add annotation to selection' : 'Select text to annotate',
 				shortcut: APP_SHORTCUTS.addNote,
-				btnLabel: 'Add note',
-				disabled: addNoteDisabled,
-				onclick: onAddNote,
+				btnLabel: 'Add annotation',
+				disabled: disabled || addNoteDisabled || !hasSelection,
+				onclick: onAddAnnotation ?? onAddNote,
 				icon: noteIcon
 			})}
 			{#snippet noteIcon()}<SquarePen size={13} strokeWidth={2} aria-hidden="true" />{/snippet}

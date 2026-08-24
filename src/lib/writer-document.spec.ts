@@ -71,14 +71,36 @@ describe('writer document helpers', () => {
 			parseSidecar(
 				{
 					...sidecar,
-					notes: [{ ...sidecar.notes[0], selection: undefined }]
+					notes: [{ ...sidecar.notes[0], selection: { from: 0, to: 10, quote: 'mismatch' } }]
 				},
 				'draft.md'
 			)
 		).toThrow('text selection is invalid');
 	});
 
-	it('restores exact text selections at their nearest matching quote', () => {
+	it('supports anchor-less notes in sidecar files', () => {
+		const sidecar = {
+			version: 1,
+			projectId: 'project',
+			markdownFile: 'notes.md',
+			notes: [
+				{
+					id: 'anchorless-note',
+					body: 'General document thought.',
+					createdAt: '2026-06-23T00:00:00.000Z',
+					updatedAt: '2026-06-23T00:00:00.000Z',
+					resolved: false
+				}
+			]
+		};
+
+		const parsed = parseSidecar(sidecar, 'notes.md');
+		expect(parsed.notes).toHaveLength(1);
+		expect(parsed.notes[0]?.body).toBe('General document thought.');
+		expect(parsed.notes[0]?.selection).toBeUndefined();
+	});
+
+	it('restores exact text selections and uses bounded local search', () => {
 		const document = 'First repeated phrase. Later repeated phrase.';
 
 		expect(resolveTextSelector({ from: 6, to: 21, quote: 'repeated phrase' }, document)).toEqual({
@@ -89,6 +111,36 @@ describe('writer document helpers', () => {
 			from: 29,
 			to: 44
 		});
+	});
+
+	it('does not jump to distant repeated phrases when text is deleted or far away', () => {
+		const document = 'A'.repeat(400) + '\n\nDistant paragraph with Introduction sentence here.';
+
+		// The sentence was deleted near offset 0, and the only other instance is 400+ chars away
+		expect(
+			resolveTextSelector({ from: 0, to: 27, quote: 'Introduction sentence here.' }, document)
+		).toBeUndefined();
+	});
+
+	it('disambiguates identical phrases using prefix and suffix context', () => {
+		const document = 'The small cat jumped. The big cat jumped.';
+		const selectorWithPrefix = {
+			from: 0,
+			to: 20,
+			quote: 'cat jumped',
+			prefix: 'The big '
+		};
+
+		// Should match the second occurrence because prefix matches 'The big '
+		expect(resolveTextSelector(selectorWithPrefix, document)).toEqual({
+			from: 30,
+			to: 40
+		});
+	});
+
+	it('returns undefined for collapsed selections', () => {
+		const document = 'Some document text.';
+		expect(resolveTextSelector({ from: 5, to: 5, quote: 'deleted' }, document)).toBeUndefined();
 	});
 
 	it('creates matching, collision-resistant fallback file names', () => {

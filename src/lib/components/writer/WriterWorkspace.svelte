@@ -806,7 +806,7 @@
             },
             {
                 hotkey: APP_SHORTCUTS.addNote,
-                callback: addNote,
+                callback: () => addNote(),
             },
             {
                 hotkey: APP_SHORTCUTS.outline,
@@ -1557,26 +1557,41 @@
         }
     }
 
-    function addNote(): void {
-        const selection = editor?.state.selection.main;
-
-        if (!editor || !selection || selection.empty) {
-            alert("Select the text you want to attach a note to.");
+    function addNote(forceDocument = false): void {
+        if (!editor) {
             return;
         }
 
+        const selection = editor.state.selection.main;
+        const hasSelection = forceDocument !== true && !selection.empty;
         const now = new Date().toISOString();
+        const docText = editor.state.doc.toString();
         const note: WriterNote = {
             id: crypto.randomUUID(),
             body: "",
             createdAt: now,
             updatedAt: now,
             resolved: false,
-            selection: {
-                from: selection.from,
-                to: selection.to,
-                quote: editor.state.doc.sliceString(selection.from, selection.to),
-            },
+            ...(hasSelection
+                ? {
+                      selection: {
+                          from: selection.from,
+                          to: selection.to,
+                          quote: editor.state.doc.sliceString(
+                              selection.from,
+                              selection.to,
+                          ),
+                          prefix: docText.slice(
+                              Math.max(0, selection.from - 32),
+                              selection.from,
+                          ),
+                          suffix: docText.slice(
+                              selection.to,
+                              Math.min(docText.length, selection.to + 32),
+                          ),
+                      },
+                  }
+                : {}),
         };
 
         notes.push(note);
@@ -1584,6 +1599,18 @@
         autofocusNoteId = note.id;
         notesOpen = true;
         notesChanged();
+    }
+
+    function addAnnotation(): void {
+        if (!editor || editor.state.selection.main.empty) {
+            return;
+        }
+
+        addNote(false);
+    }
+
+    function addDocumentNote(): void {
+        addNote(true);
     }
 
     function updateNote(id: string, body: string): void {
@@ -1633,10 +1660,19 @@
             return;
         }
 
+        const docText = editor.state.doc.toString();
         note.selection = {
             from: selection.from,
             to: selection.to,
             quote: editor.state.doc.sliceString(selection.from, selection.to),
+            prefix: docText.slice(
+                Math.max(0, selection.from - 32),
+                selection.from,
+            ),
+            suffix: docText.slice(
+                selection.to,
+                Math.min(docText.length, selection.to + 32),
+            ),
         };
         note.updatedAt = new Date().toISOString();
         notesChanged();
@@ -1666,6 +1702,12 @@
                 selection: { anchor: range.from, head: range.to },
             });
             scrollPositionIntoView(editor, range.from, { y: "center" });
+        } else if (note?.selection && editor) {
+            const pos = Math.min(note.selection.from, editor.state.doc.length);
+            editor.dispatch({
+                selection: { anchor: pos },
+            });
+            scrollPositionIntoView(editor, pos, { y: "center" });
         }
     }
 
@@ -1699,23 +1741,39 @@
         let changed = false;
 
         for (const note of notes) {
-            const oldRange = noteRangeForState(note, oldState);
-
-            if (!oldRange) {
+            if (!note.selection) {
                 continue;
             }
 
-            const from = mapPosition(oldRange.from, 1);
-            const to = mapPosition(oldRange.to, -1);
-            const quote =
-                from < to
-                    ? newState.doc.sliceString(from, to)
-                    : oldState.doc.sliceString(oldRange.from, oldRange.to);
-            note.selection = {
-                from,
-                to: from < to ? to : from + quote.length,
-                quote,
-            };
+            const from = mapPosition(note.selection.from, 1);
+            const to = mapPosition(note.selection.to, -1);
+
+            if (from < to) {
+                const quote = newState.doc.sliceString(from, to);
+                const prefix = newState.doc.sliceString(
+                    Math.max(0, from - 32),
+                    from,
+                );
+                const suffix = newState.doc.sliceString(
+                    to,
+                    Math.min(newState.doc.length, to + 32),
+                );
+                note.selection = {
+                    from,
+                    to,
+                    quote,
+                    prefix,
+                    suffix,
+                };
+            } else {
+                note.selection = {
+                    from,
+                    to: from,
+                    quote: note.selection.quote,
+                    ...(note.selection.prefix !== undefined ? { prefix: note.selection.prefix } : {}),
+                    ...(note.selection.suffix !== undefined ? { suffix: note.selection.suffix } : {}),
+                };
+            }
             changed = true;
         }
 
@@ -1725,7 +1783,7 @@
     }
 
     function noteRange(note: WriterNote): TextRange | undefined {
-        if (!editor) {
+        if (!editor || !note.selection) {
             return undefined;
         }
 
@@ -1736,11 +1794,24 @@
         note: WriterNote,
         state: EditorState,
     ): TextRange | undefined {
+        if (!note.selection) {
+            return undefined;
+        }
+
         return resolveTextSelector(note.selection, state.doc.toString());
     }
 
     function buildNoteViews(): NoteView[] {
         return notes.map((note) => {
+            if (!note.selection) {
+                return {
+                    note,
+                    anchorLabel: "Document note",
+                    orphaned: false,
+                    top: noteTops[note.id] ?? 0,
+                };
+            }
+
             const range = noteRange(note);
             const label = range
                 ? draft
@@ -1748,7 +1819,9 @@
                       .replace(/\s+/g, " ")
                       .trim()
                       .slice(0, 54)
-                : "Unattached note";
+                : note.selection.quote
+                  ? `“${note.selection.quote.replace(/\s+/g, " ").trim().slice(0, 48)}”`
+                  : "Unattached note";
 
             return {
                 note,
@@ -1781,24 +1854,31 @@
               ) || 84
             : 0;
         const asideTop = surfaceTop + searchOffset;
+        const docLength = editor.state.doc.length;
         const ordered = notes
-            .map((note) => ({ note, range: noteRange(note) }))
-            .filter(
-                (
-                    item,
-                ): item is { note: WriterNote; range: TextRange } =>
-                    Boolean(item.range),
-            )
-            .sort((left, right) => left.range.from - right.range.from);
+            .map((note) => {
+                const range = noteRange(note);
+                const pos = range
+                    ? range.from
+                    : note.selection
+                      ? Math.min(note.selection.from, docLength)
+                      : -1;
+                return { note, range, pos };
+            })
+            .sort((left, right) => left.pos - right.pos);
         const next: Record<string, number> = {};
         let previousBottom = 0;
 
-        for (const { note, range } of ordered) {
-            const coordinates = editor.coordsAtPos(range.from);
-            const anchorTop = Math.max(
-                0,
-                (coordinates?.top ?? asideTop) - asideTop,
-            );
+        for (const { note, pos } of ordered) {
+            const coordinates =
+                pos >= 0 ? editor.coordsAtPos(pos) : null;
+            const anchorTop =
+                pos === -1
+                    ? 0
+                    : Math.max(
+                          0,
+                          (coordinates?.top ?? asideTop) - asideTop,
+                      );
             const top = Math.max(anchorTop, previousBottom);
 
             next[note.id] = top;
@@ -2442,6 +2522,7 @@
             {noteViews}
             {notesOpen}
             onActivateNote={focusNote}
+            onAddNote={addDocumentNote}
             onAutofocusNote={noteAutofocused}
             onCloseGuide={() => (guideOpen = false)}
             onDeleteNote={deleteNote}
@@ -2594,11 +2675,10 @@
 
     {#if actionBarOpen}
         <WriterStatus
-            addNoteDisabled={!hasTextSelection}
             disabled={readerMode}
             {documentStats}
             {selectionStats}
-            onAddNote={addNote}
+            onAddAnnotation={addAnnotation}
             onToggleFormat={(open, close) => editor && toggleInlineFormat(editor, open, close)}
             onToggleHeading={(level) => editor && toggleHeading(editor, level)}
             onToggleBlockquote={() => editor && toggleBlockquote(editor)}
