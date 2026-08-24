@@ -31,10 +31,9 @@
 	--max-width-shell: 70rem;
 
 	--font-mono:
-		'SF Mono', ui-monospace, 'Geist Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-	--font-sans:
-		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', system-ui,
-		sans-serif;
+		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+		monospace;
+	--font-sans: system-ui, sans-serif;
 	--font-serif: 'Newsreader', 'Charter', 'Sitka Text', Cambria, Georgia, serif;
 }
 
