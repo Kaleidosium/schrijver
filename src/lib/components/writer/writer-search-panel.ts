@@ -63,7 +63,7 @@ function getSearchPanelHtml(): string {
 	return `
 <div class="cm-search-row">
 	<div class="cm-search-input-box">
-		<input class="cm-textfield cm-search-input-field" name="search" placeholder="Search…" aria-label="Search" main-field="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		<input class="cm-textfield cm-search-input-field" name="search" placeholder="Find…" aria-label="Find" main-field="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 		<div class="cm-search-input-toggles" role="group" aria-label="Search options">
 			<button type="button" class="cm-search-toggle-btn" name="case" title="Match case (${formatForDisplay('Mod+Alt+C')})" aria-label="Match case" aria-pressed="false">Aa</button>
 			<button type="button" class="cm-search-toggle-btn cm-search-toggle-word" name="word" title="Match whole word (${formatForDisplay('Mod+Alt+W')})" aria-label="Match whole word" aria-pressed="false"><span class="cm-search-word-label">wd</span></button>
@@ -87,7 +87,7 @@ function getSearchPanelHtml(): string {
 </div>
 <div class="cm-replace-row">
 	<div class="cm-search-input-box cm-replace-input-box">
-		<input class="cm-textfield cm-search-input-field" name="replace" placeholder="Replace with…" aria-label="Replace with" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+		<input class="cm-textfield cm-search-input-field" name="replace" placeholder="Replace…" aria-label="Replace" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 	</div>
 	<div class="cm-replace-actions">
 		<button type="button" class="cm-button cm-search-action-btn" name="replace" title="Replace next (Enter in replace field)" aria-label="Replace next">

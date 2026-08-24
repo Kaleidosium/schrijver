@@ -75,7 +75,7 @@ describe('writer document helpers', () => {
 				},
 				'draft.md'
 			)
-		).toThrow('text selection is invalid');
+		).toThrow('Invalid note text selection');
 	});
 
 	it('supports anchor-less notes in sidecar files', () => {

@@ -69,7 +69,7 @@
 						autocapitalize: 'sentences',
 						spellcheck: 'true'
 					}),
-					placeholder('Private thought…'),
+					placeholder(note.selection ? 'Write an annotation…' : 'Write a note…'),
 					EditorView.updateListener.of((update) => {
 						if (update.docChanged && !syncing) {
 							onUpdate(note.id, update.state.doc.toString());
@@ -134,7 +134,7 @@
 
 			editor.contentDOM.setAttribute(
 				'aria-label',
-				anchor ? `Writer’s note for ${anchor}` : 'Writer’s note'
+				anchor ? `Annotation for "${anchor}"` : "Writer's note"
 			);
 
 			if (body === editor.state.doc.toString()) {

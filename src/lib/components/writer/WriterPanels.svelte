@@ -62,14 +62,14 @@
 			'absolute bottom-0 left-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-r border-rule bg-page/96 p-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(0,0,0,0.06)] backdrop-blur-md transition-[top] duration-150 lg:w-rail lg:shadow-none',
 			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
 		]}
-		aria-label="Document outline"
+		aria-label="Manuscript outline"
 		data-rail="outline"
 	>
 		<h2 class="mb-xs text-[0.72rem] font-bold tracking-wider text-ink uppercase">Outline</h2>
 		{#if outline.length === 0}
-			<p class="m-0 leading-relaxed">Headings appear here.</p>
+			<p class="m-0 leading-relaxed">Headings appear here as you write.</p>
 		{:else}
-			<nav class="grid gap-0.5" aria-label="Document headings">
+			<nav class="grid gap-0.5" aria-label="Manuscript headings">
 				{#each outline as item (item.id)}
 					<button
 						aria-label={`Jump to heading: ${item.label}`}
@@ -92,16 +92,16 @@
 			'absolute bottom-0 right-0 z-12 w-[calc(100vw-1rem)] max-w-80 overflow-auto overscroll-contain border-l border-rule bg-page/96 px-xs py-s font-sans text-[0.8rem] text-muted shadow-[0_0.75rem_2rem_rgba(0,0,0,0.06)] backdrop-blur-md transition-[top] duration-150 lg:w-rail lg:shadow-none',
 			searchOpen ? 'top-(--search-panel-height)' : 'top-0'
 		]}
-		aria-label="Writer’s notes"
+		aria-label="Writer's notes"
 		data-rail="notes"
 	>
 		<div class="mb-xs flex items-center justify-between gap-xs">
 			<h2 class="shrink-0 text-[0.72rem] font-bold tracking-wider text-ink uppercase whitespace-nowrap">
-				Writer’s notes
+				Writer's notes
 			</h2>
 			{#if onAddNote}
 				<button
-					aria-label="Add document note"
+					aria-label="Add manuscript note"
 					class="flex shrink-0 cursor-pointer items-center gap-1 rounded border border-rule bg-paper px-2 py-0.5 text-[0.72rem] font-medium text-muted whitespace-nowrap hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 					type="button"
 					onclick={onAddNote}
@@ -112,7 +112,7 @@
 			{/if}
 		</div>
 		{#if noteViews.length === 0}
-			<p class="m-0 leading-relaxed">Add a document note or select text to annotate.</p>
+			<p class="m-0 leading-relaxed">Add a manuscript note or select text to annotate.</p>
 		{:else}
 			<div class="relative min-h-auto lg:min-h-full">
 				{#each noteViews as view (view.note.id)}
@@ -129,7 +129,7 @@
 					>
 						{#if view.note.selection}
 							<button
-								aria-label={`Jump to note: ${view.orphaned ? 'Anchor missing' : view.anchorLabel}`}
+								aria-label={`Jump to annotation: ${view.orphaned ? 'Missing anchor' : view.anchorLabel}`}
 								class={[
 									'truncate border-0 bg-transparent p-0 text-left text-[0.7rem] text-muted cursor-pointer hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1',
 									view.orphaned && 'text-mark'
@@ -137,7 +137,7 @@
 								type="button"
 								onclick={() => onJumpToNote(view.note.id)}
 							>
-								{view.orphaned ? 'Anchor missing' : view.anchorLabel}
+								{view.orphaned ? 'Missing anchor' : view.anchorLabel}
 							</button>
 						{:else}
 							<span class="truncate text-[0.7rem] font-medium text-muted">
@@ -154,7 +154,7 @@
 						<div class="flex justify-end gap-3xs">
 							{#if view.orphaned}
 								<button
-									aria-label={`Reattach note: ${view.anchorLabel}`}
+									aria-label={`Reattach annotation: ${view.anchorLabel}`}
 									class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 									type="button"
 									onclick={() => onReattachNote(view.note.id)}
@@ -163,7 +163,7 @@
 								</button>
 							{:else}
 								<button
-									aria-label={`${view.note.resolved ? 'Reopen' : 'Resolve'} note: ${view.anchorLabel}`}
+									aria-label={`${view.note.resolved ? 'Reopen' : 'Resolve'} ${view.note.selection ? 'annotation' : 'note'}: ${view.anchorLabel}`}
 									class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 									type="button"
 									onclick={() => onResolveNote(view.note.id, !view.note.resolved)}
@@ -172,7 +172,7 @@
 								</button>
 							{/if}
 							<button
-								aria-label={`Delete note: ${view.anchorLabel}`}
+								aria-label={`Delete ${view.note.selection ? 'annotation' : 'note'}: ${view.anchorLabel}`}
 								class="cursor-pointer rounded border border-rule bg-paper px-2 py-1 text-[0.74rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
 								type="button"
 								onclick={() => onDeleteNote(view.note.id)}
@@ -204,7 +204,7 @@
 				</Dialog.Close>
 			</header>
 			<Dialog.Description class="sr-only">
-				Keyboard shortcuts reference for application and editor actions.
+				Keyboard shortcuts for the application and editor.
 			</Dialog.Description>
 			{#each ['App', 'Editor'] as scope (scope)}
 				<h3 class="mt-s mb-0 text-[0.72rem] font-bold tracking-wider text-muted uppercase">

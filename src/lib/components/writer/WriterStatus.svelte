@@ -65,7 +65,7 @@
 
 <footer
 	class="flex min-h-[calc(var(--size-control)+0.5rem)] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-1.5 font-sans text-[0.78rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
-	aria-label="Formatting and document statistics"
+	aria-label="Formatting and manuscript statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
 		<div
@@ -325,7 +325,7 @@
 					{...triggerProps}
 					class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2.5 text-[0.78rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 					type="button"
-					aria-label="Show document statistics"
+					aria-label="Show manuscript statistics"
 				>
 					<span class="tabular-nums">{documentStats.words.toLocaleString()} {documentStats.words === 1 ? 'word' : 'words'}</span>
 					<ChevronDown size={12} class={['transition-transform duration-150', statsOpen && 'rotate-180']} aria-hidden="true" />
@@ -361,7 +361,7 @@
 						<span class="font-mono font-medium tabular-nums">{documentStats.characters.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
-						<span class="text-muted">No spaces</span>
+						<span class="text-muted">Without spaces</span>
 						<span class="font-mono font-medium tabular-nums">{documentStats.charactersWithoutSpaces.toLocaleString()}</span>
 					</div>
 					<div class="flex items-baseline justify-between">
@@ -397,7 +397,7 @@
 								<span class="font-mono font-medium tabular-nums">{selectionStats.characters.toLocaleString()}</span>
 							</div>
 							<div class="flex items-baseline justify-between">
-								<span class="text-muted">No spaces</span>
+								<span class="text-muted">Without spaces</span>
 								<span class="font-mono font-medium tabular-nums">{selectionStats.charactersWithoutSpaces.toLocaleString()}</span>
 							</div>
 						</div>

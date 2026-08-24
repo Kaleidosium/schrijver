@@ -1,4 +1,4 @@
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import {
 	EditorSelection,
 	type ChangeSpec,
@@ -35,11 +35,11 @@ export const APP_SHORTCUTS = {
 export const COMMAND_HELP = [
 	{ label: 'New manuscript', shortcut: APP_SHORTCUTS.newDocument, scope: 'App' },
 	{ label: 'Open folder', shortcut: APP_SHORTCUTS.open, scope: 'App' },
-	{ label: 'Save project', shortcut: APP_SHORTCUTS.save, scope: 'App' },
+	{ label: 'Save manuscript', shortcut: APP_SHORTCUTS.save, scope: 'App' },
 	{ label: 'Save as…', shortcut: APP_SHORTCUTS.saveAs, scope: 'App' },
 	{ label: 'Toggle focus', shortcut: APP_SHORTCUTS.focus, scope: 'App' },
 	{ label: 'Toggle reader mode', shortcut: APP_SHORTCUTS.preview, scope: 'App' },
-	{ label: 'Add writer’s note', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
+	{ label: 'Add note or annotation', shortcut: APP_SHORTCUTS.addNote, scope: 'App' },
 	{ label: 'Toggle outline', shortcut: APP_SHORTCUTS.outline, scope: 'App' },
 	{ label: 'Toggle style', shortcut: APP_SHORTCUTS.review, scope: 'App' },
 	{ label: 'Keyboard shortcuts', shortcut: APP_SHORTCUTS.guide, scope: 'App' },
@@ -516,8 +516,9 @@ export const paragraphNavigationKeymap: readonly KeyBinding[] = [
 
 function topLevelBlocks(state: EditorState): MarkdownBlock[] {
 	const blocks: MarkdownBlock[] = [];
+	const tree = ensureSyntaxTree(state, state.doc.length, 5000) ?? syntaxTree(state);
 
-	syntaxTree(state).iterate({
+	tree.iterate({
 		enter(node) {
 			if (node.node.parent?.name !== 'Document') {
 				return;
@@ -611,7 +612,8 @@ function isProseOrHeading(state: EditorState, position: number): boolean {
 		return false;
 	}
 
-	let node = syntaxTree(state).resolveInner(position, position === line.from ? 1 : -1);
+	const tree = ensureSyntaxTree(state, state.doc.length, 5000) ?? syntaxTree(state);
+	let node = tree.resolveInner(position, position === line.from ? 1 : -1);
 	let paragraph = false;
 
 	for (;;) {

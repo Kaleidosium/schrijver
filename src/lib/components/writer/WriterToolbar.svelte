@@ -68,8 +68,8 @@
 	const reviewOptions = [
 		{ check: 'weasel', label: 'Weasel words' },
 		{ check: 'illusion', label: 'Repeated words' },
-		{ check: 'so', label: 'Starts with “so”' },
-		{ check: 'thereIs', label: 'There is or are' },
+		{ check: 'so', label: 'Starts with "so"' },
+		{ check: 'thereIs', label: '"There is" or "there are"' },
 		{ check: 'passive', label: 'Passive voice' },
 		{ check: 'adverb', label: 'Weak adverbs' },
 		{ check: 'tooWordy', label: 'Wordy phrases' },
@@ -167,21 +167,21 @@
 							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onNew}
 						>
-							<span>New</span>
+							<span>New manuscript</span>
 							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.newDocument)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={() => void onOpen()}
 						>
-							<span>Open manuscript</span>
+							<span>Open folder</span>
 							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.open)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
 							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={() => void onSave()}
 						>
-							<span>Save draft</span>
+							<span>Save manuscript</span>
 							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.save)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item
@@ -340,7 +340,7 @@
 							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onZoomReset}
 						>
-							<span>Restore default zoom</span>
+							<span>Reset zoom (100%)</span>
 							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.zoomReset)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
@@ -399,7 +399,7 @@
 						sideOffset={6}
 						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
-						<span>Document outline</span>
+						<span>Manuscript outline</span>
 						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.outline)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -428,7 +428,7 @@
 						sideOffset={6}
 						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
-						<span>Writer’s notes</span>
+						<span>Writer's notes</span>
 						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.addNote)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -550,7 +550,7 @@
 						sideOffset={6}
 						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
-						<span>Hemingway mode (write-only)</span>
+						<span>Hemingway mode (forward-only writing)</span>
 						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.hemingway)}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>
@@ -643,7 +643,7 @@
 							<span class="w-4 shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewMode ? '✓' : ''}
 							</span>
-							<span>{reviewMode ? 'Disable style check' : 'Enable style check'}</span>
+							<span>{reviewMode ? 'Disable style checks' : 'Enable style checks'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
 						<DropdownMenu.Group>
@@ -692,7 +692,7 @@
 						sideOffset={6}
 						class="z-50 flex items-center gap-2 rounded-md border border-rule bg-paper/98 px-2.5 py-1.5 font-sans text-[0.74rem] text-ink shadow-[0_4px_12px_rgba(0,0,0,0.06)] select-none outline-none backdrop-blur-md"
 					>
-						<span>Search in document</span>
+						<span>Find in manuscript</span>
 						<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay('Mod+F')}</kbd>
 					</Tooltip.Content>
 				</Tooltip.Portal>

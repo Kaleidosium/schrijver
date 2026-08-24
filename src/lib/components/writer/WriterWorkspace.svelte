@@ -414,6 +414,77 @@
     let zoomLevel = $state(loadInitialZoom());
     let loadingProject = false;
 
+    interface ConfirmModalState {
+        readonly title: string;
+        readonly description: string;
+        readonly confirmLabel?: string;
+        readonly destructive?: boolean;
+    }
+    interface AlertModalState {
+        readonly title: string;
+        readonly description: string;
+    }
+    interface PromptModalState {
+        readonly title: string;
+        readonly description?: string;
+        readonly defaultValue?: string;
+        readonly placeholder?: string;
+        readonly confirmLabel?: string;
+    }
+
+    let confirmModal = $state<ConfirmModalState | null>(null);
+    let confirmResolver: ((value: boolean) => void) | null = null;
+    let alertModal = $state<AlertModalState | null>(null);
+    let promptModal = $state<PromptModalState | null>(null);
+    let promptValue = $state("");
+    let promptResolver: ((value: string | null) => void) | null = null;
+
+    function showConfirm(options: ConfirmModalState): Promise<boolean> {
+        return new Promise((resolve) => {
+            confirmResolver = resolve;
+            confirmModal = options;
+        });
+    }
+
+    function handleConfirmResult(confirmed: boolean): void {
+        const resolver = confirmResolver;
+        confirmResolver = null;
+        confirmModal = null;
+        resolver?.(confirmed);
+        if (!confirmed) {
+            editor?.focus();
+        }
+    }
+
+    function showAlert(description: string, title = "Notice"): void {
+        alertModal = { title, description };
+    }
+
+    function handleAlertClose(): void {
+        alertModal = null;
+        editor?.focus();
+    }
+
+    function showPrompt(options: PromptModalState): Promise<string | null> {
+        return new Promise((resolve) => {
+            promptResolver = resolve;
+            promptValue = options.defaultValue ?? "";
+            promptModal = options;
+        });
+    }
+
+    function handlePromptResult(confirmed: boolean): void {
+        const resolver = promptResolver;
+        const value = confirmed ? promptValue.trim() : null;
+        promptResolver = null;
+        promptModal = null;
+        promptValue = "";
+        resolver?.(value || null);
+        if (!confirmed) {
+            editor?.focus();
+        }
+    }
+
     function loadInitialActionBar(): boolean {
         try {
             const raw = localStorage.getItem(ACTION_BAR_KEY);
@@ -722,7 +793,7 @@
                     notePositionPlugin,
                     EditorView.lineWrapping,
                     EditorView.contentAttributes.of({
-                        "aria-label": "Markdown draft",
+                        "aria-label": "Markdown manuscript",
                         autocapitalize: "sentences",
                         spellcheck: "true",
                     }),
@@ -1248,7 +1319,7 @@
             const candidates = await manuscriptCandidatesIn(nextDirectory);
 
             if (candidates.length === 0) {
-                alert("This folder does not contain a Markdown file.");
+                showAlert("No Markdown files (.md, .markdown, or .txt) found in this folder.", "No files found");
                 return;
             }
 
@@ -1266,7 +1337,7 @@
         } catch (error) {
             if (!isAbortError(error)) {
                 saveState = "error";
-                alert(error instanceof Error ? error.message : "Could not open the folder.");
+                showAlert(error instanceof Error ? error.message : "Could not open the folder.", "Could not open folder");
             }
         }
     }
@@ -1285,7 +1356,7 @@
         );
 
         if (!markdownFile) {
-            alert("Choose a Markdown file. Select its matching notes file if you have one.");
+            showAlert("Select a Markdown file (.md, .markdown, or .txt) to open.", "Select a file");
             return;
         }
 
@@ -1302,11 +1373,11 @@
                 : emptySidecar(markdownFile.file.name);
 
             if (
-                !loadDiskProject(
+                !(await loadDiskProject(
                     await markdownFile.file.text(),
                     markdownFile.file.name,
                     nextSidecar,
-                )
+                ))
             ) {
                 return;
             }
@@ -1316,7 +1387,7 @@
             sidecarHandle = undefined;
         } catch (error) {
             saveState = "error";
-            alert(error instanceof Error ? error.message : "Could not open the file.");
+            showAlert(error instanceof Error ? error.message : "Could not open the file.", "Could not open file");
         }
     }
 
@@ -1370,7 +1441,7 @@
             }
         } catch (error) {
             saveState = "error";
-            alert(error instanceof Error ? error.message : "Could not open the file.");
+            showAlert(error instanceof Error ? error.message : "Could not open the file.", "Could not open file");
         } finally {
             manuscriptOpening = false;
         }
@@ -1390,7 +1461,7 @@
               )
             : emptySidecar(candidate.name);
 
-        if (!loadDiskProject(markdownText, candidate.name, nextSidecar)) {
+        if (!(await loadDiskProject(markdownText, candidate.name, nextSidecar))) {
             return false;
         }
 
@@ -1414,11 +1485,11 @@
         pendingOpenDirectory = undefined;
     }
 
-    function loadDiskProject(
+    async function loadDiskProject(
         markdownText: string,
         nextFileName: string,
         nextSidecar: WriterSidecar,
-    ): boolean {
+    ): Promise<boolean> {
         const diskHash = hashText(markdownText);
         const reconnectingRecovery =
             dirty &&
@@ -1432,8 +1503,16 @@
             return true;
         }
 
-        if (dirty && draft.trim() && !confirm("Replace the recovered unsaved work?")) {
-            return false;
+        if (dirty && draft.trim()) {
+            const confirmed = await showConfirm({
+                title: "Discard unsaved changes?",
+                description: "Opening another manuscript will discard your unsaved changes.",
+                confirmLabel: "Discard",
+                destructive: true,
+            });
+            if (!confirmed) {
+                return false;
+            }
         }
 
         loadingProject = true;
@@ -1517,7 +1596,12 @@
                 const nextDirectory = await picker.showDirectoryPicker({
                     mode: "readwrite",
                 });
-                const requestedName = prompt("File name", manuscriptLabel(fileName));
+                const requestedName = await showPrompt({
+                    title: "Save manuscript",
+                    description: "Enter a file name for your manuscript.",
+                    defaultValue: manuscriptLabel(fileName),
+                    confirmLabel: "Save",
+                });
 
                 if (!requestedName) {
                     return false;
@@ -1543,13 +1627,13 @@
         }
 
         if (!markdownHandle) {
-            return downloadProject();
+            return await downloadProject();
         }
 
         if (!(await ensureReadWritePermission(directoryHandle ?? markdownHandle))) {
             markDirty();
             saveState = "error";
-            alert("Allow folder editing to save the manuscript and notes.");
+            showAlert("Folder edit permission is required to save the manuscript and notes.", "Permission required");
             return false;
         }
 
@@ -1593,7 +1677,12 @@
                 const nextDirectory = await picker.showDirectoryPicker({
                     mode: "readwrite",
                 });
-                const requestedName = prompt("File name", manuscriptLabel(fileName));
+                const requestedName = await showPrompt({
+                    title: "Save copy",
+                    description: "Enter a file name for the new copy.",
+                    defaultValue: manuscriptLabel(fileName),
+                    confirmLabel: "Save copy",
+                });
 
                 if (!requestedName) {
                     return;
@@ -1626,17 +1715,22 @@
             } catch (error) {
                 if (!isAbortError(error)) {
                     saveState = "error";
-                    alert(error instanceof Error ? error.message : "Could not save the file.");
+                    showAlert(error instanceof Error ? error.message : "Could not save the file.", "Save error");
                 }
             }
             return;
         }
 
-        downloadProject();
+        await downloadProject();
     }
 
-    function downloadProject(): boolean {
-        const requestedName = prompt("File name", manuscriptLabel(fileName));
+    async function downloadProject(): Promise<boolean> {
+        const requestedName = await showPrompt({
+            title: "Download manuscript",
+            description: "Enter a file name for the download.",
+            defaultValue: manuscriptLabel(fileName),
+            confirmLabel: "Download",
+        });
 
         if (!requestedName) {
             return false;
@@ -1662,7 +1756,7 @@
             return true;
         } catch (error) {
             saveState = "error";
-            alert(error instanceof Error ? error.message : "Could not name the download.");
+            showAlert(error instanceof Error ? error.message : "Could not prepare the download.", "Download error");
             return false;
         }
     }
@@ -1790,12 +1884,26 @@
         notesChanged();
     }
 
-    function deleteNote(id: string): void {
-        if (!confirm("Delete this note?")) {
+    async function deleteNote(id: string): Promise<void> {
+        const note = notes.find((candidate) => candidate.id === id);
+        const isAnnotation = Boolean(note?.selection);
+        const quoteSnippet = note?.selection?.quote?.trim();
+        const description = quoteSnippet
+            ? `Delete annotation on "${quoteSnippet.slice(0, 40)}${quoteSnippet.length > 40 ? "…" : ""}"?`
+            : "Delete this manuscript note?";
+
+        const confirmed = await showConfirm({
+            title: isAnnotation ? "Delete annotation" : "Delete note",
+            description,
+            confirmLabel: "Delete",
+            destructive: true,
+        });
+
+        if (!confirmed) {
             return;
         }
 
-        notes = notes.filter((note) => note.id !== id);
+        notes = notes.filter((candidate) => candidate.id !== id);
 
         if (activeNoteId === id) {
             activeNoteId = undefined;
@@ -1809,7 +1917,7 @@
         const selection = editor?.state.selection.main;
 
         if (!editor || !note || !selection || selection.empty) {
-            alert("Select the replacement text first.");
+            showAlert("Select text in the editor first to reattach this annotation.", "Select text");
             return;
         }
 
@@ -1959,7 +2067,7 @@
             if (!note.selection) {
                 return {
                     note,
-                    anchorLabel: "Document note",
+                    anchorLabel: "Manuscript note",
                     orphaned: false,
                     top: noteTops[note.id] ?? 0,
                 };
@@ -1973,7 +2081,7 @@
                       .trim()
                       .slice(0, 54)
                 : note.selection.quote
-                  ? `“${note.selection.quote.replace(/\s+/g, " ").trim().slice(0, 48)}”`
+                  ? `"${note.selection.quote.replace(/\s+/g, " ").trim().slice(0, 48)}"`
                   : "Unattached note";
 
             return {
@@ -2642,7 +2750,7 @@
                 role="status"
                 aria-live="polite"
             >
-                <span class="flex-1">Unsaved changes restored from this browser.</span>
+                <span class="flex-1">Unsaved changes restored from local storage.</span>
                 <button
                     class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
@@ -2658,13 +2766,13 @@
                 role="alert"
                 aria-live="assertive"
             >
-                <span class="flex-1">Another tab has newer recovered work.</span>
+                <span class="flex-1">Another tab updated this manuscript with newer changes.</span>
                 <button
                     class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
                     onclick={reloadOtherRecovery}
                 >
-                    Load it
+                    Load latest
                 </button>
                 <button
                     class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
@@ -2768,10 +2876,10 @@
                     <header class="flex items-start justify-between gap-s">
                         <div>
                             <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
-                                Choose manuscript
+                                Open manuscript
                             </Dialog.Title>
                             <Dialog.Description class="mt-3xs text-[0.82rem] leading-relaxed text-muted">
-                                Most recently modified first. Notes load from the matching sidecar.
+                                Select a manuscript to open. Matching notes load automatically.
                             </Dialog.Description>
                         </div>
                         <Dialog.Close
@@ -2799,7 +2907,7 @@
                                             candidate.sidecarHandle ? "text-accent-ink" : "text-muted",
                                         ]}
                                     >
-                                        {candidate.sidecarHandle ? "Notes found" : "No notes yet"}
+                                        {candidate.sidecarHandle ? "Notes found" : "No notes"}
                                     </span>
                                 </span>
                                 <span class="flex items-baseline justify-between gap-s text-[0.72rem] text-muted font-mono">
@@ -2834,7 +2942,7 @@
                             Unsaved changes
                         </Dialog.Title>
                         <Dialog.Description class="mt-2 text-[0.82rem] leading-relaxed text-muted">
-                            Do you want to save the changes to “{manuscriptLabel(fileName)}” before creating a new document?
+                            Save changes to "{manuscriptLabel(fileName)}" before creating a new manuscript?
                         </Dialog.Description>
                     </div>
                 </header>
@@ -2863,6 +2971,156 @@
                 </div>
             </Dialog.Content>
         </Dialog.Portal>
+    </Dialog.Root>
+
+    <Dialog.Root
+        open={confirmModal !== null}
+        onOpenChange={(open) => {
+            if (!open) {
+                handleConfirmResult(false);
+            }
+        }}
+    >
+        {#if confirmModal}
+            <Dialog.Portal>
+                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
+                <Dialog.Content
+                    class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
+                >
+                    <header class="flex items-start justify-between gap-s">
+                        <div>
+                            <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
+                                {confirmModal.title}
+                            </Dialog.Title>
+                            <Dialog.Description class="mt-2 text-[0.82rem] leading-relaxed text-muted">
+                                {confirmModal.description}
+                            </Dialog.Description>
+                        </div>
+                    </header>
+                    <div class="mt-6 flex items-center justify-end gap-2">
+                        <button
+                            class="cursor-pointer rounded border border-rule bg-paper px-3 py-1.5 text-[0.78rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
+                            type="button"
+                            onclick={() => handleConfirmResult(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            class={[
+                                "cursor-pointer rounded px-3.5 py-1.5 text-[0.78rem] font-medium text-paper transition-colors focus-visible:outline-2 focus-visible:outline-offset-1",
+                                confirmModal.destructive
+                                    ? "border border-mark bg-mark hover:opacity-90 focus-visible:outline-mark"
+                                    : "border border-accent bg-accent hover:bg-accent-ink focus-visible:outline-accent",
+                            ]}
+                            type="button"
+                            onclick={() => handleConfirmResult(true)}
+                        >
+                            {confirmModal.confirmLabel ?? "Confirm"}
+                        </button>
+                    </div>
+                </Dialog.Content>
+            </Dialog.Portal>
+        {/if}
+    </Dialog.Root>
+
+    <Dialog.Root
+        open={alertModal !== null}
+        onOpenChange={(open) => {
+            if (!open) {
+                handleAlertClose();
+            }
+        }}
+    >
+        {#if alertModal}
+            <Dialog.Portal>
+                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
+                <Dialog.Content
+                    class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
+                >
+                    <header class="flex items-start justify-between gap-s">
+                        <div>
+                            <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
+                                {alertModal.title}
+                            </Dialog.Title>
+                            <Dialog.Description class="mt-2 text-[0.82rem] leading-relaxed text-muted">
+                                {alertModal.description}
+                            </Dialog.Description>
+                        </div>
+                    </header>
+                    <div class="mt-6 flex items-center justify-end">
+                        <button
+                            class="cursor-pointer rounded border border-accent bg-accent px-3.5 py-1.5 text-[0.78rem] font-medium text-paper hover:bg-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
+                            type="button"
+                            onclick={handleAlertClose}
+                        >
+                            OK
+                        </button>
+                    </div>
+                </Dialog.Content>
+            </Dialog.Portal>
+        {/if}
+    </Dialog.Root>
+
+    <Dialog.Root
+        open={promptModal !== null}
+        onOpenChange={(open) => {
+            if (!open) {
+                handlePromptResult(false);
+            }
+        }}
+    >
+        {#if promptModal}
+            <Dialog.Portal>
+                <Dialog.Overlay class="fixed inset-0 z-50 bg-ink/20 backdrop-blur-xs" />
+                <Dialog.Content
+                    class="fixed top-1/2 left-1/2 z-51 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper p-6 font-sans text-ink shadow-[0_16px_40px_rgba(0,0,0,0.08)] outline-none"
+                >
+                    <form
+                        onsubmit={(event) => {
+                            event.preventDefault();
+                            handlePromptResult(true);
+                        }}
+                    >
+                        <header class="flex items-start justify-between gap-s">
+                            <div>
+                                <Dialog.Title class="text-[1.1rem] font-bold text-pretty">
+                                    {promptModal.title}
+                                </Dialog.Title>
+                                {#if promptModal.description}
+                                    <Dialog.Description class="mt-2 text-[0.82rem] leading-relaxed text-muted">
+                                        {promptModal.description}
+                                    </Dialog.Description>
+                                {/if}
+                            </div>
+                        </header>
+                        <div class="mt-4">
+                            <input
+                                class="w-full rounded border border-rule bg-page px-3 py-2 text-[0.88rem] text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:bg-paper focus:ring-1 focus:ring-accent"
+                                placeholder={promptModal.placeholder ?? "File name"}
+                                type="text"
+                                bind:value={promptValue}
+                            />
+                        </div>
+                        <div class="mt-6 flex items-center justify-end gap-2">
+                            <button
+                                class="cursor-pointer rounded border border-rule bg-paper px-3 py-1.5 text-[0.78rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
+                                type="button"
+                                onclick={() => handlePromptResult(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                class="cursor-pointer rounded border border-accent bg-accent px-3.5 py-1.5 text-[0.78rem] font-medium text-paper hover:bg-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors disabled:cursor-default disabled:opacity-50"
+                                disabled={!promptValue.trim()}
+                                type="submit"
+                            >
+                                {promptModal.confirmLabel ?? "OK"}
+                            </button>
+                        </div>
+                    </form>
+                </Dialog.Content>
+            </Dialog.Portal>
+        {/if}
     </Dialog.Root>
 
     {#if actionBarOpen}

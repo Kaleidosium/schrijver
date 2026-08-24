@@ -5,7 +5,7 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="A focused local Markdown writing surface with autosave and flexible focus modes."
+		content="A focused Markdown editor for manuscripts, with auto-save, focus modes, and margin notes."
 	/>
 </svelte:head>
 

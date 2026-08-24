@@ -69,7 +69,7 @@ export function normalizeMarkdownFileName(name: string): string {
 	const trimmed = name.trim();
 
 	if (!trimmed || /[/\\]/.test(trimmed)) {
-		throw new Error('Choose a valid file name.');
+		throw new Error('Enter a valid file name.');
 	}
 
 	return /\.(?:md|markdown|txt)$/i.test(trimmed) ? trimmed : `${trimmed}.md`;
@@ -100,7 +100,7 @@ export function hashText(text: string): string {
 
 export function outlineItems(state: EditorState): OutlineItem[] {
 	const items: OutlineItem[] = [];
-	const tree = ensureSyntaxTree(state, state.doc.length) ?? syntaxTree(state);
+	const tree = ensureSyntaxTree(state, state.doc.length, 5000) ?? syntaxTree(state);
 	const cursor = tree.cursor();
 
 	do {
@@ -208,11 +208,11 @@ export function parseSidecar(value: unknown, markdownFile: string): WriterSideca
 		raw.version !== 1 ||
 		typeof raw.projectId !== 'string'
 	) {
-		throw new Error('The notes file has an unsupported format.');
+		throw new Error('Unsupported notes file format.');
 	}
 
 	if (typeof raw.markdownFile !== 'string' || !Array.isArray(raw.notes)) {
-		throw new Error('The notes file is incomplete.');
+		throw new Error('Incomplete notes file.');
 	}
 
 	return {
@@ -280,7 +280,7 @@ function parseNote(value: unknown): WriterNote {
 		typeof note.updatedAt !== 'string' ||
 		typeof note.resolved !== 'boolean'
 	) {
-		throw new Error('A note is incomplete.');
+		throw new Error('Incomplete note data.');
 	}
 
 	return {
@@ -307,7 +307,7 @@ function parseTextSelector(value: unknown): TextSelector {
 		sel.to < sel.from ||
 		(sel.to > sel.from && sel.quote.length !== sel.to - sel.from)
 	) {
-		throw new Error('A note text selection is invalid.');
+		throw new Error('Invalid note text selection.');
 	}
 
 	return {
