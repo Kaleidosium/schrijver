@@ -233,6 +233,7 @@
 
 			{@render toolBtn({
 				label: 'Blockquote',
+				shortcut: '>',
 				onclick: onToggleBlockquote,
 				icon: quoteIcon
 			})}

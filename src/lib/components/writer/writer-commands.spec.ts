@@ -224,33 +224,80 @@ describe('formatting commands', () => {
 		expect(view.selection.main.head).toBe(7);
 	});
 
-	it('toggles headings level 1 to 6', () => {
+	it('toggles headings level 1 to 6 and places cursor on the right of prefix', () => {
+		const emptyView = createEditorContext('', { anchor: 0 });
+		toggleHeading(emptyView, 1);
+		expect(emptyView.doc).toBe('# ');
+		expect(emptyView.selection.main.head).toBe(2);
+
+		// Switch blank heading 1 directly to heading 6
+		toggleHeading(emptyView, 6);
+		expect(emptyView.doc).toBe('###### ');
+		expect(emptyView.selection.main.head).toBe(7);
+
+		// Switch blank heading 6 without trailing space
+		const noSpaceHeading = createEditorContext('######', { anchor: 6 });
+		toggleHeading(noSpaceHeading, 1);
+		expect(noSpaceHeading.doc).toBe('# ');
+		expect(noSpaceHeading.selection.main.head).toBe(2);
+
+		// Clear blank heading back to body text
+		toggleHeading(noSpaceHeading, 0);
+		expect(noSpaceHeading.doc).toBe('');
+		expect(noSpaceHeading.selection.main.head).toBe(0);
+
 		const view = createEditorContext('My Heading', { anchor: 0 });
 
 		toggleHeading(view, 1);
 		expect(view.doc).toBe('# My Heading');
+		expect(view.selection.main.head).toBe(2);
 
 		toggleHeading(view, 5);
 		expect(view.doc).toBe('##### My Heading');
+		expect(view.selection.main.head).toBe(6);
 
 		toggleHeading(view, 6);
 		expect(view.doc).toBe('###### My Heading');
+		expect(view.selection.main.head).toBe(7);
 
 		toggleHeading(view, 6);
 		expect(view.doc).toBe('My Heading');
+		expect(view.selection.main.head).toBe(0);
 	});
 
-	it('toggles blockquote on lines', () => {
+	it('toggles blockquote on lines and places cursor on the right', () => {
+		const emptyView = createEditorContext('', { anchor: 0 });
+		toggleBlockquote(emptyView);
+		expect(emptyView.doc).toBe('> ');
+		expect(emptyView.selection.main.head).toBe(2);
+
 		const view = createEditorContext('Quote text', { anchor: 0 });
 
 		toggleBlockquote(view);
 		expect(view.doc).toBe('> Quote text');
+		expect(view.selection.main.head).toBe(2);
 
 		toggleBlockquote(view);
 		expect(view.doc).toBe('Quote text');
+		expect(view.selection.main.head).toBe(0);
 	});
 
-	it('toggles bullet list, numbered list, and task checklist', () => {
+	it('toggles bullet list, numbered list, and task checklist and places cursor on the right', () => {
+		const emptyBullet = createEditorContext('', { anchor: 0 });
+		toggleBulletList(emptyBullet);
+		expect(emptyBullet.doc).toBe('- ');
+		expect(emptyBullet.selection.main.head).toBe(2);
+
+		const emptyNum = createEditorContext('', { anchor: 0 });
+		toggleNumberedList(emptyNum);
+		expect(emptyNum.doc).toBe('1. ');
+		expect(emptyNum.selection.main.head).toBe(3);
+
+		const emptyTask = createEditorContext('', { anchor: 0 });
+		toggleTaskList(emptyTask);
+		expect(emptyTask.doc).toBe('- [ ] ');
+		expect(emptyTask.selection.main.head).toBe(6);
+
 		const view = createEditorContext('First line\nSecond line', { anchor: 0, head: 15 });
 
 		toggleBulletList(view);
@@ -286,16 +333,32 @@ describe('formatting commands', () => {
 		expect(view2.doc).toContain('---');
 	});
 
-	it('inserts auto-incrementing footnotes and definitions', () => {
+	it('inserts auto-incrementing footnotes and definitions with proper formatting', () => {
+		// Empty document
+		const emptyView = createEditorContext('', { anchor: 0 });
+		insertFootnote(emptyView);
+		expect(emptyView.doc).toBe('[^1]\n\n[^1]: ');
+		expect(emptyView.selection.main.head).toBe(4);
+
+		// With text at cursor
 		const view = createEditorContext('Some claim here.', { anchor: 10 });
 		insertFootnote(view);
 		expect(view.doc).toBe('Some claim[^1] here.\n\n[^1]: ');
+		expect(view.selection.main.head).toBe(14);
 
-		// Insert second footnote
+		// Insert second footnote appends cleanly to definition list
 		const view2 = createEditorContext(view.doc, { anchor: 5 });
 		insertFootnote(view2);
-		expect(view2.doc).toContain('[^2]');
-		expect(view2.doc).toContain('[^2]: ');
+		expect(view2.doc).toBe('Some [^2]claim[^1] here.\n\n[^1]: \n[^2]: ');
+
+		// With text selection - preserves selected text and inserts footnote after it
+		const selectView = createEditorContext('The general relativity concept', {
+			anchor: 4,
+			head: 22
+		});
+		insertFootnote(selectView);
+		expect(selectView.doc).toBe('The general relativity[^1] concept\n\n[^1]: ');
+		expect(selectView.selection.main.head).toBe(26);
 	});
 
 	it('strips markdown formatting using stripMarkdownFormatting', () => {

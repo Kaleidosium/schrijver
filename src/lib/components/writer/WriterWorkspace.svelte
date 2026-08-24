@@ -34,7 +34,6 @@
     import {
         Decoration,
         EditorView,
-        WidgetType,
         keymap,
         ViewPlugin,
         type DecorationSet,
@@ -341,34 +340,7 @@
         "Conjunction",
     ];
     const refreshNotes = StateEffect.define<void>();
-    class HeadingMarkWidget extends WidgetType {
-        readonly marker: string;
 
-        constructor(marker: string) {
-            super();
-            this.marker = marker;
-        }
-
-        override eq(widget: WidgetType): boolean {
-            return (
-                widget instanceof HeadingMarkWidget &&
-                widget.marker === this.marker
-            );
-        }
-
-        override toDOM(): HTMLElement {
-            const element = document.createElement("span");
-
-            element.className = "cm-heading-mark";
-            element.style.setProperty(
-                "--heading-marker-width",
-                `${this.marker.length}ch`,
-            );
-            element.textContent = this.marker;
-
-            return element;
-        }
-    }
 
     let editor: EditorView | undefined;
     let draft = $state("");
@@ -2345,8 +2317,11 @@
                             builder.add(
                                 line.from,
                                 line.from + match[0].length,
-                                Decoration.replace({
-                                    widget: new HeadingMarkWidget(match[0]),
+                                Decoration.mark({
+                                    class: "cm-heading-mark",
+                                    attributes: {
+                                        style: `--heading-marker-width: ${match[0].length}ch;`,
+                                    },
                                 }),
                             );
                         }

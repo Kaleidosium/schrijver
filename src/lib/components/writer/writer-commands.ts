@@ -159,7 +159,14 @@ function applyLinePrefixChanges(
 	const changes = computeChanges(lines);
 
 	if (changes.length > 0) {
-		view.dispatch({ changes, scrollIntoView: true, userEvent: 'input' });
+		const changeSet = view.state.changes(changes);
+		const selection = view.state.selection.map(changeSet, 1);
+		view.dispatch({
+			changes: changeSet,
+			selection,
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
 	}
 
 	view.focus?.();
@@ -190,7 +197,7 @@ function toggleList(
 
 export function toggleHeading(view: MarkdownEditorContext, level: number): boolean {
 	const targetPrefix = level > 0 ? `${'#'.repeat(level)} ` : '';
-	const headingRegex = /^(\s*)#{1,6}\s+/;
+	const headingRegex = /^(\s*)#{1,6}(?:\s+|$)/;
 	return applyLinePrefixChanges(view, (lines) => {
 		const allTarget = lines.every((line) =>
 			level > 0 ? line.text.startsWith(targetPrefix) : !headingRegex.test(line.text)
@@ -357,18 +364,31 @@ export function insertFootnote(view: MarkdownEditorContext): boolean {
 	const nextIndex = maxIndex + 1;
 	const refTag = `[^${nextIndex}]`;
 	const endOfDoc = doc.length;
-	const needsNewline =
-		endOfDoc > 0 && !docText.endsWith('\n\n') ? (docText.endsWith('\n') ? '\n' : '\n\n') : '';
-	const defInsert = `${needsNewline}[^${nextIndex}]: `;
+	const insertPos = main.to;
+
+	let defPrefix: string;
+	if (docText.trim() === '') {
+		defPrefix = '\n\n';
+	} else if (/\[\^\d+\]:[^\n]*\s*$/.test(docText)) {
+		defPrefix = docText.endsWith('\n') ? '' : '\n';
+	} else if (docText.endsWith('\n\n')) {
+		defPrefix = '';
+	} else if (docText.endsWith('\n')) {
+		defPrefix = '\n';
+	} else {
+		defPrefix = '\n\n';
+	}
+
+	const defInsert = `${defPrefix}[^${nextIndex}]: `;
 
 	const changes: ChangeSpec[] = [
-		{ from: main.from, to: main.to, insert: refTag },
+		{ from: insertPos, insert: refTag },
 		{ from: endOfDoc, insert: defInsert }
 	];
 
 	view.dispatch({
 		changes,
-		selection: EditorSelection.cursor(main.from + refTag.length),
+		selection: EditorSelection.cursor(insertPos + refTag.length),
 		scrollIntoView: true,
 		userEvent: 'input'
 	});
