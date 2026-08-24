@@ -347,6 +347,20 @@ describe('formatting commands', () => {
 		expect(COMMAND_HELP.some((cmd) => cmd.label === 'New manuscript')).toBe(true);
 	});
 
+	it('defines editor shortcuts for markdown formatting and replace in command help', () => {
+		const shortcutsByLabel = new Map(COMMAND_HELP.map((cmd) => [cmd.label, cmd.shortcut]));
+		expect(shortcutsByLabel.get('Find & replace')).toBe('Mod+H');
+		expect(shortcutsByLabel.get('Inline code')).toBe('Mod+E');
+		expect(shortcutsByLabel.get('Strikethrough')).toBe('Mod+Shift+X');
+		expect(shortcutsByLabel.get('Code block')).toBe('Mod+Shift+K');
+		expect(shortcutsByLabel.get('Heading 1')).toBe('Mod+Alt+1');
+		expect(shortcutsByLabel.get('Body text')).toBe('Mod+Alt+0');
+		expect(shortcutsByLabel.get('Bullet list')).toBe('Mod+Shift+8');
+		expect(shortcutsByLabel.get('Numbered list')).toBe('Mod+Shift+7');
+		expect(shortcutsByLabel.get('Task checklist')).toBe('Mod+Shift+C');
+		expect(shortcutsByLabel.get('Clear formatting')).toBe('Mod+\\');
+	});
+
 	it('indents and unindents lines with indentMore and indentLess', async () => {
 		const { indentLess, indentMore } = await import('@codemirror/commands');
 		const indented = runCommand('Hello world', indentMore, { anchor: 5 });

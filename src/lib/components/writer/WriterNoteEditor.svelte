@@ -26,10 +26,11 @@
 		readonly autofocus?: boolean | undefined;
 		readonly note: WriterNote;
 		readonly onAutofocus?: ((id: string) => void) | undefined;
+		readonly onEscape?: (() => void) | undefined;
 		readonly onUpdate: (id: string, body: string) => void;
 	}
 
-	const { autofocus = false, note, onAutofocus, onUpdate }: Props = $props();
+	const { autofocus = false, note, onAutofocus, onEscape, onUpdate }: Props = $props();
 	const editability = new Compartment();
 
 	function noteEditability(resolved: boolean): Extension {
@@ -78,7 +79,15 @@
 						keymap.of([
 							...paragraphNavigationKeymap,
 							{ key: 'Enter', run: insertParagraphBreak },
-							{ key: 'Shift-Enter', run: insertNewlineAndIndent }
+							{ key: 'Shift-Enter', run: insertNewlineAndIndent },
+							{
+								key: 'Escape',
+								run: (view) => {
+									view.contentDOM.blur();
+									onEscape?.();
+									return true;
+								}
+							}
 						])
 					),
 					keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap])

@@ -92,7 +92,7 @@
         toggleTaskList,
     } from "./writer-commands";
     import WriterPanels from "./WriterPanels.svelte";
-    import { createZedSearchPanel } from "./writer-search-panel";
+    import { createZedSearchPanel, openReplacePanel } from "./writer-search-panel";
     import WriterStatus from "./WriterStatus.svelte";
     import WriterToolbar from "./WriterToolbar.svelte";
     import type {
@@ -715,8 +715,72 @@
                             run: (view) => toggleInlineFormat(view, "*"),
                         },
                         {
+                            key: "Mod-e",
+                            run: (view) => toggleInlineFormat(view, "`"),
+                        },
+                        {
+                            key: "Mod-`",
+                            run: (view) => toggleInlineFormat(view, "`"),
+                        },
+                        {
+                            key: "Mod-Shift-x",
+                            run: (view) => toggleInlineFormat(view, "~~"),
+                        },
+                        {
                             key: "Mod-k",
                             run: (view) => insertLink(view),
+                        },
+                        {
+                            key: "Mod-Shift-k",
+                            run: (view) => insertCodeBlock(view),
+                        },
+                        {
+                            key: "Mod-\\",
+                            run: (view) => clearFormatting(view),
+                        },
+                        {
+                            key: "Mod-Alt-1",
+                            run: (view) => toggleHeading(view, 1),
+                        },
+                        {
+                            key: "Mod-Alt-2",
+                            run: (view) => toggleHeading(view, 2),
+                        },
+                        {
+                            key: "Mod-Alt-3",
+                            run: (view) => toggleHeading(view, 3),
+                        },
+                        {
+                            key: "Mod-Alt-4",
+                            run: (view) => toggleHeading(view, 4),
+                        },
+                        {
+                            key: "Mod-Alt-5",
+                            run: (view) => toggleHeading(view, 5),
+                        },
+                        {
+                            key: "Mod-Alt-6",
+                            run: (view) => toggleHeading(view, 6),
+                        },
+                        {
+                            key: "Mod-Alt-0",
+                            run: (view) => toggleHeading(view, 0),
+                        },
+                        {
+                            key: "Mod-Shift-8",
+                            run: (view) => toggleBulletList(view),
+                        },
+                        {
+                            key: "Mod-Shift-7",
+                            run: (view) => toggleNumberedList(view),
+                        },
+                        {
+                            key: "Mod-Shift-c",
+                            run: (view) => toggleTaskList(view),
+                        },
+                        {
+                            key: "Mod-h",
+                            run: (view) => openReplacePanel(view),
                         },
                         ...searchKeymap,
                         ...defaultKeymap,
@@ -830,6 +894,14 @@
                 callback: () => {
                     if (guideOpen) {
                         guideOpen = false;
+                        editor?.focus();
+                    } else if (readerMode) {
+                        readerMode = false;
+                        editor?.focus();
+                    } else if (searchOpen && editor) {
+                        closeSearchPanel(editor);
+                        searchOpen = false;
+                        editor.focus();
                     }
                 },
             },
@@ -2527,8 +2599,12 @@
             onActivateNote={focusNote}
             onAddNote={addDocumentNote}
             onAutofocusNote={noteAutofocused}
-            onCloseGuide={() => (guideOpen = false)}
+            onCloseGuide={() => {
+                guideOpen = false;
+                editor?.focus();
+            }}
             onDeleteNote={deleteNote}
+            onEscapeNote={() => editor?.focus()}
             onJumpToNote={activateNote}
             onJumpToHeading={jumpToHeading}
             onReattachNote={reattachNote}

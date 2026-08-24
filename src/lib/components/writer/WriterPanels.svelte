@@ -18,6 +18,7 @@
 		readonly onAutofocusNote: (id: string) => void;
 		readonly onCloseGuide: () => void;
 		readonly onDeleteNote: (id: string) => void;
+		readonly onEscapeNote?: (() => void) | undefined;
 		readonly onJumpToNote: (id: string) => void;
 		readonly onJumpToHeading: (item: OutlineItem) => void;
 		readonly onReattachNote: (id: string) => void;
@@ -39,6 +40,7 @@
 		onAutofocusNote,
 		onCloseGuide,
 		onDeleteNote,
+		onEscapeNote,
 		onJumpToNote,
 		onJumpToHeading,
 		onReattachNote,
@@ -143,6 +145,7 @@
 							autofocus={autofocusNoteId === view.note.id}
 							note={view.note}
 							onAutofocus={onAutofocusNote}
+							onEscape={onEscapeNote}
 							onUpdate={onUpdateNote}
 						/>
 						<div class="flex justify-end gap-3xs">

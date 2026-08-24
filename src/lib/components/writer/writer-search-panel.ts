@@ -3,6 +3,7 @@ import {
 	findNext,
 	findPrevious,
 	getSearchQuery,
+	openSearchPanel,
 	replaceNext,
 	replaceAll,
 	SearchQuery,
@@ -306,4 +307,18 @@ export class ZedSearchPanel implements Panel {
 
 export function createZedSearchPanel(view: EditorView): Panel {
 	return new ZedSearchPanel(view);
+}
+
+export function openReplacePanel(view: EditorView): boolean {
+	openSearchPanel(view);
+	requestAnimationFrame(() => {
+		const replaceField = view.dom.querySelector(
+			'.cm-zed-search input[name="replace"]'
+		) as HTMLInputElement | null;
+		if (replaceField) {
+			replaceField.focus();
+			replaceField.select();
+		}
+	});
+	return true;
 }
