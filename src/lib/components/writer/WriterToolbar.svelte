@@ -159,6 +159,7 @@
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
 						align="start"
+						collisionPadding={8}
 						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
@@ -212,6 +213,7 @@
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
 						align="start"
+						collisionPadding={8}
 						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
@@ -316,6 +318,7 @@
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
 						align="start"
+						collisionPadding={8}
 						class="z-50 min-w-48 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
@@ -442,10 +445,10 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							aria-pressed={focusMode}
+							aria-pressed={focusMode || typewriterMode}
 							disabled={readerMode}
 							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
-							data-mode={focusMode ? 'on' : 'off'}
+							data-mode={focusMode || typewriterMode ? 'on' : 'off'}
 						>
 							<span>Focus</span>
 							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
@@ -454,52 +457,36 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
-						align="end"
-						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
+						align="start"
+						collisionPadding={8}
+						class="z-50 min-w-50 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.84rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
-						<DropdownMenu.Item
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-							closeOnSelect={false}
-							onSelect={() => onFocusModeChange(!focusMode)}
+						<DropdownMenu.RadioGroup
+							value={focusMode ? focusScope : 'off'}
+							onValueChange={(val) => {
+								if (val === 'off') {
+									onFocusModeChange(false);
+								} else {
+									onFocusScopeChange(val);
+								}
+							}}
 						>
-							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
-								{focusMode ? '✓' : ''}
-							</span>
-							<span>{focusMode ? 'Disable focus' : 'Enable focus'}</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
-						<DropdownMenu.RadioGroup value={focusScope} onValueChange={onFocusScopeChange}>
 							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 								closeOnSelect={false}
-								disabled={!focusMode}
-								value="all"
+								value="off"
 							>
 								{#snippet children({ checked })}
 									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 										{checked ? '✓' : ''}
 									</span>
-									<span>All</span>
+									<span>Off</span>
 								{/snippet}
 							</DropdownMenu.RadioItem>
 							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 								closeOnSelect={false}
-								disabled={!focusMode}
-								value="paragraph"
-							>
-								{#snippet children({ checked })}
-									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
-										{checked ? '✓' : ''}
-									</span>
-									<span>Paragraph</span>
-								{/snippet}
-							</DropdownMenu.RadioItem>
-							<DropdownMenu.RadioItem
-								class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-								closeOnSelect={false}
-								disabled={!focusMode}
 								value="sentence"
 							>
 								{#snippet children({ checked })}
@@ -509,20 +496,31 @@
 									<span>Sentence</span>
 								{/snippet}
 							</DropdownMenu.RadioItem>
+							<DropdownMenu.RadioItem
+								class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+								closeOnSelect={false}
+								value="paragraph"
+							>
+								{#snippet children({ checked })}
+									<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
+										{checked ? '✓' : ''}
+									</span>
+									<span>Paragraph</span>
+								{/snippet}
+							</DropdownMenu.RadioItem>
 						</DropdownMenu.RadioGroup>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.CheckboxItem
 							checked={typewriterMode}
-							class="flex min-h-[1.9rem] cursor-default items-center gap-2xs rounded px-2xs select-none outline-none data-disabled:opacity-40 data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
+							class="flex min-h-[1.9rem] cursor-pointer items-center gap-2xs rounded px-2xs select-none outline-none data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
 							closeOnSelect={false}
-							disabled={!focusMode}
 							onCheckedChange={onTypewriterModeChange}
 						>
 							{#snippet children({ checked })}
 								<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 									{checked ? '✓' : ''}
 								</span>
-								<span>Typewriter</span>
+								<span>Typewriter mode</span>
 							{/snippet}
 						</DropdownMenu.CheckboxItem>
 					</DropdownMenu.Content>
@@ -576,7 +574,8 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
-						align="end"
+						align="start"
+						collisionPadding={8}
 						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
@@ -631,7 +630,8 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
-						align="end"
+						align="start"
+						collisionPadding={8}
 						class="z-50 min-w-54 max-w-[calc(100vw-1rem)] rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_96%,var(--color-page))] p-3xs font-sans text-[0.86rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.1)] outline-none"
 						sideOffset={6}
 					>
@@ -643,7 +643,7 @@
 							<span class="w-[1.2rem] shrink-0 text-center font-bold text-ink" aria-hidden="true">
 								{reviewMode ? '✓' : ''}
 							</span>
-							<span>{reviewMode ? 'Disable style' : 'Enable style'}</span>
+							<span>{reviewMode ? 'Disable style check' : 'Enable style check'}</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="my-3xs mx-2xs h-px bg-rule" />
 						<DropdownMenu.Group>

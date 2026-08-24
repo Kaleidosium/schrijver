@@ -93,6 +93,7 @@
 				<DropdownMenu.Portal>
 					<DropdownMenu.Content
 						align="start"
+						collisionPadding={8}
 						side="top"
 						sideOffset={6}
 						class="z-50 min-w-44 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"

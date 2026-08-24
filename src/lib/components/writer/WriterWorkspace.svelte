@@ -400,7 +400,7 @@
     let notes = $state<WriterNote[]>([]);
     let noteTops = $state<Record<string, number>>({});
     let focusMode = $state(false);
-    let focusScope = $state<FocusScope>("all");
+    let focusScope = $state<FocusScope>("sentence");
     let typewriterMode = $state(false);
     let hemingwayMode = $state(false);
     let syntaxMode = $state(false);
@@ -910,7 +910,8 @@
     );
 
     function setFocusScopeValue(nextFocusScope: string): void {
-        if (!focusMode) {
+        if (nextFocusScope === "off") {
+            setFocusModeValue(false);
             return;
         }
 
@@ -922,6 +923,7 @@
             return;
         }
 
+        focusMode = true;
         focusScope = nextFocusScope;
         editor?.dispatch({ effects: setFocusScope.of(focusScope) });
         scheduleRecovery();
@@ -929,10 +931,6 @@
     }
 
     function setTypewriterModeValue(nextTypewriterMode: boolean): void {
-        if (!focusMode) {
-            return;
-        }
-
         typewriterMode = nextTypewriterMode;
         editor?.dispatch({ effects: setTypewriterMode.of(typewriterMode) });
         scheduleRecovery();
@@ -941,10 +939,13 @@
 
     function setFocusModeValue(nextFocusMode: boolean): void {
         focusMode = nextFocusMode;
+        if (focusMode && focusScope === "all") {
+            focusScope = "sentence";
+        }
         editor?.dispatch({
             effects: [
                 setFocusScope.of(focusMode ? focusScope : "all"),
-                setTypewriterMode.of(focusMode && typewriterMode),
+                setTypewriterMode.of(typewriterMode),
             ],
         });
         scheduleRecovery();
