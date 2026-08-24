@@ -64,7 +64,7 @@
 </script>
 
 <footer
-	class="flex min-h-[calc(var(--size-control)+0.5rem)] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-1 font-sans text-[0.78rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
+	class="flex min-h-[calc(var(--size-control)+0.5rem)] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-1.5 font-sans text-[0.78rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
 	aria-label="Formatting and document statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
