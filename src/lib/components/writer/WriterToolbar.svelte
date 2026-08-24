@@ -340,7 +340,7 @@
 							class="flex min-h-8 cursor-pointer items-center justify-between gap-4 rounded px-1 py-1 select-none outline-none data-highlighted:bg-page data-highlighted:text-ink"
 							onSelect={onZoomReset}
 						>
-							<span>Reset zoom (100%)</span>
+							<span>Restore default zoom</span>
 							<kbd class="rounded border border-rule/80 bg-page px-1.5 py-0.5 font-mono text-[0.7rem] font-medium tracking-wide text-muted shadow-[0_1px_0_rgba(0,0,0,0.04)]">{formatForDisplay(APP_SHORTCUTS.zoomReset)}</kbd>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator class="mx-1.5 my-1.5 h-px bg-rule" />
