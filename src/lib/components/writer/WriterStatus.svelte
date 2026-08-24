@@ -14,6 +14,7 @@
 		ListOrdered,
 		ListTodo,
 		Quote,
+		SquareCode,
 		SquarePen,
 		Strikethrough
 	} from '@lucide/svelte';
@@ -63,7 +64,7 @@
 </script>
 
 <footer
-	class="flex min-h-[calc(var(--size-control)+var(--spacing-3xs))] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-0.5 font-sans text-[0.76rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
+	class="flex min-h-[calc(var(--size-control)+0.5rem)] items-center justify-between gap-x-s border-t border-rule bg-page/92 px-2xs py-1 font-sans text-[0.78rem] text-muted backdrop-blur-md transition-opacity duration-150 group-data-[focused=true]:opacity-35 group-data-[focused=true]:hover:opacity-100 group-data-[focused=true]:focus-within:opacity-100 min-[42.01rem]:px-[max(var(--spacing-s),calc((100vw-var(--max-width-shell))/2+var(--spacing-s)))]"
 	aria-label="Formatting and document statistics"
 >
 	<Tooltip.Provider delayDuration={400} skipDelayDuration={200}>
@@ -74,18 +75,18 @@
 			]}
 			aria-disabled={disabled}
 		>
-			<!-- Group 1: Headings Menu (H1 - H6 + Body) -->
+			<!-- Group 1: Structure (Blocks: Headings, Lists, Blockquote) -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props: triggerProps })}
 						<button
 							{...triggerProps}
-							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink"
 							type="button"
 							aria-label="Heading options"
 						>
-							<Heading size={13} strokeWidth={2} aria-hidden="true" />
-							<ChevronDown size={10} class="opacity-60" aria-hidden="true" />
+							<Heading size={16} strokeWidth={2} aria-hidden="true" />
+							<ChevronDown size={12} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -172,8 +173,8 @@
 							<button
 								{...tooltipProps}
 								class={[
-									'flex h-6 min-h-6 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40',
-									btnLabel ? 'gap-1 px-1.5 text-[0.74rem] font-medium' : 'w-6 text-[0.78rem]',
+									'flex h-7 min-h-7 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent bg-transparent leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-40',
+									btnLabel ? 'gap-1.5 px-2 text-[0.78rem] font-medium' : 'w-7 text-[0.80rem]',
 									extraClass
 								]}
 								type="button"
@@ -205,9 +206,40 @@
 				</Tooltip.Root>
 			{/snippet}
 
-			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
+			{@render toolBtn({
+				label: 'Bullet list',
+				shortcut: '-',
+				onclick: onToggleBulletList,
+				icon: listIcon
+			})}
+			{#snippet listIcon()}<List size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
 
-			<!-- Group 2: Emphasis (Bold, Italic, Strikethrough) -->
+			{@render toolBtn({
+				label: 'Numbered list',
+				shortcut: '1.',
+				onclick: onToggleNumberedList,
+				icon: listOrdIcon
+			})}
+			{#snippet listOrdIcon()}<ListOrdered size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
+
+			{@render toolBtn({
+				label: 'Task checklist',
+				shortcut: '[ ]',
+				onclick: onToggleTaskList,
+				icon: taskIcon
+			})}
+			{#snippet taskIcon()}<ListTodo size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
+
+			{@render toolBtn({
+				label: 'Blockquote',
+				onclick: onToggleBlockquote,
+				icon: quoteIcon
+			})}
+			{#snippet quoteIcon()}<Quote size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
+
+			<span class="mx-0.5 h-4 w-px bg-rule" aria-hidden="true"></span>
+
+			<!-- Group 2: Emphasis (Inline: Bold, Italic, Strikethrough) -->
 			{@render toolBtn({
 				label: 'Bold',
 				shortcut: 'Mod+B',
@@ -215,7 +247,7 @@
 				onclick: () => onToggleFormat('**'),
 				icon: boldIcon
 			})}
-			{#snippet boldIcon()}<Bold size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
+			{#snippet boldIcon()}<Bold size={16} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Italic',
@@ -224,102 +256,41 @@
 				onclick: () => onToggleFormat('*'),
 				icon: italicIcon
 			})}
-			{#snippet italicIcon()}<Italic size={13} strokeWidth={2.5} aria-hidden="true" />{/snippet}
+			{#snippet italicIcon()}<Italic size={16} strokeWidth={2.5} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Strikethrough',
 				onclick: () => onToggleFormat('~~'),
 				icon: strikeIcon
 			})}
-			{#snippet strikeIcon()}<Strikethrough size={13} strokeWidth={2.2} aria-hidden="true" />{/snippet}
+			{#snippet strikeIcon()}<Strikethrough size={16} strokeWidth={2.2} aria-hidden="true" />{/snippet}
 
-			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
+			<span class="mx-0.5 h-4 w-px bg-rule" aria-hidden="true"></span>
 
-			<!-- Group 3: Code & Link -->
-			<!-- Code Menu -->
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger>
-					{#snippet child({ props: triggerProps })}
-						<button
-							{...triggerProps}
-							class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-0.5 rounded border border-transparent bg-transparent px-1.5 text-[0.74rem] leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
-							type="button"
-							aria-label="Code options"
-						>
-							<Code size={13} strokeWidth={2} aria-hidden="true" />
-							<ChevronDown size={10} class="opacity-60" aria-hidden="true" />
-						</button>
-					{/snippet}
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Portal>
-					<DropdownMenu.Content
-						align="start"
-						side="top"
-						sideOffset={6}
-						class="z-50 min-w-36 rounded-md border border-rule bg-[color-mix(in_srgb,var(--color-paper)_97%,var(--color-page))] p-1 font-sans text-[0.78rem] text-ink shadow-[0_0.5rem_1.5rem_rgba(34,35,31,0.12)] backdrop-blur-md outline-none"
-					>
-						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-							onclick={() => onToggleFormat('`')}
-						>
-							<span>Inline code</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">`</kbd>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item
-							class="flex min-h-7 cursor-pointer items-center justify-between rounded px-2 select-none outline-none hover:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] focus:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)] data-highlighted:bg-[color-mix(in_srgb,var(--color-accent)_11%,transparent)]"
-							onclick={onInsertCodeBlock}
-						>
-							<span>Code block</span>
-							<kbd class="rounded border border-rule bg-paper px-1.5 py-0.5 font-mono text-[0.70rem] font-medium text-ink/80 shadow-[0_1px_1px_rgba(34,35,31,0.05)]">```</kbd>
-						</DropdownMenu.Item>
-					</DropdownMenu.Content>
-				</DropdownMenu.Portal>
-			</DropdownMenu.Root>
-
+			<!-- Group 3: Inserts & References (Link, Inline code, Code block, Footnote) -->
 			{@render toolBtn({
 				label: 'Link',
 				shortcut: 'Mod+K',
 				onclick: onInsertLink,
 				icon: linkIcon
 			})}
-			{#snippet linkIcon()}<LinkIcon size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
-
-			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
-
-			<!-- Group 4: Structure (Lists: Bullet, Numbered, Task checklist) -->
-			{@render toolBtn({
-				label: 'Bullet list',
-				shortcut: '-',
-				onclick: onToggleBulletList,
-				icon: listIcon
-			})}
-			{#snippet listIcon()}<List size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
+			{#snippet linkIcon()}<LinkIcon size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
-				label: 'Numbered list',
-				shortcut: '1.',
-				onclick: onToggleNumberedList,
-				icon: listOrdIcon
+				label: 'Inline code',
+				shortcut: '`',
+				onclick: () => onToggleFormat('`'),
+				icon: codeIcon
 			})}
-			{#snippet listOrdIcon()}<ListOrdered size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
+			{#snippet codeIcon()}<Code size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
-				label: 'Task checklist',
-				shortcut: '[ ]',
-				onclick: onToggleTaskList,
-				icon: taskIcon
+				label: 'Code block',
+				shortcut: '```',
+				onclick: onInsertCodeBlock,
+				icon: squareCodeIcon
 			})}
-			{#snippet taskIcon()}<ListTodo size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
-
-			<span class="mx-0.5 h-3.5 w-px bg-rule" aria-hidden="true"></span>
-
-			<!-- Group 5: Blocks & Extras (Blockquote, Footnote) -->
-			{@render toolBtn({
-				label: 'Blockquote',
-				onclick: onToggleBlockquote,
-				icon: quoteIcon
-			})}
-			{#snippet quoteIcon()}<Quote size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
+			{#snippet squareCodeIcon()}<SquareCode size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
 
 			{@render toolBtn({
 				label: 'Footnote',
@@ -327,10 +298,10 @@
 				onclick: onInsertFootnote,
 				icon: footnoteIcon
 			})}
-			{#snippet footnoteIcon()}<Asterisk size={13} strokeWidth={2.2} aria-hidden="true" />{/snippet}
+			{#snippet footnoteIcon()}<Asterisk size={16} strokeWidth={2.2} aria-hidden="true" />{/snippet}
 
-			<!-- Group 6: Note Annotation -->
-			<span class="mx-1 h-3.5 w-px bg-rule" aria-hidden="true"></span>
+			<!-- Group 4: Note Annotation -->
+			<span class="mx-1 h-4 w-px bg-rule" aria-hidden="true"></span>
 
 			{@render toolBtn({
 				label: hasSelection ? 'Add annotation to selection' : 'Select text to annotate',
@@ -340,7 +311,7 @@
 				onclick: onAddAnnotation ?? onAddNote,
 				icon: noteIcon
 			})}
-			{#snippet noteIcon()}<SquarePen size={13} strokeWidth={2} aria-hidden="true" />{/snippet}
+			{#snippet noteIcon()}<SquarePen size={16} strokeWidth={2} aria-hidden="true" />{/snippet}
 		</div>
 	</Tooltip.Provider>
 
@@ -350,12 +321,12 @@
 			{#snippet child({ props: triggerProps })}
 				<button
 					{...triggerProps}
-					class="flex h-6 min-h-6 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.75rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
+					class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2.5 text-[0.78rem] font-medium text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1"
 					type="button"
 					aria-label="Show document statistics"
 				>
 					<span class="tabular-nums">{documentStats.words.toLocaleString()} {documentStats.words === 1 ? 'word' : 'words'}</span>
-					<ChevronDown size={11} class={['transition-transform duration-150', statsOpen && 'rotate-180']} aria-hidden="true" />
+					<ChevronDown size={12} class={['transition-transform duration-150', statsOpen && 'rotate-180']} aria-hidden="true" />
 				</button>
 			{/snippet}
 		</Popover.Trigger>

@@ -148,11 +148,11 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							type="button"
 						>
 							<span>File</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -201,11 +201,11 @@
 						<Toolbar.Button
 							{...triggerProps}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
 							type="button"
 						>
 							<span>Edit</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -305,11 +305,11 @@
 					{#snippet child({ props: triggerProps })}
 						<Toolbar.Button
 							{...triggerProps}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink min-[42.01rem]:px-2.5"
 							type="button"
 						>
 							<span>View</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -444,11 +444,11 @@
 							{...triggerProps}
 							aria-pressed={focusMode}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
 							data-mode={focusMode ? 'on' : 'off'}
 						>
 							<span>Focus</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -566,11 +566,11 @@
 							{...triggerProps}
 							aria-pressed={syntaxMode}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
 							data-mode={syntaxMode ? 'on' : 'off'}
 						>
 							<span>Syntax</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
@@ -621,11 +621,11 @@
 							{...triggerProps}
 							aria-pressed={reviewMode}
 							disabled={readerMode}
-							class="flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
+							class="group flex h-7 min-h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded border border-transparent bg-transparent px-2 text-[0.78rem] font-medium leading-none text-muted transition-colors select-none hover:border-rule hover:bg-paper hover:text-accent-ink focus-visible:border-rule focus-visible:bg-paper focus-visible:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 data-[mode=on]:border-rule data-[mode=on]:bg-paper data-[mode=on]:text-accent-ink data-[state=open]:border-rule data-[state=open]:bg-paper data-[state=open]:text-accent-ink disabled:pointer-events-none disabled:opacity-40 min-[42.01rem]:px-2.5"
 							data-mode={reviewMode ? 'on' : 'off'}
 						>
 							<span>Style</span>
-							<ChevronDown size={11} class="opacity-60 transition-transform duration-150" aria-hidden="true" />
+							<ChevronDown size={11} class="opacity-60 transition-transform duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
 						</Toolbar.Button>
 					{/snippet}
 				</DropdownMenu.Trigger>
