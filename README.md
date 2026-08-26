@@ -1,20 +1,20 @@
 # schrijver
 
-schrijver is a distraction-free Markdown text editor designed for manuscripts and long-form writing. It pairs plain-text simplicity with editorial tools, margin notes, syntax highlighting, and local recovery.
+schrijver is a distraction-free Markdown editor for manuscripts and long-form prose. It combines plain-text editing with margin notes, parts-of-speech highlighting, style checks, and local crash recovery.
 
 ## Features
 
-- **Typography-first editing**: Custom paper-toned theme with proportional and monospace type, balanced headings, and reader mode.
-- **Focus modes**: Sentence and paragraph isolation dim the rest of the text so you can focus on the current line.
-- **Hemingway mode**: Disables backspace and deletion so you keep moving forward.
-- **Syntax and style analysis**: Highlights parts of speech (adjectives, nouns, adverbs, verbs, conjunctions) and stylistic patterns (weasel words, passive voice, wordy phrases, clichés).
-- **Writer's notes**: Anchored margin annotations and manuscript-level notes saved in `.schrijver.json` sidecar files alongside standard Markdown files.
-- **Local persistence**: Automatic crash recovery and multi-tab sync using local storage.
-- **File system access**: Open and save local folders directly in supported browsers, with automatic fallback downloads.
+- **Typography.** Paper-toned theme with proportional and monospace fonts, reader mode, and clean headings.
+- **Focus modes.** Sentence and paragraph isolation dim the rest of the text while you write.
+- **Hemingway mode.** Disables backspace and deletion to stop second-guessing during drafts.
+- **Syntax and style checks.** Highlights parts of speech like adjectives, verbs, and nouns, along with wordy phrases, passive voice, and clichés.
+- **Writer notes.** Anchored margin annotations and manuscript-level notes saved in `.schrijver.json` sidecar files alongside Markdown files.
+- **Local persistence.** Crash recovery and multi-tab synchronization backed by local storage.
+- **File system access.** Open and save folders directly in supported browsers, or download files as a fallback.
 
 ## Development
 
-This project uses [Vite+](https://viteplus.dev), which unifies the toolchain through the `vp` CLI.
+This project runs on [Vite+](https://viteplus.dev), using the `vp` CLI for package management, checks, and builds.
 
 ### Install dependencies
 
@@ -40,3 +40,7 @@ vp test
 ```sh
 vp build
 ```
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE)

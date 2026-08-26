@@ -1319,7 +1319,7 @@
             const candidates = await manuscriptCandidatesIn(nextDirectory);
 
             if (candidates.length === 0) {
-                showAlert("No Markdown files (.md, .markdown, or .txt) found in this folder.", "No files found");
+                showAlert("No Markdown files found in this folder.", "No files found");
                 return;
             }
 
@@ -1356,7 +1356,7 @@
         );
 
         if (!markdownFile) {
-            showAlert("Select a Markdown file (.md, .markdown, or .txt) to open.", "Select a file");
+            showAlert("Select a Markdown file to open.", "Select a file");
             return;
         }
 
@@ -1633,7 +1633,7 @@
         if (!(await ensureReadWritePermission(directoryHandle ?? markdownHandle))) {
             markDirty();
             saveState = "error";
-            showAlert("Folder edit permission is required to save the manuscript and notes.", "Permission required");
+            showAlert("Grant folder edit permissions to save the manuscript and notes.", "Permission required");
             return false;
         }
 
@@ -2750,7 +2750,7 @@
                 role="status"
                 aria-live="polite"
             >
-                <span class="flex-1">Unsaved changes restored from local storage.</span>
+                <span class="flex-1">Restored unsaved changes from local storage.</span>
                 <button
                     class="cursor-pointer rounded border border-rule bg-paper px-2.5 py-1 text-[0.76rem] font-medium text-muted hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 transition-colors"
                     type="button"
