@@ -13,7 +13,8 @@
 		"test:unit": "vp test",
 		"test": "npm run test:unit -- --run",
 		"lint": "vp fmt --check . && vp lint .",
-		"format": "vp fmt ."
+		"format": "vp fmt .",
+		"deploy": "vp build && (cd dist && rm -rf .git && git init -b sites && git add -A && git commit -m \"Deploy to Tangled Sites\" && git push -f $(git -C .. remote get-url origin) sites)"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
