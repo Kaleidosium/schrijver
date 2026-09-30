@@ -2,6 +2,12 @@
 
 schrijver is a distraction-free Markdown editor for manuscripts and long-form prose. It combines plain-text editing with margin notes, parts-of-speech highlighting, style checks, and local crash recovery.
 
+## Repository and hosting
+
+The canonical repository is on [Tangled](https://tangled.org/kaleidosium.my.id/schrijver/). It is mirrored to GitHub.
+
+This project is officially hosted at <https://kaleidosium.tngl.io/schrijver/>.
+
 ## Features
 
 - **Typography.** Paper-toned theme with proportional and monospace fonts, reader mode, and clean headings.
