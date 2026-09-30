@@ -5,13 +5,13 @@ patchedDependencies:
   passive-voice@0.1.0: patches/passive-voice@0.1.0.patch
   weasel-words@0.1.1: patches/weasel-words@0.1.1.patch
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.3.0
-  vite-plus: 0.3.0
-  vitest: 4.1.11
-  '@vitest/browser-playwright': 4.1.11
+  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
+  vite-plus: 1.0.0
+  vitest: 5.0.1
+  '@vitest/browser-playwright': 5.0.1
 overrides:
-  vite: 'catalog:'
-  vitest: 'catalog:'
+  vite@*: 'catalog:'
+  vitest@*: 'catalog:'
 peerDependencyRules:
   allowAny:
     - vite
